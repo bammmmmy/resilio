@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_dark"
+        app:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/disaster_info_title"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select a disaster type to see safety guides"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2">
+
+            <!-- Flood -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_flood"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider_color"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌊"
+                        android:textSize="40sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_flood"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginTop="12dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Typhoon -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_typhoon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider_color"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌪"
+                        android:textSize="40sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_typhoon"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginTop="12dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Landslide -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_landslide"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider_color"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⛰"
+                        android:textSize="40sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_landslide"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginTop="12dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Earthquake -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_earthquake"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider_color"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌎"
+                        android:textSize="40sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_earthquake"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginTop="12dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            </GridLayout>
+
+            <LinearLayout
+                android:id="@+id/hazard_locations_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hazard_locations_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/hazard_locations_subtitle"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_hazard_location"
+                    style="@style/Widget.Resilio.EvacuationActionButton.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/add_hazard_location"
+                    android:textColor="@color/text_primary"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_location_on"
+                    app:iconTint="@color/gold_accent"
+                    app:strokeColor="@color/gold_accent" />
+
+                <TextView
+                    android:id="@+id/tv_no_hazard_locations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/no_hazard_locations"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/hazard_location_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

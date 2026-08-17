@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
+    <item
+        android:id="@+id/evacuationMapFragment"
+        android:icon="@drawable/ic_map"
+        android:title="@string/nav_evacuation_map" />
+    <item
+        android:id="@+id/alertsUpdatesFragment"
+        android:icon="@drawable/ic_alerts"
+        android:title="@string/nav_alerts_updates" />
+    <item
+        android:id="@+id/disasterAwarenessFragment"
+        android:icon="@drawable/ic_awareness"
+        android:title="@string/nav_disaster_awareness" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_nav_placeholder"
+        android:title="Profile" />
+</menu>

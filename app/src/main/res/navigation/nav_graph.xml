@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.resilio.LoginFragment"
+        android:label="Login" >
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_bdrrmoDashboardFragment"
+            app:destination="@id/bdrrmoDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_chairmanDashboardFragment"
+            app:destination="@id/chairmanDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_verificationFragment"
+            app:destination="@id/verificationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.resilio.RegisterFragment"
+        android:label="Register" >
+        <action
+            android:id="@+id/action_registerFragment_to_verificationFragment"
+            app:destination="@id/verificationFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_bdrrmoDashboardFragment"
+            app:destination="@id/bdrrmoDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_registerFragment_to_chairmanDashboardFragment"
+            app:destination="@id/chairmanDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/verificationFragment"
+        android:name="com.example.resilio.VerificationFragment"
+        android:label="Verification" >
+        <action
+            android:id="@+id/action_verificationFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.resilio.HomeFragment"
+        android:label="@string/nav_home">
+        <action
+            android:id="@+id/action_homeFragment_to_aiChatFragment"
+            app:destination="@id/aiChatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bdrrmoDashboardFragment"
+        android:name="com.example.resilio.BDRRMODashboardFragment"
+        android:label="BDRRMO Dashboard" >
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_createAnnouncementFragment"
+            app:destination="@id/createAnnouncementFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_createEmergencyAlertFragment"
+            app:destination="@id/createEmergencyAlertFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_manageReportsFragment"
+            app:destination="@id/manageReportsFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_liveMonitoringFragment"
+            app:destination="@id/liveMonitoringFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_emergencyContactsFragment"
+            app:destination="@id/emergencyContactsFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_resourceDeploymentFragment"
+            app:destination="@id/resourceDeploymentFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_announcementsFragment"
+            app:destination="@id/announcementsFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_alertsUpdatesFragment"
+            app:destination="@id/alertsUpdatesFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_aiChatFragment"
+            app:destination="@id/aiChatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chairmanDashboardFragment"
+        android:name="com.example.resilio.ChairmanDashboardFragment"
+        android:label="Chairman Dashboard" >
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_userManagementFragment"
+            app:destination="@id/userManagementFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_disasterAlertsFragment"
+            app:destination="@id/disasterAlertsFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_createEmergencyAlertFragment"
+            app:destination="@id/createEmergencyAlertFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_announcementsFragment"
+            app:destination="@id/announcementsFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_analyticsFragment"
+            app:destination="@id/analyticsFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_alertsUpdatesFragment"
+            app:destination="@id/alertsUpdatesFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_aiChatFragment"
+            app:destination="@id/aiChatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageReportsFragment"
+        android:name="com.example.resilio.ManageReportsFragment"
+        android:label="Manage Reports" />
+
+    <fragment
+        android:id="@+id/liveMonitoringFragment"
+        android:name="com.example.resilio.LiveMonitoringFragment"
+        android:label="Live Monitoring" />
+
+    <fragment
+        android:id="@+id/resourceDeploymentFragment"
+        android:name="com.example.resilio.ResourceDeploymentFragment"
+        android:label="Resources" />
+
+    <fragment
+        android:id="@+id/userManagementFragment"
+        android:name="com.example.resilio.UserManagementFragment"
+        android:label="User Management" />
+
+    <fragment
+        android:id="@+id/disasterAlertsFragment"
+        android:name="com.example.resilio.DisasterAlertsFragment"
+        android:label="Disaster Alerts" />
+
+    <fragment
+        android:id="@+id/announcementsFragment"
+        android:name="com.example.resilio.AnnouncementsFragment"
+        android:label="Announcements" >
+        <action
+            android:id="@+id/action_announcementsFragment_to_announcementDetailFragment"
+            app:destination="@id/announcementDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/announcementDetailFragment"
+        android:name="com.example.resilio.AnnouncementDetailFragment"
+        android:label="Announcement Details" >
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="content"
+            app:argType="string" />
+        <argument
+            android:name="authorUid"
+            app:argType="string" />
+        <argument
+            android:name="affectedAreas"
+            app:argType="string" />
+        <argument
+            android:name="evacuationCenter"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="com.example.resilio.AnalyticsFragment"
+        android:label="Analytics" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.resilio.ProfileFragment"
+        android:label="Profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createReportFragment"
+        android:name="com.example.resilio.CreateReportFragment"
+        android:label="Report Hazard" />
+
+    <fragment
+        android:id="@+id/createAnnouncementFragment"
+        android:name="com.example.resilio.CreateAnnouncementFragment"
+        android:label="Create Announcement" />
+
+    <fragment
+        android:id="@+id/createEmergencyAlertFragment"
+        android:name="com.example.resilio.CreateEmergencyAlertFragment"
+        android:label="Create Emergency Alert" />
+
+    <fragment
+        android:id="@+id/createEvacuationAreaFragment"
+        android:name="com.example.resilio.CreateEvacuationAreaFragment"
+        android:label="Create Evacuation Area">
+        <action
+            android:id="@+id/action_createEvacuationAreaFragment_to_evacuationMapFragment"
+            app:destination="@id/evacuationMapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createHazardLocationFragment"
+        android:name="com.example.resilio.CreateHazardLocationFragment"
+        android:label="@string/add_hazard_location_title">
+        <action
+            android:id="@+id/action_createHazardLocationFragment_to_evacuationMapFragment"
+            app:destination="@id/evacuationMapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/evacuationMapFragment"
+        android:name="com.example.resilio.EvacuationMapFragment"
+        android:label="@string/nav_evacuation_map">
+        <argument
+            android:name="createMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="areaName"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="areaAddress"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="focusLatitude"
+            app:argType="float"
+            android:defaultValue="0" />
+        <argument
+            android:name="focusLongitude"
+            app:argType="float"
+            android:defaultValue="0" />
+        <argument
+            android:name="hazardCreateMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="hazardType"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="hazardAddress"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="hazardDescription"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/alertsUpdatesFragment"
+        android:name="com.example.resilio.AlertsUpdatesFragment"
+        android:label="@string/nav_alerts_updates">
+        <action
+            android:id="@+id/action_alertsUpdatesFragment_to_createEvacuationAreaFragment"
+            app:destination="@id/createEvacuationAreaFragment" />
+        <action
+            android:id="@+id/action_alertsUpdatesFragment_to_evacuationMapFragment"
+            app:destination="@id/evacuationMapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/disasterAwarenessFragment"
+        android:name="com.example.resilio.DisasterAwarenessFragment"
+        android:label="@string/nav_disaster_awareness" >
+        <action
+            android:id="@+id/action_disasterAwarenessFragment_to_disasterDetailFragment"
+            app:destination="@id/disasterDetailFragment" />
+        <action
+            android:id="@+id/action_disasterAwarenessFragment_to_createHazardLocationFragment"
+            app:destination="@id/createHazardLocationFragment" />
+        <action
+            android:id="@+id/action_disasterAwarenessFragment_to_evacuationMapFragment"
+            app:destination="@id/evacuationMapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiChatFragment"
+        android:name="com.example.resilio.AiChatFragment"
+        android:label="Resilio AI" />
+
+    <fragment
+        android:id="@+id/disasterDetailFragment"
+        android:name="com.example.resilio.DisasterDetailFragment"
+        android:label="Disaster Details" >
+        <argument
+            android:name="disasterType"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/preparednessGuideFragment"
+        android:name="com.example.resilio.PreparednessGuideFragment"
+        android:label="Preparedness Guide" />
+
+    <fragment
+        android:id="@+id/emergencyContactsFragment"
+        android:name="com.example.resilio.EmergencyContactsFragment"
+        android:label="Emergency Contacts" />
+</navigation>

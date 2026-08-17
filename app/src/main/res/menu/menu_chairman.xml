@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/chairmanDashboardFragment"
+        android:icon="@drawable/ic_home"
+        android:title="Admin" />
+    <item
+        android:id="@+id/userManagementFragment"
+        android:icon="@drawable/ic_nav_placeholder"
+        android:title="Users" />
+    <item
+        android:id="@+id/disasterReportsFragment"
+        android:icon="@drawable/ic_alerts"
+        android:title="Reports" />
+    <item
+        android:id="@+id/announcementsFragment"
+        android:icon="@drawable/ic_preparedness"
+        android:title="Announcements" />
+</menu>

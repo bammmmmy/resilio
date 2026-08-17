@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EvacuationMapFragment">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Mask Overlay -->
+    <com.example.resilio.MapMaskView
+        android:id="@+id/map_mask_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/streetview_pin"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/evacuation_pin_content_description"
+        android:src="@drawable/ic_location_on"
+        android:tint="@android:color/black"
+        android:visibility="gone"
+        android:elevation="8dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_confirm_street_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Confirm Street View location"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_done"
+        app:backgroundTint="@color/gold_accent"
+        app:tint="@color/background_dark"
+        app:elevation="6dp"
+        app:fabSize="normal" />
+
+    <FrameLayout
+        android:id="@+id/street_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/street_view"
+            android:name="com.google.android.gms.maps.SupportStreetViewPanoramaFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/streetview_hint_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="#CC000000"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Swipe hint"
+                    android:src="@drawable/ic_swipe_arrow"
+                    android:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Swipe to look around"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_ai_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/ai_chat_open"
+            app:srcCompat="@drawable/ic_chat"
+            app:backgroundTint="@color/gold_accent"
+            app:tint="@color/background_dark"
+            app:elevation="6dp"
+            app:fabSize="normal" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_close_street_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/street_view_close"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_close"
+            app:backgroundTint="@color/emergency_red"
+            app:tint="@color/white"
+            app:elevation="6dp"
+            app:fabSize="normal" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_street_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="20dp"
+        android:contentDescription="@string/street_view_open"
+        app:srcCompat="@drawable/ic_street_view"
+        app:backgroundTint="@color/gold_accent"
+        app:tint="@color/background_dark"
+        app:elevation="6dp"
+        app:fabSize="normal" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm_evacuation_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="20dp"
+        android:layout_marginBottom="92dp"
+        android:text="@string/confirm_evacuation_area"
+        android:visibility="gone"
+        app:backgroundTint="@color/gold_accent"
+        android:textColor="@color/background_dark"
+        app:cornerRadius="16dp" />
+
+</FrameLayout>

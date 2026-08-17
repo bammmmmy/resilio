@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- UI/UX Overhaul Colors -->
+    <color name="background_dark">#000000</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="gold_accent">#FFD700</color>
+    <color name="gold_accent_dark">#CFB53B</color>
+    <color name="primary_green">#4CAF50</color>
+    <color name="secondary_blue">#2196F3</color>
+    <color name="emergency_red">#F44336</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="chip_background">#333333</color>
+    <color name="divider_color">#2C2C2C</color>
+</resources>

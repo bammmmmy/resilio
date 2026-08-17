@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header with Logout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chairman Dashboard"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/gold_accent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Brgy. San Jose Administration"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <include
+            android:id="@+id/card_ask_resilio"
+            layout="@layout/include_card_ask_resilio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Core Modules Grid -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:alignmentMode="alignMargins"
+            android:columnOrderPreserved="false">
+
+            <!-- Send Emergency Alert -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDisasterAlerts"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/emergency_red">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_alerts"
+                        app:tint="@color/white"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Send Emergency Alert"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Announcements -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAnnouncements"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_preparedness"
+                        app:tint="@color/gold_accent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Create Announcement"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- View Announcements -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardViewAnnouncements"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_chat"
+                        app:tint="@color/gold_accent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Announcements"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Evacuation Monitoring -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEvacuationMonitoring"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_map"
+                        app:tint="@color/gold_accent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Evacuation"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Report Approval -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardReportApproval"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_hotline"
+                        app:tint="@color/gold_accent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reports Approval"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- User Verification -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardUserManagement"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surface_dark">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_nav_placeholder"
+                        app:tint="@color/gold_accent"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Verify Residents"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+
+        <!-- Risk Level Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Community Risk Level"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@color/surface_dark"
+            android:layout_marginBottom="24dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Overall Status: LOW RISK"
+                        android:textColor="@color/primary_green"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGenerateAiSummary"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Summary"
+                        android:textSize="12sp"
+                        app:icon="@drawable/ic_chat"/>
+                </LinearLayout>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:progress="20"
+                    app:indicatorColor="@color/primary_green"
+                    app:trackColor="@color/chip_background"
+                    app:trackThickness="8dp"
+                    app:trackCornerRadius="4dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

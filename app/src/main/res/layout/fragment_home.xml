@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Title Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/dashboard_title"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/buttonAnnouncements"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/content_description_announcements_button"
+                    app:cardCornerRadius="22dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/gold_accent"
+                    app:cardBackgroundColor="@color/surface_dark">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_alerts"
+                        app:tint="@color/gold_accent" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Preparedness Level Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/background_dark"
+                app:strokeColor="@color/gold_accent"
+                app:strokeWidth="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_preparedness"
+                        app:tint="@color/gold_accent"
+                        android:layout_marginEnd="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/preparedness_level"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:textAllCaps="true"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/preparedness_status"
+                            android:textColor="@color/gold_accent"
+                            android:textSize="22sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <include
+                android:id="@+id/card_ask_resilio"
+                layout="@layout/include_card_ask_resilio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Quick Actions Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/quick_actions"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginBottom="32dp">
+
+                <!-- Disaster Info -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_disaster_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface_dark">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_awareness"
+                            app:tint="@color/gold_accent"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/action_disaster_info"
+                            android:textColor="@color/white"
+                            android:layout_marginTop="12dp"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:gravity="center"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Evacuation Centers -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_evacuation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface_dark">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_map"
+                            app:tint="@color/gold_accent"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/action_evacuation_centers"
+                            android:textColor="@color/white"
+                            android:layout_marginTop="12dp"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:gravity="center"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Preparedness Guide -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_preparedness"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface_dark">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_preparedness"
+                            app:tint="@color/gold_accent"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/action_preparedness"
+                            android:textColor="@color/white"
+                            android:layout_marginTop="12dp"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:gravity="center"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Emergency Contacts -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_emergency_contacts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface_dark">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_hotline"
+                            app:tint="@color/gold_accent"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/action_emergency_contacts"
+                            android:textColor="@color/white"
+                            android:layout_marginTop="12dp"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:gravity="center"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </GridLayout>
+
+            <!-- Emergency Contacts List Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/emergency_contacts_title"
+                android:textColor="@color/emergency_red"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tap_to_call"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Barangay San Jose Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_brgy_san_jose_pro"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_1" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_2" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_3" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_4" />
+
+            <!-- CDRRMO Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_cdrrmo_antipolo_pro"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"/>
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_1" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_2" />
+
+            <!-- Police Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_police_pro"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"/>
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_1" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_2" />
+
+            <!-- Fire Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_fire_department_pro"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"/>
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_1" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_2" />
+
+            <!-- Medical Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_ambulance_pro"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"/>
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_1" />
+            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_2" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

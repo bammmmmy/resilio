@@ -1,0 +1,181 @@
+<resources>
+    <string name="app_name">SJ Fire and Rescue 614</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_evacuation_map">VR Map</string>
+    <string name="nav_alerts_updates">Evacuation</string>
+    <string name="nav_disaster_awareness">Disasters</string>
+    <string name="street_view_open">Street View</string>
+    <string name="street_view_close">Close Street View</string>
+    <string name="evacuation_area_saved">Evacuation area saved.</string>
+    <string name="evacuation_area_save_failed">Unable to save evacuation area. Please try again.</string>
+    <string name="evacuation_pin_content_description">Drag pin to set evacuation area location</string>
+    <string name="confirm_evacuation_area">Confirm evacuation area</string>
+    <string name="view_on_vr_map">VR Map</string>
+    <string name="evacuation_area_no_location">This area has no map location yet.</string>
+    <string name="evacuation_marker_info">Tap marker for details. Tap info window for Street View.</string>
+    <string name="delete_evacuation_area">Delete</string>
+    <string name="delete_evacuation_area_title">Delete evacuation area?</string>
+    <string name="delete_evacuation_area_message">Remove \"%1$s\" from evacuation centers? This cannot be undone.</string>
+    <string name="evacuation_area_deleted">Evacuation area deleted.</string>
+    <string name="evacuation_area_delete_failed">Unable to delete evacuation area. Please try again.</string>
+    <string name="ai_chat_open">AI chat</string>
+    <string name="ai_chat_title">AI Assistant</string>
+    <string name="ai_chat_subtitle">Ask about Antipolo safety and evacuation</string>
+    <string name="ai_chat_hint">Ask a question…</string>
+    <string name="ai_chat_send">Send</string>
+    <string name="ai_chat_toolbar_title">Ask Resilio AI</string>
+    <string name="ai_chat_hint_new">Ask about disasters, evacuation, or safety…</string>
+    <string name="ai_chat_initial_greeting">I\'m Resilio AI. Ask about disasters, evacuation, or safety in Antipolo.</string>
+    <string name="ai_chat_off_topic">I can only help with disasters, weather safety, evacuation, and emergencies. Please ask a related question.</string>
+    <string name="ai_chat_error_message">Sorry, I\'m having trouble connecting right now. Please try again.</string>
+    <string name="ai_chat_busy">The AI is busy right now. Please wait a moment and try again.</string>
+    <string name="ai_chat_quota_exceeded">Free AI quota reached. Wait a minute and try again, or check your API key limits in Google AI Studio.</string>
+    <string name="ai_chat_missing_key">Add your OpenAI key: in the project root, set OPENAI_API_KEY in local.properties, then Sync Project.</string>
+    <string name="ai_chat_error">Something went wrong: %1$s</string>
+
+    <!-- Home Dashboard -->
+    <string name="dashboard_title">Brgy. San Jose, Antipolo City Dashboard</string>
+    <string name="preparedness_level">Preparedness Level</string>
+    <string name="preparedness_status">MODERATE</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="action_disaster_info">Disaster Info</string>
+    <string name="action_evacuation_centers">Evacuation Centers</string>
+    <string name="action_emergency_contacts">Emergency Contacts</string>
+    <string name="action_preparedness">Preparedness Guide</string>
+    <string name="action_ask_resilio">Ask Resilio</string>
+    <string name="ask_resilio_subtitle">Quick answers on disasters, evacuation, and safety</string>
+    <string name="emergency_contacts_title">EMERGENCY CONTACTS</string>
+    <string name="tap_to_call">Tap to call</string>
+    <string name="announcements_title">Announcements</string>
+    <string name="no_announcements">No announcements available yet.</string>
+    <string name="announcement_published">Announcement published.</string>
+    <string name="announcement_submitted_pending">Announcement submitted for Chairman approval.</string>
+    <string name="create_emergency_alert_title">Create Emergency Alert</string>
+    <string name="submit_emergency_alert">Submit Emergency Alert</string>
+    <string name="content_description_announcements_button">Open announcements</string>
+
+    <!-- Professional Emergency Labels -->
+    <string name="label_brgy_san_jose_pro">Barangay San Jose</string>
+    <string name="label_cdrrmo_antipolo_pro">CDRRMO Antipolo</string>
+    <string name="label_police_pro">Police</string>
+    <string name="label_fire_department_pro">Fire Department</string>
+    <string name="label_ambulance_pro">Ambulance</string>
+
+    <!-- Specific numbers for row layout -->
+    <string name="num_brgy_landline_1">8234-9252</string>
+    <string name="num_brgy_landline_2">8234-0378</string>
+    <string name="num_brgy_mobile_1">0923-730-2561</string>
+    <string name="num_brgy_mobile_2">0923-089-6265</string>
+    <string name="num_cdrrmo_1_val">8689-4577</string>
+    <string name="num_cdrrmo_2_val">8689-4564</string>
+    <string name="num_police_1_val">8697-2409</string>
+    <string name="num_police_2_val">0917-157-7627</string>
+    <string name="num_fire_1_val">8871-2865</string>
+    <string name="num_fire_2_val">0945-155-6015</string>
+    <string name="num_medical_1_val">8251-1559</string>
+    <string name="num_medical_2_val">8941-8518</string>
+
+    <string name="btn_call_action">CALL</string>
+
+    <!-- Disaster Info -->
+    <string name="disaster_info_title">Disaster Information</string>
+    <string name="filter_all">All</string>
+    <string name="filter_flood">Flood</string>
+    <string name="filter_typhoon">Typhoon</string>
+    <string name="filter_landslide">Landslide</string>
+    <string name="filter_earthquake">Earthquake</string>
+    <string name="warning_signs">Warning Signs</string>
+    <string name="preparation_tips">Preparation Tips</string>
+
+    <!-- Disaster Details -->
+    <string name="before_disaster">Safety Preparation (Before)</string>
+    <string name="during_disaster">During Disaster Actions</string>
+    <string name="after_disaster">After Disaster (Recovery)</string>
+    <string name="evacuation_centers_title">Evacuation Centers</string>
+    <string name="high_risk_areas_title">High-Risk Areas</string>
+
+    <!-- Flood Info -->
+    <string name="flood_before">Elevate belongings, monitor water levels, prepare go-bag with essentials.</string>
+    <string name="flood_during">Switch off electricity, evacuate to higher ground, avoid walking/driving in flood water.</string>
+    <string name="flood_after">Clean up debris safely, wait for clearance from officials, check for electrical hazards.</string>
+    <string name="flood_centers">San Jose Elementary School, Antipolo City National HS.</string>
+    <string name="flood_high_risk">Lower Main Gate, Sitio PAGASA, Kabisay, Bamban, San Josef.</string>
+
+    <!-- Typhoon Info -->
+    <string name="typhoon_before">Secure roof and windows, stock enough food and water, charge all emergency devices.</string>
+    <string name="typhoon_during">Stay indoors, monitor news updates, stay away from glass windows and power lines.</string>
+    <string name="typhoon_after">Inspect house for damage, avoid downed power lines, clear debris only when safe.</string>
+    <string name="typhoon_centers">Ynares Center, San Jose Brgy Hall.</string>
+    <string name="typhoon_high_risk">Entire low-lying areas of Brgy. San Jose.</string>
+
+    <!-- Landslide Info -->
+    <string name="landslide_before">Identify slope risks, monitor heavy rain, watch for cracks in the ground or leaning trees.</string>
+    <string name="landslide_during">Evacuate immediately if signs occur, move to stable ground away from the slope.</string>
+    <string name="landslide_after">Stay away from slide area, watch for secondary slides, check for injured persons nearby.</string>
+    <string name="landslide_centers">San Jose Elementary School.</string>
+    <string name="landslide_high_risk">Daang Pare, Hinapaw, Sitio San Isidro, Bamban.</string>
+
+    <!-- Earthquake Info -->
+    <string name="earthquake_before">Anchor heavy furniture, identify safe spots in every room, participate in regular drills.</string>
+    <string name="earthquake_during">Drop, Cover, and Hold on. Stay away from glass, windows, and heavy objects.</string>
+    <string name="earthquake_after">Expect aftershocks, check for gas leaks and injuries, evacuate to open spaces.</string>
+    <string name="earthquake_centers">Designated open spaces and evacuation zones.</string>
+    <string name="earthquake_high_risk">Structural safety checks recommended for old buildings and high-density areas.</string>
+
+    <!-- Navigation & Routes -->
+    <string name="status_primary">PRIMARY</string>
+    <string name="status_secondary">SECONDARY</string>
+    <string name="navigate">Navigate</string>
+    <string name="near_me">Near Me</string>
+    <string name="add_evacuation_area">Add Area</string>
+    <string name="no_evacuation_areas">No evacuation areas have been added yet. Please check back later.</string>
+
+    <string name="hazard_locations_title">Hazard locations</string>
+    <string name="hazard_locations_subtitle">Active hazards marked in San Jose, Antipolo. Tap VR Map to view on the map.</string>
+    <string name="hazard_location_badge">HAZARD</string>
+    <string name="add_hazard_location">Add hazard</string>
+    <string name="add_hazard_location_title">Add Hazard Location</string>
+    <string name="add_hazard_location_subtitle">Select the hazard type, add a description, enter the address, then pin the location on the VR map.</string>
+    <string name="hazard_type_hint">Type of hazard</string>
+    <string name="hazard_description_hint">Description</string>
+    <string name="hazard_address_hint">Address</string>
+    <string name="hazard_type_required">Please select a hazard type</string>
+    <string name="hazard_description_required">Please enter a hazard description</string>
+    <string name="hazard_description_not_provided">No description provided</string>
+    <string name="hazard_address_required">Please enter the hazard address</string>
+    <string name="hazard_ai_info_title">Hazard analysis</string>
+    <string name="hazard_ai_info_subtitle">AI safety analysis for this marked area</string>
+    <string name="hazard_ai_analyzing">Analyzing hazard area…</string>
+    <string name="hazard_ai_tap_marker">Tap the hazard marker for AI analysis</string>
+    <string name="hazard_view_street_view">View Street View</string>
+    <string name="hazard_official_description">Reported details</string>
+    <string name="set_in_vr_map">Set in the VR map</string>
+    <string name="confirm_hazard_location">Confirm hazard location</string>
+    <string name="hazard_location_saved">Hazard location saved.</string>
+    <string name="hazard_location_save_failed">Unable to save hazard location. Please try again.</string>
+    <string name="hazard_location_load_failed">Unable to load hazard locations. Please try again.</string>
+    <string name="hazard_location_deleted">Hazard location deleted.</string>
+    <string name="hazard_location_delete_failed">Unable to delete hazard location.</string>
+    <string name="hazard_location_no_location">This hazard has no map location yet.</string>
+    <string name="delete_hazard_location">Delete</string>
+    <string name="delete_hazard_location_title">Delete hazard location?</string>
+    <string name="delete_hazard_location_message">Remove this %1$s hazard at \"%2$s\"? This cannot be undone.</string>
+    <string name="no_hazard_locations">No hazard locations have been marked yet.</string>
+    <string name="hazard_pin_content_description">Drag pin to set hazard location</string>
+    <string name="hazard_marker_title">%1$s hazard</string>
+
+    <!-- Hotline Dialog -->
+    <string name="call_confirm_title">Emergency Call</string>
+    <string name="call_confirm_msg">Are you sure you want to call the emergency hotline?</string>
+    <string name="call_action">Call</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Preparedness Guide -->
+    <string name="section_kit">Go-Bag Essentials</string>
+    <string name="kit_water">Water (3 gallons/person)</string>
+    <string name="kit_food">Non-perishable food (3 days)</string>
+    <string name="kit_flashlight">Flashlight with batteries</string>
+    <string name="kit_first_aid">First Aid Kit</string>
+    <string name="kit_powerbank">Charged Powerbank</string>
+    <string name="kit_documents">Important Documents (sealed)</string>
+</resources>

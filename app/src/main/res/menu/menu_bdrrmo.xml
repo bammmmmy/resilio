@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bdrrmoDashboardFragment"
+        android:icon="@drawable/ic_home"
+        android:title="Overview" />
+    <item
+        android:id="@+id/manageReportsFragment"
+        android:icon="@drawable/ic_chat"
+        android:title="Reports" />
+    <item
+        android:id="@+id/createAnnouncementFragment"
+        android:icon="@drawable/ic_alerts"
+        android:title="Send Alert" />
+    <item
+        android:id="@+id/evacuationMapFragment"
+        android:icon="@drawable/ic_map"
+        android:title="Evacuation" />
+</menu>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_dark"
+        app:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/evacuation_centers_title"
+                android:textColor="@color/text_primary"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_near_me"
+                    style="@style/Widget.Resilio.EvacuationActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="@string/near_me"
+                    android:textColor="@color/background_dark"
+                    app:backgroundTint="@color/gold_accent"
+                    app:icon="@drawable/ic_map"
+                    app:iconTint="@color/background_dark" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_evacuation_area"
+                    style="@style/Widget.Resilio.EvacuationActionButton.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/add_evacuation_area"
+                    android:textColor="@color/text_primary"
+                    app:icon="@drawable/ic_evacuation"
+                    app:iconTint="@color/gold_accent"
+                    app:strokeColor="@color/gold_accent" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/tv_no_evacuation_areas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/no_evacuation_areas"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/evacuation_area_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Evacuation Area"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Enter the evacuation area details, then set the location in the VR map."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:hint="Name of Evacuation area"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/gold_accent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_evacuation_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Address"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/gold_accent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_evacuation_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_set_in_vr_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Set in the VR map"
+            app:backgroundTint="@color/gold_accent"
+            android:textColor="@color/background_dark"
+            app:icon="@drawable/ic_map"
+            app:iconTint="@color/background_dark"
+            app:iconGravity="textStart" />
+    </LinearLayout>
+</ScrollView>

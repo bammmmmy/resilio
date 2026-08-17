@@ -1,0 +1,101 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Resilio" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">@color/gold_accent</item>
+        <item name="colorOnPrimary">@color/background_dark</item>
+        <item name="colorSecondary">@color/secondary_blue</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorTertiary">@color/primary_green</item>
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <style name="Theme.Resilio" parent="Base.Theme.Resilio" />
+
+    <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet</item>
+    </style>
+
+    <style name="Widget.App.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.App.BottomSheet</item>
+        <item name="backgroundTint">@color/surface_dark</item>
+    </style>
+
+    <style name="ShapeAppearance.App.BottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">28dp</item>
+        <item name="cornerSizeTopRight">28dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- Emergency Contacts Styles -->
+    <style name="CategoryHeader">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">12dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/gold_accent</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="EmergencyCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardBackgroundColor">@color/surface_dark</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/divider_color</item>
+    </style>
+
+    <style name="EmergencyCardContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <style name="Widget.Resilio.EvacuationActionButton" parent="Widget.Material3.Button">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">6dp</item>
+    </style>
+
+    <style name="Widget.Resilio.EvacuationActionButton.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">6dp</item>
+        <item name="strokeColor">@color/divider_color</item>
+    </style>
+
+    <style name="RowDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/divider_color</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+    </style>
+</resources>

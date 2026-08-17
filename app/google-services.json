@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "982198594203",
+    "project_id": "resilio-ab61f",
+    "storage_bucket": "resilio-ab61f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982198594203:android:08217a001b975d76c9f43e",
+        "android_client_info": {
+          "package_name": "com.example.resilio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9HocXlhSMuIpqTXBTzsn_QT7EqwbtNeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
