@@ -32,7 +32,135 @@
         android:text="user@email.com"
         android:textColor="@color/text_secondary"
         android:textSize="16sp"
-        android:layout_marginBottom="48dp"/>
+        android:layout_marginBottom="24dp"/>
+
+    <!-- BDRRMO Specific Actions -->
+    <LinearLayout
+        android:id="@+id/layoutBdrrmoActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="24dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSendEmergencyAlert"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="SEND EMERGENCY ALERT"
+            android:backgroundTint="@color/emergency_red"
+            android:textColor="@color/white"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_alerts"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreateAnnouncement"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="CREATE ANNOUNCEMENT"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_preparedness"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewAnnouncements"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="VIEW ANNOUNCEMENTS"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_chat"
+            app:iconGravity="textStart"/>
+
+    </LinearLayout>
+
+    <!-- Chairman Specific Actions -->
+    <LinearLayout
+        android:id="@+id/layoutChairmanActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="24dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChairmanSendAlert"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="SEND EMERGENCY ALERT"
+            android:backgroundTint="@color/emergency_red"
+            android:textColor="@color/white"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_alerts"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChairmanCreateAnnouncement"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="CREATE ANNOUNCEMENT"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_preparedness"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChairmanViewAnnouncements"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="VIEW ANNOUNCEMENTS"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_chat"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnReportsApproval"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="REPORTS APPROVAL"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_hotline"
+            android:layout_marginBottom="12dp"
+            app:iconGravity="textStart"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerifyResidents"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="VERIFY RESIDENTS"
+            android:backgroundTint="@color/surface_dark"
+            android:textColor="@color/gold_accent"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_nav_placeholder"
+            app:iconGravity="textStart"/>
+
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"

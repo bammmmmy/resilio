@@ -30,19 +30,6 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBdrrmoDashboardBinding.bind(view)
 
-        // Navigation
-        binding.cardSendAlert.setOnClickListener {
-            findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_createEmergencyAlertFragment)
-        }
-
-        binding.cardCreateAnnouncement.setOnClickListener {
-            findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_createAnnouncementFragment)
-        }
-
-        binding.cardViewAnnouncements.setOnClickListener {
-            findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_announcementsFragment)
-        }
-
         binding.cardAskResilio.root.setOnClickListener {
             findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_aiChatFragment)
         }
