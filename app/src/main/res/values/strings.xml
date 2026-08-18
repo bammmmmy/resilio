@@ -4,6 +4,7 @@
     <string name="nav_evacuation_map">VR Map</string>
     <string name="nav_alerts_updates">Evacuation</string>
     <string name="nav_disaster_awareness">Disasters</string>
+    <string name="nav_menu">Menu</string>
     <string name="street_view_open">Street View</string>
     <string name="street_view_close">Close Street View</string>
     <string name="evacuation_area_saved">Evacuation area saved.</string>
@@ -178,4 +179,19 @@
     <string name="kit_first_aid">First Aid Kit</string>
     <string name="kit_powerbank">Charged Powerbank</string>
     <string name="kit_documents">Important Documents (sealed)</string>
+
+    <!-- Weather -->
+    <string name="weather_antipolo">Antipolo City</string>
+    <string name="weather_loading">Updating weather&#8230;</string>
+    <string name="temp_placeholder">--</string>
+    <string name="precip_placeholder">Precipitation: --</string>
+    <string name="humidity_placeholder">Humidity: --</string>
+    <string name="wind_placeholder">Wind: --</string>
+    <string name="temp_format_dual">%1$d°C / %2$d°F</string>
+    <string name="precip_format">Precipitation: %1$d%%</string>
+    <string name="humidity_format">Humidity: %1$d%%</string>
+    <string name="wind_format">Wind: %1$.1f km/h</string>
+    <string name="weather_day_placeholder">Wednesday</string>
+    <string name="weather_time_placeholder">12:00 PM</string>
+    <string name="weather_datetime_format">%1$s, %2$s</string>
 </resources>

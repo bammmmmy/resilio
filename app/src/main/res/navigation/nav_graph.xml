@@ -87,9 +87,6 @@
             android:id="@+id/action_bdrrmoDashboardFragment_to_liveMonitoringFragment"
             app:destination="@id/liveMonitoringFragment" />
         <action
-            android:id="@+id/action_bdrrmoDashboardFragment_to_emergencyContactsFragment"
-            app:destination="@id/emergencyContactsFragment" />
-        <action
             android:id="@+id/action_bdrrmoDashboardFragment_to_resourceDeploymentFragment"
             app:destination="@id/resourceDeploymentFragment" />
         <action
@@ -193,7 +190,7 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.resilio.ProfileFragment"
-        android:label="Profile" >
+        android:label="@string/nav_menu" >
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment"
@@ -321,9 +318,4 @@
         android:id="@+id/preparednessGuideFragment"
         android:name="com.example.resilio.PreparednessGuideFragment"
         android:label="Preparedness Guide" />
-
-    <fragment
-        android:id="@+id/emergencyContactsFragment"
-        android:name="com.example.resilio.EmergencyContactsFragment"
-        android:label="Emergency Contacts" />
 </navigation>

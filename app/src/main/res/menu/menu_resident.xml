@@ -13,11 +13,7 @@
         android:icon="@drawable/ic_chat"
         android:title="Report" />
     <item
-        android:id="@+id/emergencyContactsFragment"
-        android:icon="@drawable/ic_hotline"
-        android:title="Contacts" />
-    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_nav_placeholder"
-        android:title="Profile" />
+        android:title="@string/nav_menu" />
 </menu>
