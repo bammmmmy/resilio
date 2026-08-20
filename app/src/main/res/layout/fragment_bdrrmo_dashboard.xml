@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,18 +44,18 @@
             android:layout_height="16dp" />
 
         <include
-            android:id="@+id/card_ask_resilio"
-            layout="@layout/include_card_ask_resilio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <include
             android:id="@+id/weather_card"
             layout="@layout/include_card_weather"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp" />
+
+        <include
+            android:id="@+id/card_ask_resilio"
+            layout="@layout/include_card_ask_resilio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

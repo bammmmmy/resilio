@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_bottom_sheet"
-    android:backgroundTint="@color/surface_dark"
+    android:backgroundTint="@color/surface"
     android:minHeight="320dp"
     android:orientation="vertical"
     android:paddingBottom="24dp">

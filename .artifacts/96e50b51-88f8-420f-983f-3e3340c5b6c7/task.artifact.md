@@ -1,0 +1,7 @@
+- [ ] Create `values-night/colors.xml` with dark mode values
+- [ ] Update `values/colors.xml` with light mode values
+- [ ] Update `values/themes.xml` to use `DayNight` parent and clean up styles
+- [ ] Delete `values-night/themes.xml`
+- [ ] Make `bg_profile_gradient.xml` theme-aware
+- [ ] Refactor `fragment_profile.xml` to use semantic colors
+- [ ] Verify light and dark mode on device

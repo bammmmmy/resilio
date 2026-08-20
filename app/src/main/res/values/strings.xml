@@ -34,6 +34,17 @@
     <string name="ai_chat_missing_key">Add your OpenAI key: in the project root, set OPENAI_API_KEY in local.properties, then Sync Project.</string>
     <string name="ai_chat_error">Something went wrong: %1$s</string>
 
+    <!-- Profile -->
+    <string name="profile_name_chairman">Barangay Chairman</string>
+    <string name="profile_name_placeholder">User Name</string>
+    <string name="profile_email_placeholder">user@email.com</string>
+    <string name="action_send_emergency_alert">SEND EMERGENCY ALERT</string>
+    <string name="action_create_announcement">CREATE ANNOUNCEMENT</string>
+    <string name="action_view_announcements">VIEW ANNOUNCEMENTS</string>
+    <string name="action_reports_approval">REPORTS APPROVAL</string>
+    <string name="action_verify_residents">VERIFY RESIDENTS</string>
+    <string name="action_logout">LOGOUT</string>
+
     <!-- Home Dashboard -->
     <string name="dashboard_title">Brgy. San Jose, Antipolo City Dashboard</string>
     <string name="preparedness_level">Preparedness Level</string>
@@ -191,7 +202,20 @@
     <string name="precip_format">Precipitation: %1$d%%</string>
     <string name="humidity_format">Humidity: %1$d%%</string>
     <string name="wind_format">Wind: %1$.1f km/h</string>
+    <string name="temp_format_single">%1$d°</string>
     <string name="weather_day_placeholder">Wednesday</string>
     <string name="weather_time_placeholder">12:00 PM</string>
     <string name="weather_datetime_format">%1$s, %2$s</string>
+
+    <!-- Dashboard Redesign Strings -->
+    <string name="dashboard_resilio">Resilio</string>
+    <string name="dashboard_area_san_jose">San Jose</string>
+    <string name="dashboard_chairman_title">Chairman Dashboard</string>
+    <string name="dashboard_chairman_desc">Manage community health and emergency responses for Brgy. San Jose Administration.</string>
+    <string name="dashboard_btn_call">Call Now</string>
+    <string name="dashboard_btn_sms">Send SMS</string>
+    <string name="dashboard_quick_awareness">Quick Awareness</string>
+    <string name="dashboard_community_safety">Community\nSafety</string>
+    <string name="dashboard_emergency_ready">Emergency\nReady</string>
+    <string name="dashboard_safe_zones">Safe\nZones</string>
 </resources>

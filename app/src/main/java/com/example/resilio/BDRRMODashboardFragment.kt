@@ -9,6 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentBdrrmoDashboardBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -35,6 +37,22 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         }
 
         fetchWeather()
+        startRealTimeClock()
+    }
+
+    private fun startRealTimeClock() {
+        lifecycleScope.launch {
+            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+            while (isActive) {
+                val now = Date()
+                if (_binding != null) {
+                    binding.weatherCard.tvWeatherTime.text = timeFormat.format(now)
+                    binding.weatherCard.tvWeatherDay.text = dayFormat.format(now)
+                }
+                delay(1000)
+            }
+        }
     }
 
     private fun updateAdvisoryBanner() {
@@ -80,10 +98,8 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
                         }
                     }
                     
-                    val apiTimeStr = current.getString("time")
-                    
                     withContext(Dispatchers.Main) {
-                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
+                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb)
                     }
                 }
             } catch (e: Exception) {
@@ -92,7 +108,7 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         }
     }
 
-    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int, apiTimeStr: String) {
+    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int) {
         if (_binding == null) return
         
         binding.weatherCard.weatherLoadingProgress.visibility = View.GONE
@@ -111,18 +127,7 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
 
         binding.weatherCard.tvWeatherPrecip.text = getString(R.string.precip_format, precipProb)
         
-        try {
-            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
-            val weatherDate = apiFormat.parse(apiTimeStr) ?: Date()
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            binding.weatherCard.tvWeatherDay.text = dayFormat.format(weatherDate)
-            binding.weatherCard.tvWeatherTime.text = timeFormat.format(weatherDate)
-        } catch (e: Exception) {
-            val now = Date()
-            binding.weatherCard.tvWeatherDay.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(now)
-            binding.weatherCard.tvWeatherTime.text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(now)
-        }
+        // Time and Day are updated in real-time by startRealTimeClock()
 
         val conditionColor = when (code) {
             in 51..55, 61, 80 -> Color.parseColor("#FFEB3B")

@@ -3,16 +3,48 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- UI/UX Overhaul Colors -->
-    <color name="background_dark">#000000</color>
-    <color name="surface_dark">#1E1E1E</color>
+    <!-- UI/UX Semantic Colors -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#F5F5F5</color>
     <color name="gold_accent">#FFD700</color>
     <color name="gold_accent_dark">#CFB53B</color>
     <color name="primary_green">#4CAF50</color>
     <color name="secondary_blue">#2196F3</color>
     <color name="emergency_red">#F44336</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B0B0B0</color>
-    <color name="chip_background">#333333</color>
-    <color name="divider_color">#2C2C2C</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="chip_background">#E0E0E0</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="warning_orange">#FF9800</color>
+    <color name="warning_orange_dark">#E65100</color>
+
+    <!-- Gradient Colors for Light Mode -->
+    <color name="gradient_start">#FFF9C4</color>
+    <color name="gradient_center">#FFFDE7</color>
+    <color name="gradient_end">#FFFFFF</color>
+
+    <!-- Dashboard Redesign Colors -->
+    <color name="dashboard_header">#473F97</color>
+    <color name="dashboard_button_call">#FF4D58</color>
+    <color name="dashboard_button_sms">#4D79FF</color>
+    <color name="dashboard_text_white">#FFFFFF</color>
+    <color name="dashboard_text_light">#E0E0E0</color>
+
+    <!-- Weather Gradients -->
+    <color name="weather_sunny_start">#FF8C6E</color>
+    <color name="weather_sunny_end">#FFAA5C</color>
+    <color name="weather_cloudy_start">#5C9CFF</color>
+    <color name="weather_cloudy_end">#8FC1FF</color>
+    <color name="weather_rainy_start">#2B3252</color>
+    <color name="weather_rainy_end">#1C2237</color>
+    <color name="weather_snowy_start">#FFAA5C</color>
+    <color name="weather_snowy_end">#FF8C6E</color>
+    <color name="weather_clear_night_start">#1D2671</color>
+    <color name="weather_clear_night_end">#C33764</color>
+
+    <!-- Chat Design Colors -->
+    <color name="chat_user_bubble">#001A4F</color>
+    <color name="chat_gradient_start">#D4E4F7</color>
+    <color name="chat_gradient_end">#F5F9FD</color>
+    <color name="chat_input_hint">#C4CFD9</color>
 </resources>
