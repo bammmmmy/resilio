@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark"
+    android:background="@color/background"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="32dp">
@@ -22,7 +22,7 @@
         android:fontFamily="@font/mallanna"
         android:text="BRGY. SAN JOSE"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -33,7 +33,7 @@
         android:fontFamily="@font/mallanna"
         android:text="FIRE AND RESCUE 614"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:textFontWeight="700"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -77,7 +77,7 @@
         android:text="LOG IN"
         android:layout_marginTop="32dp"
         android:backgroundTint="@color/gold_accent"
-        android:textColor="@color/background_dark"
+        android:textColor="@color/background"
         app:cornerRadius="12dp"/>
 
     <TextView

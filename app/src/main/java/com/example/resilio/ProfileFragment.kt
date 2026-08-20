@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentProfileBinding
-import com.example.resilio.model.User
 import com.example.resilio.model.UserRole
 import com.example.resilio.viewmodel.AuthViewModel
 
@@ -20,12 +19,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentProfileBinding.bind(view)
 
-        // Observe user data to display name and email
         authViewModel.userState.observe(viewLifecycleOwner) { result ->
             result?.onSuccess { user ->
                 binding.tvProfileName.text = user.fullName
                 binding.tvProfileEmail.text = user.email
-                
+
                 // Show specific actions based on role
                 when (user.role) {
                     UserRole.BDRRMO -> {
@@ -43,6 +41,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 }
             }
         }
+        
         authViewModel.checkAuthState()
 
         // BDRRMO Listeners
@@ -57,7 +56,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         // Chairman Listeners
-        binding.btnChairmanSendAlert.setOnClickListener {
+        binding.btnChairmanSendEmergencyAlert.setOnClickListener {
             findNavController().navigate(R.id.createEmergencyAlertFragment)
         }
         binding.btnChairmanCreateAnnouncement.setOnClickListener {

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark"
+    android:background="@color/background"
     android:padding="20dp">
 
     <LinearLayout
@@ -86,10 +86,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/set_in_vr_map"
-            android:textColor="@color/background_dark"
+            android:textColor="@color/background"
             app:backgroundTint="@color/gold_accent"
             app:icon="@drawable/ic_map"
             app:iconGravity="textStart"
-            app:iconTint="@color/background_dark" />
+            app:iconTint="@color/background" />
     </LinearLayout>
 </ScrollView>

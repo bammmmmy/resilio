@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
-    app:cardBackgroundColor="@color/background_dark"
+    app:cardBackgroundColor="@color/background"
     app:strokeColor="@color/divider_color"
     app:strokeWidth="1dp">
 
@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold"/>
 

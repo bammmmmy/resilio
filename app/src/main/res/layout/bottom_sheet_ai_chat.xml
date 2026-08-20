@@ -6,7 +6,7 @@
     android:minHeight="500dp"
     android:orientation="vertical"
     android:background="@drawable/bg_bottom_sheet"
-    android:backgroundTint="@color/surface_dark"
+    android:backgroundTint="@color/surface"
     android:padding="0dp">
 
     <!-- Header -->
@@ -53,7 +53,7 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:padding="16dp"
-        android:background="@color/background_dark"/>
+        android:background="@color/background"/>
 
     <!-- Input Area -->
     <com.google.android.material.card.MaterialCardView
@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         app:cardElevation="12dp"
         app:cardCornerRadius="0dp"
-        app:cardBackgroundColor="@color/surface_dark">
+        app:cardBackgroundColor="@color/surface">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -97,7 +97,7 @@
                 android:layout_height="48dp"
                 app:icon="@drawable/ic_chat"
                 app:backgroundTint="@color/gold_accent"
-                app:iconTint="@color/background_dark"
+                app:iconTint="@color/background"
                 app:cornerRadius="24dp"
                 android:layout_marginStart="8dp"
                 android:contentDescription="@string/ai_chat_send" />

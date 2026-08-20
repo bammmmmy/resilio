@@ -4,98 +4,110 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.Toast
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ProgressBar
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
 class AiChatBottomSheetFragment : BottomSheetDialogFragment() {
 
-    private lateinit var adapter: ChatMessageAdapter
-    private val conversation = mutableListOf<ChatMessage>()
-    private val systemPrompt = ChatMessage(
-        "system",
-        "You are a helpful assistant for Resilio, a disaster preparedness and evacuation app. " +
-            "Give concise, practical answers (safety, evacuation, alerts, maps). If unsure, say so."
-    )
+    private lateinit var rvChat: RecyclerView
+    private lateinit var rvSuggestions: RecyclerView
+    private lateinit var etMessage: EditText
+    private lateinit var btnSend: ImageButton
+    private lateinit var progressBar: ProgressBar
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.ThemeOverlay_App_BottomSheetDialog)
-    }
+    private val chatAdapter = ChatMessageAdapter()
+    private val messages = mutableListOf<ChatMessage>()
+    private lateinit var historyStore: AiChatHistoryStore
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.bottom_sheet_ai_chat, container, false)
+    ): View? {
+        return inflater.inflate(R.layout.layout_ai_chat_bottom_sheet, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recycler = view.findViewById<RecyclerView>(R.id.recycler_chat)
-        val input = view.findViewById<TextInputEditText>(R.id.input_message)
-        val send = view.findViewById<MaterialButton>(R.id.button_send)
+        historyStore = AiChatHistoryStore(requireContext())
 
-        adapter = ChatMessageAdapter()
-        recycler.layoutManager = LinearLayoutManager(requireContext()).apply {
+        rvChat = view.findViewById(R.id.rv_chat)
+        rvSuggestions = view.findViewById(R.id.rv_suggestions)
+        etMessage = view.findViewById(R.id.et_message)
+        btnSend = view.findViewById(R.id.btn_send)
+        progressBar = view.findViewById(R.id.progress_bar)
+
+        rvChat.adapter = chatAdapter
+        rvChat.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
-        recycler.adapter = adapter
 
-        send.setOnClickListener { trySend(view, input, send) }
-        input.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                trySend(view, input, send)
-                true
-            } else {
-                false
+        rvSuggestions.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+
+        btnSend.setOnClickListener {
+            val text = etMessage.text.toString().trim()
+            if (text.isNotEmpty()) {
+                sendMessage(text)
+                etMessage.setText("")
             }
+        }
+
+        restoreChatHistory()
+    }
+
+    private fun restoreChatHistory() {
+        val saved = historyStore.load()
+        if (saved.isNotEmpty()) {
+            messages.clear()
+            messages.addAll(saved)
+            chatAdapter.replaceAll(messages)
+            scrollToLatest()
+        } else {
+            addMessage(ChatMessage("assistant", getString(R.string.ai_chat_initial_greeting)))
         }
     }
 
-    private fun trySend(root: View, input: TextInputEditText, send: MaterialButton) {
-        val text = input.text?.toString()?.trim().orEmpty()
-        if (text.isEmpty()) return
-        if (BuildConfig.OPENAI_API_KEY.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.ai_chat_missing_key, Toast.LENGTH_LONG).show()
-            return
-        }
+    private fun sendMessage(userText: String) {
+        addMessage(ChatMessage("user", userText))
+        
+        progressBar.visibility = View.VISIBLE
+        btnSend.isEnabled = false
 
-        input.text?.clear()
-        conversation.add(ChatMessage("user", text))
-        adapter.replaceAll(conversation)
-        scrollToBottom(root)
+        lifecycleScope.launch {
+            val result = GeminiClient.chatWithHistory(messages.dropLast(1), userText)
+            progressBar.visibility = View.GONE
+            btnSend.isEnabled = true
 
-        send.isEnabled = false
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val payload = listOf(systemPrompt) + conversation
-                val reply = OpenAiClient.chat(payload)
-                conversation.add(ChatMessage("assistant", reply))
-                adapter.replaceAll(conversation)
-                scrollToBottom(root)
-            } catch (e: Exception) {
-                val msg = getString(R.string.ai_chat_error, e.message ?: e.javaClass.simpleName)
-                conversation.add(ChatMessage("assistant", msg))
-                adapter.replaceAll(conversation)
-                scrollToBottom(root)
-            } finally {
-                send.isEnabled = true
+            val reply = when (result) {
+                is ChatResult.Success -> result.text
+                ChatResult.OffTopic -> getString(R.string.ai_chat_off_topic)
+                is ChatResult.Error -> result.message
             }
+            addMessage(ChatMessage("assistant", reply))
         }
     }
 
-    private fun scrollToBottom(root: View) {
-        val recycler = root.findViewById<RecyclerView>(R.id.recycler_chat)
-        if (adapter.itemCount > 0) {
-            recycler.post {
-                recycler.scrollToPosition(adapter.itemCount - 1)
-            }
+    private fun addMessage(message: ChatMessage) {
+        messages.add(message)
+        chatAdapter.replaceAll(messages)
+        historyStore.save(messages)
+        scrollToLatest()
+    }
+
+    private fun scrollToLatest() {
+        if (messages.isEmpty()) return
+        rvChat.post {
+            rvChat.scrollToPosition(messages.size - 1)
         }
+    }
+
+    companion object {
+        const val TAG = "AiChatBottomSheet"
     }
 }

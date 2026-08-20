@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentHomeBinding
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -36,6 +38,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupNavigation()
         setupCallButtons()
         fetchWeather()
+        startRealTimeClock()
+    }
+
+    private fun startRealTimeClock() {
+        lifecycleScope.launch {
+            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+            while (isActive) {
+                val now = Date()
+                if (_binding != null) {
+                    binding.weatherCard.tvWeatherTime.text = timeFormat.format(now)
+                    binding.weatherCard.tvWeatherDay.text = dayFormat.format(now)
+                }
+                delay(1000) // Update every second for better responsiveness
+            }
+        }
     }
 
     private fun updateAdvisoryBanner() {
@@ -85,10 +103,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         }
                     }
                     
-                    val apiTimeStr = current.getString("time") // ISO format "2023-10-25T14:30"
-                    
                     withContext(Dispatchers.Main) {
-                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
+                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb)
                     }
                 }
             } catch (e: Exception) {
@@ -97,7 +113,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int, apiTimeStr: String) {
+    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int) {
         if (_binding == null) return
         
         // Hide loading indicator and restore alpha
@@ -118,22 +134,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding.weatherCard.tvWeatherPrecip.text = getString(R.string.precip_format, precipProb)
         
-        // Parse time directly from API for 100% accuracy
-        try {
-            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
-            val weatherDate = apiFormat.parse(apiTimeStr) ?: Date()
-            
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            
-            binding.weatherCard.tvWeatherDay.text = dayFormat.format(weatherDate)
-            binding.weatherCard.tvWeatherTime.text = timeFormat.format(weatherDate)
-        } catch (e: Exception) {
-            // Fallback to device time if parsing fails
-            val now = Date()
-            binding.weatherCard.tvWeatherDay.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(now)
-            binding.weatherCard.tvWeatherTime.text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(now)
-        }
+        // Time and Day are now updated in real-time by startRealTimeClock()
 
         // Color coding for weather condition text based on severity (PAGASA-inspired)
         val conditionColor = when (code) {

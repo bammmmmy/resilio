@@ -58,30 +58,25 @@ class HazardAiInfoBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            when (
-                val result = GeminiClient.analyzeHazard(
-                    hazardType = hazardType,
-                    address = address,
-                    description = description,
-                    latitude = latitude,
-                    longitude = longitude,
-                )
-            ) {
-                is ChatResult.Success -> {
-                    progress.visibility = View.GONE
-                    analysisView.visibility = View.VISIBLE
-                    analysisView.text = result.text
-                }
-                is ChatResult.Error -> {
-                    progress.visibility = View.GONE
-                    analysisView.visibility = View.VISIBLE
-                    analysisView.text = result.message
-                }
-                is ChatResult.OffTopic -> {
-                    progress.visibility = View.GONE
-                    analysisView.visibility = View.VISIBLE
-                    analysisView.text = getString(R.string.ai_chat_off_topic)
-                }
+            try {
+                val prompt = """
+                    Analyze this hazard in San Jose, Antipolo City:
+                    Type: $hazardType
+                    Address: $address
+                    Description: $description
+                    Coordinates: $latitude, $longitude
+                    
+                    Provide a brief safety analysis and precautions.
+                """.trimIndent()
+                
+                val result = OpenAiClient.chat(listOf(ChatMessage("user", prompt)))
+                progress.visibility = View.GONE
+                analysisView.visibility = View.VISIBLE
+                analysisView.text = result
+            } catch (_: Exception) {
+                progress.visibility = View.GONE
+                analysisView.visibility = View.VISIBLE
+                analysisView.text = getString(R.string.ai_chat_error_message)
             }
         }
     }

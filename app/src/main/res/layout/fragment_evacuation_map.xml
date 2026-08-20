@@ -40,7 +40,7 @@
         android:visibility="gone"
         app:srcCompat="@drawable/ic_done"
         app:backgroundTint="@color/gold_accent"
-        app:tint="@color/background_dark"
+        app:tint="@color/background"
         app:elevation="6dp"
         app:fabSize="normal" />
 
@@ -109,7 +109,7 @@
             android:contentDescription="@string/ai_chat_open"
             app:srcCompat="@drawable/ic_chat"
             app:backgroundTint="@color/gold_accent"
-            app:tint="@color/background_dark"
+            app:tint="@color/background"
             app:elevation="6dp"
             app:fabSize="normal" />
 
@@ -135,7 +135,7 @@
         android:contentDescription="@string/street_view_open"
         app:srcCompat="@drawable/ic_street_view"
         app:backgroundTint="@color/gold_accent"
-        app:tint="@color/background_dark"
+        app:tint="@color/background"
         app:elevation="6dp"
         app:fabSize="normal" />
 
@@ -149,7 +149,7 @@
         android:text="@string/confirm_evacuation_area"
         android:visibility="gone"
         app:backgroundTint="@color/gold_accent"
-        android:textColor="@color/background_dark"
+        android:textColor="@color/background"
         app:cornerRadius="16dp" />
 
 </FrameLayout>

@@ -180,7 +180,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         }
 
         fabAi.setOnClickListener {
-            AiChatBottomSheetFragment().show(childFragmentManager, "ai_chat")
+            findNavController().navigate(R.id.aiChatFragment)
         }
     }
 
