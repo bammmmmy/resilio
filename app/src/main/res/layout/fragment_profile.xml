@@ -5,82 +5,82 @@
     android:layout_height="match_parent"
     android:background="@color/background_dark"
     android:gravity="center"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="32dp">
 
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_nav_placeholder"
-        app:tint="@color/gold_accent"
-        android:layout_marginBottom="16dp"/>
+        app:tint="@color/gold_accent" />
 
     <TextView
         android:id="@+id/tvProfileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="User Name"
         android:textColor="@color/text_primary"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvProfileEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:text="user@email.com"
         android:textColor="@color/text_secondary"
-        android:textSize="16sp"
-        android:layout_marginBottom="24dp"/>
+        android:textSize="16sp" />
 
     <!-- BDRRMO Specific Actions -->
     <LinearLayout
         android:id="@+id/layoutBdrrmoActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:layout_marginBottom="24dp">
+        android:visibility="gone">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSendEmergencyAlert"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="SEND EMERGENCY ALERT"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/emergency_red"
+            android:text="SEND EMERGENCY ALERT"
             android:textColor="@color/white"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_alerts"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreateAnnouncement"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="CREATE ANNOUNCEMENT"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/surface_dark"
+            android:text="CREATE ANNOUNCEMENT"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_preparedness"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnViewAnnouncements"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="VIEW ANNOUNCEMENTS"
             android:backgroundTint="@color/surface_dark"
+            android:text="VIEW ANNOUNCEMENTS"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_chat"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 
@@ -89,76 +89,76 @@
         android:id="@+id/layoutChairmanActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:layout_marginBottom="24dp">
+        android:visibility="gone">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnChairmanSendAlert"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="SEND EMERGENCY ALERT"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/emergency_red"
+            android:text="SEND EMERGENCY ALERT"
             android:textColor="@color/white"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_alerts"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnChairmanCreateAnnouncement"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="CREATE ANNOUNCEMENT"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/surface_dark"
+            android:text="CREATE ANNOUNCEMENT"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_preparedness"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnChairmanViewAnnouncements"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="VIEW ANNOUNCEMENTS"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/surface_dark"
+            android:text="VIEW ANNOUNCEMENTS"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_chat"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnReportsApproval"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="REPORTS APPROVAL"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/surface_dark"
+            android:text="REPORTS APPROVAL"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_hotline"
-            android:layout_marginBottom="12dp"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVerifyResidents"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="VERIFY RESIDENTS"
             android:backgroundTint="@color/surface_dark"
+            android:text="VERIFY RESIDENTS"
             android:textColor="@color/gold_accent"
-            app:strokeColor="@color/gold_accent"
-            app:strokeWidth="1dp"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_nav_placeholder"
-            app:iconGravity="textStart"/>
+            app:iconGravity="textStart"
+            app:strokeColor="@color/gold_accent"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 
@@ -166,11 +166,11 @@
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="LOGOUT"
         android:backgroundTint="#FF5252"
+        android:text="LOGOUT"
         android:textColor="@color/white"
         app:cornerRadius="12dp"
         app:icon="@drawable/ic_close"
-        app:iconGravity="textStart"/>
+        app:iconGravity="textStart" />
 
 </LinearLayout>
