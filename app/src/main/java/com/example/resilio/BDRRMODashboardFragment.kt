@@ -37,22 +37,6 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         }
 
         fetchWeather()
-        startRealTimeClock()
-    }
-
-    private fun startRealTimeClock() {
-        lifecycleScope.launch {
-            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            while (isActive) {
-                val now = Date()
-                if (_binding != null) {
-                    binding.weatherCard.tvWeatherTime.text = timeFormat.format(now)
-                    binding.weatherCard.tvWeatherDay.text = dayFormat.format(now)
-                }
-                delay(1000)
-            }
-        }
     }
 
     private fun updateAdvisoryBanner() {
@@ -68,7 +52,10 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
     }
 
     private fun fetchWeather() {
-        val url = "https://api.open-meteo.com/v1/forecast?latitude=14.5845&longitude=121.1754&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation&hourly=precipitation_probability&timezone=auto"
+        // Hardcoded Antipolo Coordinates
+        val lat = 14.5845
+        val lon = 121.1754
+        val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation&hourly=precipitation_probability&timezone=auto"
         
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -85,6 +72,7 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
                     val windSpeed = current.getDouble("wind_speed_10m")
                     val windGusts = current.getDouble("wind_gusts_10m")
                     val code = current.getInt("weather_code")
+                    val apiTimeStr = current.getString("time")
                     
                     val hourly = jsonObject.getJSONObject("hourly")
                     val times = hourly.getJSONArray("time")
@@ -99,7 +87,7 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
                     }
                     
                     withContext(Dispatchers.Main) {
-                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb)
+                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
                     }
                 }
             } catch (e: Exception) {
@@ -108,17 +96,21 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         }
     }
 
-    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int) {
+    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int, apiTimeStr: String) {
         if (_binding == null) return
         
-        binding.weatherCard.weatherLoadingProgress.visibility = View.GONE
-        binding.weatherCard.layoutWeatherData.alpha = 1.0f
+        // Switch visibility from Loading UI to Weather Content
+        binding.weatherCard.layoutWeatherLoading.visibility = View.GONE
+        binding.weatherCard.layoutWeatherContent.visibility = View.VISIBLE
         
-        val tempF = (tempC * 9/5) + 32
-        binding.weatherCard.tvWeatherTemp.text = getString(R.string.temp_format_dual, tempC.toInt(), tempF.toInt())
-        binding.weatherCard.tvWeatherCondition.text = getWeatherDescription(code)
+        binding.weatherCard.tvWeatherTemp.text = getString(R.string.temp_format_user, tempC.toInt())
+        
+        val condition = getWeatherDescription(code)
+        binding.weatherCard.tvWeatherCondition.text = condition
+        
         binding.weatherCard.tvWeatherHumidity.text = getString(R.string.humidity_format, humidity)
         
+        // Show wind speed and gusts for better accuracy
         binding.weatherCard.tvWeatherWind.text = if (windGusts > windSpeed * 1.5) {
             "Wind: ${windSpeed.toInt()}-${windGusts.toInt()} km/h"
         } else {
@@ -127,10 +119,30 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
 
         binding.weatherCard.tvWeatherPrecip.text = getString(R.string.precip_format, precipProb)
         
-        // Time and Day are updated in real-time by startRealTimeClock()
+        // Set time and day from API
+        try {
+            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+            val weatherDate = apiFormat.parse(apiTimeStr) ?: Date()
+            binding.weatherCard.tvWeatherTime.text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(weatherDate)
+            binding.weatherCard.tvWeatherDay.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(weatherDate)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
+        // Background selection
+        val backgroundRes = when (code) {
+            0, 1 -> R.drawable.bg_weather_sunny
+            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy
+            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy
+            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy
+            95, 96, 99 -> R.drawable.bg_weather_rainy
+            else -> R.drawable.bg_weather_sunny
+        }
+        binding.weatherCard.layoutWeatherContainer.setBackgroundResource(backgroundRes)
+
+        // Color coding for condition text and icon
         val conditionColor = when (code) {
-            in 51..55, 61, 80 -> Color.parseColor("#FFEB3B")
+            51, 53, 55, 61, 80 -> Color.parseColor("#FFEB3B")
             63, 81 -> Color.parseColor("#FF9800")
             65, 82, 95, 96, 99 -> Color.parseColor("#FF5252")
             else -> Color.WHITE

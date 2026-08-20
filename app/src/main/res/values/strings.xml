@@ -203,6 +203,7 @@
     <string name="humidity_format">Humidity: %1$d%%</string>
     <string name="wind_format">Wind: %1$.1f km/h</string>
     <string name="temp_format_single">%1$d°</string>
+    <string name="temp_format_user">%1$d°C</string>
     <string name="weather_day_placeholder">Wednesday</string>
     <string name="weather_time_placeholder">12:00 PM</string>
     <string name="weather_datetime_format">%1$s, %2$s</string>

@@ -12,8 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentHomeBinding
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -38,22 +36,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupNavigation()
         setupCallButtons()
         fetchWeather()
-        startRealTimeClock()
-    }
-
-    private fun startRealTimeClock() {
-        lifecycleScope.launch {
-            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            while (isActive) {
-                val now = Date()
-                if (_binding != null) {
-                    binding.weatherCard.tvWeatherTime.text = timeFormat.format(now)
-                    binding.weatherCard.tvWeatherDay.text = dayFormat.format(now)
-                }
-                delay(1000) // Update every second for better responsiveness
-            }
-        }
     }
 
     private fun updateAdvisoryBanner() {
@@ -69,7 +51,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun fetchWeather() {
-        val url = "https://api.open-meteo.com/v1/forecast?latitude=14.5845&longitude=121.1754&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation&hourly=precipitation_probability&timezone=auto"
+        // Hardcoded Antipolo Coordinates
+        val lat = 14.5845
+        val lon = 121.1754
+        val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation&hourly=precipitation_probability&timezone=auto"
         
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -86,13 +71,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     val windSpeed = current.getDouble("wind_speed_10m")
                     val windGusts = current.getDouble("wind_gusts_10m")
                     val code = current.getInt("weather_code")
+                    val apiTimeStr = current.getString("time")
                     
-                    // Find correct index for current hour in precipitation probability
                     val hourly = jsonObject.getJSONObject("hourly")
                     val times = hourly.getJSONArray("time")
-                    
-                    // Open-Meteo current time string is exact, but hourly array is on the hour.
-                    // We need to match the hourly slot (e.g. 12:15 current matches 12:00 hourly)
                     val currentTimeStr = current.getString("time").substring(0, 13) + ":00"
                     var currentPrecipProb = 0
                     
@@ -104,7 +86,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     }
                     
                     withContext(Dispatchers.Main) {
-                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb)
+                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
                     }
                 }
             } catch (e: Exception) {
@@ -113,19 +95,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int) {
+    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int, apiTimeStr: String) {
         if (_binding == null) return
         
-        // Hide loading indicator and restore alpha
-        binding.weatherCard.weatherLoadingProgress.visibility = View.GONE
-        binding.weatherCard.layoutWeatherData.alpha = 1.0f
+        // Switch visibility from Loading UI to Weather Content
+        binding.weatherCard.layoutWeatherLoading.visibility = View.GONE
+        binding.weatherCard.layoutWeatherContent.visibility = View.VISIBLE
         
-        val tempF = (tempC * 9/5) + 32
-        binding.weatherCard.tvWeatherTemp.text = getString(R.string.temp_format_dual, tempC.toInt(), tempF.toInt())
-        binding.weatherCard.tvWeatherCondition.text = getWeatherDescription(code)
+        binding.weatherCard.tvWeatherTemp.text = getString(R.string.temp_format_user, tempC.toInt())
+        
+        val condition = getWeatherDescription(code)
+        binding.weatherCard.tvWeatherCondition.text = condition
+        
         binding.weatherCard.tvWeatherHumidity.text = getString(R.string.humidity_format, humidity)
         
-        // Show wind speed and gusts for better accuracy of "what it feels like"
+        // Show wind speed and gusts for better accuracy
         binding.weatherCard.tvWeatherWind.text = if (windGusts > windSpeed * 1.5) {
             "Wind: ${windSpeed.toInt()}-${windGusts.toInt()} km/h"
         } else {
@@ -134,29 +118,46 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding.weatherCard.tvWeatherPrecip.text = getString(R.string.precip_format, precipProb)
         
-        // Time and Day are now updated in real-time by startRealTimeClock()
+        // Set time and day from API
+        try {
+            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+            val weatherDate = apiFormat.parse(apiTimeStr) ?: Date()
+            binding.weatherCard.tvWeatherTime.text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(weatherDate)
+            binding.weatherCard.tvWeatherDay.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(weatherDate)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        // Color coding for weather condition text based on severity (PAGASA-inspired)
+        // Background selection
+        val backgroundRes = when (code) {
+            0, 1 -> R.drawable.bg_weather_sunny
+            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy
+            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy
+            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy
+            95, 96, 99 -> R.drawable.bg_weather_rainy
+            else -> R.drawable.bg_weather_sunny
+        }
+        binding.weatherCard.layoutWeatherContainer.setBackgroundResource(backgroundRes)
+
+        // Color coding for condition text and icon
         val conditionColor = when (code) {
-            in 51..55, 61, 80 -> Color.parseColor("#FFEB3B") // Yellow: Awareness (Light rain/Drizzle)
-            63, 81 -> Color.parseColor("#FF9800")           // Orange: Preparedness (Moderate rain)
-            65, 82, 95, 96, 99 -> Color.parseColor("#FF5252") // Red: Emergency (Heavy rain/Storms)
-            else -> Color.WHITE                              // Default for Clear/Cloudy
+            51, 53, 55, 61, 80 -> Color.parseColor("#FFEB3B")
+            63, 81 -> Color.parseColor("#FF9800")
+            65, 82, 95, 96, 99 -> Color.parseColor("#FF5252")
+            else -> Color.WHITE
         }
         binding.weatherCard.tvWeatherCondition.setTextColor(conditionColor)
         binding.weatherCard.ivWeatherIcon.setColorFilter(conditionColor)
 
-        // Auto-advisory based on weather code
         lastWeatherAdvisory = getAutoAdvisory(code)
         updateAdvisoryBanner()
         
-        // Update icon based on code and severity category
         val iconRes = when (code) {
-            0, 1 -> R.drawable.ic_sun                 // Clear (White)
-            2, 3, in 45..48 -> R.drawable.ic_cloud   // Cloudy/Fog (White)
-            in 51..55, 61, 80 -> R.drawable.ic_drizzle // Light Rain (Yellow)
-            63, 81 -> R.drawable.ic_rain              // Moderate Rain (Orange)
-            65, 82, 95, 96, 99 -> R.drawable.ic_storm // Heavy Rain/Storms (Red)
+            0, 1 -> R.drawable.ic_sun
+            2, 3, in 45..48 -> R.drawable.ic_cloud
+            in 51..55, 61, 80 -> R.drawable.ic_drizzle
+            63, 81 -> R.drawable.ic_rain
+            65, 82, 95, 96, 99 -> R.drawable.ic_storm
             else -> R.drawable.ic_cloud
         }
         binding.weatherCard.ivWeatherIcon.setImageResource(iconRes)

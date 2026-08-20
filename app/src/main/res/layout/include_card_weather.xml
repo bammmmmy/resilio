@@ -12,144 +12,200 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_weather_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@drawable/bg_weather_sunny"
         android:padding="20dp">
 
-        <!-- Loading Progress -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/weather_loading_progress"
+        <!-- Loading UI Overlay -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_weather_loading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            app:indicatorColor="@color/white"
+            android:visibility="visible"
             app:layout_constraintTop_toTopOf="parent"
-            app:trackColor="@android:color/transparent"
-            android:visibility="gone"/>
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Top Left: Icon and Condition -->
-        <ImageView
-            android:id="@+id/iv_weather_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_sun"
-            android:contentDescription="@null"
-            app:layout_constraintStart_toStartOf="parent"
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/weather_loading_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                app:indicatorColor="@color/white"
+                app:indicatorSize="32dp"
+                app:trackThickness="3dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/weather_loading"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/weather_loading_spinner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Weather Content (Initially Invisible) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_weather_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
-            android:id="@+id/tv_weather_condition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Sunny"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_weather_icon"
-            app:layout_constraintStart_toEndOf="@+id/iv_weather_icon"
-            app:layout_constraintTop_toTopOf="@+id/iv_weather_icon" />
+            <!-- Top Left: Icon and Condition -->
+            <ImageView
+                android:id="@+id/iv_weather_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_sun"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
 
-        <!-- Bottom Left: Temperature -->
-        <TextView
-            android:id="@+id/tv_weather_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="36°"
-            android:textColor="@color/white"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_weather_icon" />
+            <TextView
+                android:id="@+id/tv_weather_condition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Sunny"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_weather_icon"
+                app:layout_constraintStart_toEndOf="@+id/iv_weather_icon"
+                app:layout_constraintTop_toTopOf="@+id/iv_weather_icon" />
 
-        <!-- Top Right: Time -->
-        <TextView
-            android:id="@+id/tv_weather_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="23:56"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <!-- Temperature -->
+            <TextView
+                android:id="@+id/tv_weather_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="27°C"
+                android:textColor="@color/white"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_weather_icon" />
 
-        <!-- Middle Right: Date -->
-        <TextView
-            android:id="@+id/tv_weather_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="MON 08-23"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_weather_time" />
+            <!-- Weather Details -->
+            <LinearLayout
+                android:id="@+id/layout_weather_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_weather_temp">
 
-        <!-- Bottom Right: Location -->
-        <TextView
-            android:id="@+id/tv_weather_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="San Francisco"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_weather_temp"
-            app:layout_constraintEnd_toEndOf="parent" />
+                <TextView
+                    android:id="@+id/tv_weather_precip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Precipitation: 0%"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
 
-        <!-- Hidden Data for Logic (keeping IDs to avoid crashes) -->
-        <View
-            android:id="@+id/layout_weather_data"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tv_weather_humidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Humidity: 0%"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tv_weather_precip"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tv_weather_wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wind: 0 km/h"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_weather_humidity"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <!-- Right Side: Weather Label, Date/Time, and Status -->
+            <LinearLayout
+                android:id="@+id/layout_weather_right_side"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_weather_wind"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tv_weather_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weather"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
+                <TextView
+                    android:id="@+id/tv_weather_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="---"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_weather_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--:--"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_weather_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Antipolo City"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Advisory Banner -->
         <LinearLayout
             android:id="@+id/layout_weather_advisory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="#44000000"
-            android:padding="8dp"
-            android:visibility="gone"
-            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:background="#66000000"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@+id/tv_weather_temp">
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/layout_weather_content">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_alerts"
+                app:tint="#FFCDD2" />
+
             <TextView
                 android:id="@+id/tv_weather_advisory"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:textColor="#FFCDD2"
                 android:textSize="12sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
