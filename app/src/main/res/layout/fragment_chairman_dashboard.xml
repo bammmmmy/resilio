@@ -74,6 +74,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp" />
 
+                <include
+                    android:id="@+id/layout_latest_announcements"
+                    layout="@layout/include_card_latest_announcements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp" />
+
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

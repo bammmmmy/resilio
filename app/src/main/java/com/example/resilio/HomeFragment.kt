@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.resilio.databinding.FragmentHomeBinding
+import com.example.resilio.model.Announcement
+import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
@@ -41,6 +43,42 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupCallButtons()
         fetchWeather()
         setupLatestAlerts()
+        setupLatestAnnouncements()
+    }
+
+    private fun setupLatestAnnouncements() {
+        binding.layoutLatestAnnouncements.rvLatestAnnouncements.layoutManager = LinearLayoutManager(requireContext())
+        
+        FirebaseFirestore.getInstance().collection("announcements")
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                val allAnnouncements = value?.toObjects(Announcement::class.java) ?: emptyList()
+                val announcements = allAnnouncements
+                    .filter { it.status == AnnouncementStatus.APPROVED }
+                    .sortedByDescending { it.timestamp }
+                    .take(3)
+
+                if (announcements.isEmpty()) {
+                    binding.layoutLatestAnnouncements.root.visibility = View.GONE
+                } else {
+                    binding.layoutLatestAnnouncements.root.visibility = View.VISIBLE
+                    binding.layoutLatestAnnouncements.rvLatestAnnouncements.adapter = LatestAnnouncementsHomeAdapter(announcements) { announcement ->
+                        val bundle = Bundle().apply {
+                            putString("title", announcement.title)
+                            putString("content", announcement.content)
+                            putString("authorUid", announcement.authorUid)
+                            putString("affectedAreas", announcement.affectedAreas)
+                            putString("evacuationCenter", announcement.evacuationCenter)
+                        }
+                        findNavController().navigate(R.id.announcementDetailFragment, bundle)
+                    }
+                }
+            }
+
+        binding.layoutLatestAnnouncements.tvViewAllAnnouncements.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_announcementsFragment)
+        }
     }
 
     private fun setupLatestAlerts() {
@@ -69,7 +107,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
 
         binding.layoutLatestAlerts.tvViewAllAlerts.setOnClickListener {
-            findNavController().navigate(R.id.disasterAlertsFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_disasterAlertsFragment)
         }
     }
 

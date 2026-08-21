@@ -68,6 +68,12 @@
         <action
             android:id="@+id/action_homeFragment_to_aiChatFragment"
             app:destination="@id/aiChatFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_announcementsFragment"
+            app:destination="@id/announcementsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_disasterAlertsFragment"
+            app:destination="@id/disasterAlertsFragment" />
     </fragment>
 
     <fragment
@@ -98,6 +104,9 @@
         <action
             android:id="@+id/action_bdrrmoDashboardFragment_to_aiChatFragment"
             app:destination="@id/aiChatFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_disasterAlertsFragment"
+            app:destination="@id/disasterAlertsFragment" />
     </fragment>
 
     <fragment
