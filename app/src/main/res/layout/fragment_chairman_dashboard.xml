@@ -18,6 +18,7 @@
 
             <!-- Header Section -->
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_dashboard_header"
@@ -67,8 +68,8 @@
                     android:layout_marginBottom="24dp" />
 
                 <include
-                    android:id="@+id/card_ask_resilio"
-                    layout="@layout/include_card_ask_resilio"
+                    android:id="@+id/layout_latest_alerts"
+                    layout="@layout/include_card_latest_alerts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp" />
@@ -77,5 +78,16 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_ask_resilio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/action_ask_resilio"
+        android:textColor="@color/black"
+        app:icon="@drawable/ic_chat"
+        app:iconTint="@color/black"
+        app:backgroundTint="@color/gold_accent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

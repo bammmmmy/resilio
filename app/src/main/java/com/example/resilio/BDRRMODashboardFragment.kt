@@ -3,11 +3,14 @@ package com.example.resilio
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.resilio.databinding.FragmentBdrrmoDashboardBinding
+import com.example.resilio.model.EmergencyAlert
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -32,11 +35,42 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBdrrmoDashboardBinding.bind(view)
 
-        binding.cardAskResilio.root.setOnClickListener {
+        binding.fabAskResilio.setOnClickListener {
             findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_aiChatFragment)
         }
 
         fetchWeather()
+        setupLatestAlerts()
+    }
+
+    private fun setupLatestAlerts() {
+        binding.layoutLatestAlerts.rvLatestAlerts.layoutManager = LinearLayoutManager(requireContext())
+        
+        FirebaseFirestore.getInstance().collection("emergency_alerts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(3)
+            .addSnapshotListener { value, _ ->
+                val alerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                if (alerts.isEmpty()) {
+                    binding.layoutLatestAlerts.root.visibility = View.GONE
+                } else {
+                    binding.layoutLatestAlerts.root.visibility = View.VISIBLE
+                    binding.layoutLatestAlerts.rvLatestAlerts.adapter = LatestAlertsHomeAdapter(alerts) { alert ->
+                        val bundle = Bundle().apply {
+                            putString("title", alert.title)
+                            putString("content", alert.content)
+                            putString("authorUid", alert.authorUid)
+                            putString("affectedAreas", alert.affectedAreas)
+                            putString("evacuationCenter", alert.evacuationCenter)
+                        }
+                        findNavController().navigate(R.id.announcementDetailFragment, bundle)
+                    }
+                }
+            }
+
+        binding.layoutLatestAlerts.tvViewAllAlerts.setOnClickListener {
+            findNavController().navigate(R.id.disasterAlertsFragment)
+        }
     }
 
     private fun updateAdvisoryBanner() {
@@ -129,16 +163,18 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
             e.printStackTrace()
         }
 
-        // Background selection
-        val backgroundRes = when (code) {
-            0, 1 -> R.drawable.bg_weather_sunny
-            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy
-            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy
-            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy
-            95, 96, 99 -> R.drawable.bg_weather_rainy
-            else -> R.drawable.bg_weather_sunny
+        // Background and Header selection
+        val (backgroundRes, headerRes) = when (code) {
+            0, 1 -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
+            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy to R.drawable.bg_header_cloudy
+            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
+            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy to R.drawable.bg_header_sunny
+            95, 96, 99 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
+            else -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
         }
+        
         binding.weatherCard.layoutWeatherContainer.setBackgroundResource(backgroundRes)
+        binding.layoutHeader.setBackgroundResource(headerRes)
 
         // Color coding for condition text and icon
         val conditionColor = when (code) {
@@ -149,6 +185,10 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
         }
         binding.weatherCard.tvWeatherCondition.setTextColor(conditionColor)
         binding.weatherCard.ivWeatherIcon.setColorFilter(conditionColor)
+
+        // Reset header text colors to white
+        binding.tvStatusTitle.setTextColor(Color.WHITE)
+        binding.tvStatusDesc.setTextColor(Color.parseColor("#E0E0E0"))
 
         lastWeatherAdvisory = getAutoAdvisory(code)
         updateAdvisoryBanner()

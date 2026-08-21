@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -13,152 +14,167 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:background="@android:color/transparent">
 
-            <!-- Title Header -->
+            <!-- Header Section -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_dashboard_header"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tv_status_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Resilio Dashboard"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_status_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Brgy. San Jose, Antipolo City"
+                    android:textColor="@color/dashboard_text_light"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_status_title" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Main Content -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <include
+                    android:id="@+id/weather_card"
+                    layout="@layout/include_card_weather"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp" />
+
+                <include
+                    android:id="@+id/layout_latest_alerts"
+                    layout="@layout/include_card_latest_alerts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Emergency Contacts List Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/emergency_contacts_title"
+                    android:textColor="@color/emergency_red"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/dashboard_title"
+                    android:text="@string/tap_to_call"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- Barangay San Jose Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_brgy_san_jose_pro"
                     android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"/>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/buttonAnnouncements"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:layout_marginStart="12dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/content_description_announcements_button"
-                    app:cardCornerRadius="22dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/gold_accent"
-                    app:cardBackgroundColor="@color/surface">
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_1" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_2" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_3" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_4" />
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_alerts"
-                        app:tint="@color/gold_accent" />
-                </com.google.android.material.card.MaterialCardView>
+                <!-- CDRRMO Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_cdrrmo_antipolo_pro"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp"/>
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_1" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_2" />
+
+                <!-- Police Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_police_pro"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp"/>
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_1" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_2" />
+
+                <!-- Fire Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_fire_department_pro"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp"/>
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_1" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_2" />
+
+                <!-- Medical Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_ambulance_pro"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp"/>
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_1" />
+                <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_2" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" />
+
             </LinearLayout>
-
-            <include
-                android:id="@+id/weather_card"
-                layout="@layout/include_card_weather"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp" />
-
-            <include
-                android:id="@+id/card_ask_resilio"
-                layout="@layout/include_card_ask_resilio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Emergency Contacts List Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/emergency_contacts_title"
-                android:textColor="@color/emergency_red"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tap_to_call"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:layout_marginBottom="24dp"/>
-
-            <!-- Barangay San Jose Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_brgy_san_jose_pro"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
-
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_1" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_2" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_3" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_brgy_4" />
-
-            <!-- CDRRMO Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_cdrrmo_antipolo_pro"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"/>
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_1" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_cdrrmo_2" />
-
-            <!-- Police Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_police_pro"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"/>
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_1" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_police_2" />
-
-            <!-- Fire Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_fire_department_pro"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"/>
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_1" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_fire_2" />
-
-            <!-- Medical Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_ambulance_pro"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"/>
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_1" />
-            <include layout="@layout/item_dashboard_contact" android:id="@+id/contact_medical_2" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="40dp" />
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_ask_resilio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/action_ask_resilio"
+        android:textColor="@color/black"
+        app:icon="@drawable/ic_chat"
+        app:iconTint="@color/black"
+        app:backgroundTint="@color/gold_accent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
