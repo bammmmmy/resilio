@@ -75,4 +75,33 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutFabActions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_delete"
+            app:tint="@android:color/white"
+            app:backgroundTint="@color/emergency_red"
+            android:contentDescription="@string/delete_announcement" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            app:tint="@android:color/white"
+            app:backgroundTint="@color/gold_accent"
+            android:contentDescription="@string/edit_announcement" />
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

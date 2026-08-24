@@ -13,7 +13,10 @@ class AnnouncementAdapter(
     private val onItemClick: ((Announcement) -> Unit)? = null,
     private val showActions: Boolean = false,
     private val onApprove: ((String) -> Unit)? = null,
-    private val onReject: ((String) -> Unit)? = null
+    private val onReject: ((String) -> Unit)? = null,
+    private val onEdit: ((Announcement) -> Unit)? = null,
+    private val onDelete: ((Announcement) -> Unit)? = null,
+    private val currentUserId: String? = null
 ) : RecyclerView.Adapter<AnnouncementAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,6 +26,9 @@ class AnnouncementAdapter(
         val layoutActions: View = view.findViewById(R.id.layoutActions)
         val btnApprove: View = view.findViewById(R.id.btnApprove)
         val btnReject: View = view.findViewById(R.id.btnReject)
+        val btnEdit: View = view.findViewById(R.id.btnEdit)
+        val btnDelete: View = view.findViewById(R.id.btnDelete)
+        val layoutAuthorActions: View = view.findViewById(R.id.layoutAuthorActions)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,6 +50,14 @@ class AnnouncementAdapter(
             holder.btnReject.setOnClickListener { onReject?.invoke(item.id) }
         } else {
             holder.layoutActions.visibility = View.GONE
+        }
+
+        if (currentUserId != null && item.authorUid == currentUserId) {
+            holder.layoutAuthorActions.visibility = View.VISIBLE
+            holder.btnEdit.setOnClickListener { onEdit?.invoke(item) }
+            holder.btnDelete.setOnClickListener { onDelete?.invoke(item) }
+        } else {
+            holder.layoutAuthorActions.visibility = View.GONE
         }
     }
 

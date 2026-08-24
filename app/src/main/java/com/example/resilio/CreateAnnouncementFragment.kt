@@ -22,9 +22,22 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    private var editId: String? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCreateAnnouncementBinding.bind(view)
+
+        arguments?.let {
+            editId = it.getString("edit_id")
+            if (editId != null) {
+                binding.etTitle.setText(it.getString("edit_title"))
+                binding.etContent.setText(it.getString("edit_content"))
+                binding.etAffectedAreas.setText(it.getString("edit_areas"))
+                binding.etEvacuationCenter.setText(it.getString("edit_evac"))
+                binding.btnSubmitAlert.setText(R.string.action_update_announcement)
+            }
+        }
 
         binding.btnSubmitAlert.setOnClickListener {
             submitAnnouncement()
@@ -67,13 +80,16 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
             return
         }
 
-        val announcementId = UUID.randomUUID().toString()
+        val announcementId = editId ?: UUID.randomUUID().toString()
 
         db.collection("users").document(uid).get()
             .addOnSuccessListener { snapshot ->
                 val user = snapshot.toObject(User::class.java)
                 val isChairman = user?.role == UserRole.CHAIRMAN
+                
+                // If editing, keep the existing status or re-approve if chairman
                 val status = if (isChairman) AnnouncementStatus.APPROVED else AnnouncementStatus.PENDING
+                
                 val announcement = Announcement(
                     id = announcementId,
                     title = title,
@@ -87,7 +103,10 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
 
                 db.collection("announcements").document(announcementId).set(announcement)
                     .addOnSuccessListener {
-                        val message = if (isChairman) {
+                        if (_binding == null) return@addOnSuccessListener
+                        val message = if (editId != null) {
+                            getString(R.string.announcement_updated)
+                        } else if (isChairman) {
                             getString(R.string.announcement_published)
                         } else {
                             getString(R.string.announcement_submitted_pending)
@@ -96,10 +115,12 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
                         findNavController().popBackStack()
                     }
                     .addOnFailureListener {
+                        if (_binding == null) return@addOnFailureListener
                         Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
                     }
             }
             .addOnFailureListener {
+                if (_binding == null) return@addOnFailureListener
                 Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }

@@ -13,6 +13,7 @@ import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,6 +33,9 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
     private val binding get() = _binding!!
     private val client = OkHttpClient()
 
+    private var announcementsListener: ListenerRegistration? = null
+    private var alertsListener: ListenerRegistration? = null
+
     private var lastWeatherAdvisory: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,9 +54,9 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
     private fun setupLatestAnnouncements() {
         binding.layoutLatestAnnouncements.rvLatestAnnouncements.layoutManager = LinearLayoutManager(requireContext())
         
-        FirebaseFirestore.getInstance().collection("announcements")
+        announcementsListener = FirebaseFirestore.getInstance().collection("announcements")
             .addSnapshotListener { value, error ->
-                if (error != null) return@addSnapshotListener
+                if (_binding == null || error != null) return@addSnapshotListener
                 
                 val allAnnouncements = value?.toObjects(Announcement::class.java) ?: emptyList()
                 val announcements = allAnnouncements
@@ -66,11 +70,13 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
                     binding.layoutLatestAnnouncements.root.visibility = View.VISIBLE
                     binding.layoutLatestAnnouncements.rvLatestAnnouncements.adapter = LatestAnnouncementsHomeAdapter(announcements) { announcement ->
                         val bundle = Bundle().apply {
+                            putString("id", announcement.id)
                             putString("title", announcement.title)
                             putString("content", announcement.content)
                             putString("authorUid", announcement.authorUid)
                             putString("affectedAreas", announcement.affectedAreas)
                             putString("evacuationCenter", announcement.evacuationCenter)
+                            putBoolean("isAlert", false)
                         }
                         findNavController().navigate(R.id.announcementDetailFragment, bundle)
                     }
@@ -85,10 +91,12 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
     private fun setupLatestAlerts() {
         binding.layoutLatestAlerts.rvLatestAlerts.layoutManager = LinearLayoutManager(requireContext())
         
-        FirebaseFirestore.getInstance().collection("emergency_alerts")
+        alertsListener = FirebaseFirestore.getInstance().collection("emergency_alerts")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(3)
             .addSnapshotListener { value, _ ->
+                if (_binding == null) return@addSnapshotListener
+                
                 val alerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
                 if (alerts.isEmpty()) {
                     binding.layoutLatestAlerts.root.visibility = View.GONE
@@ -96,11 +104,14 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
                     binding.layoutLatestAlerts.root.visibility = View.VISIBLE
                     binding.layoutLatestAlerts.rvLatestAlerts.adapter = LatestAlertsHomeAdapter(alerts) { alert ->
                         val bundle = Bundle().apply {
+                            putString("id", alert.id)
                             putString("title", alert.title)
                             putString("content", alert.content)
                             putString("authorUid", alert.authorUid)
                             putString("affectedAreas", alert.affectedAreas)
                             putString("evacuationCenter", alert.evacuationCenter)
+                            putBoolean("isAlert", true)
+                            putString("hazardType", alert.type.name)
                         }
                         findNavController().navigate(R.id.announcementDetailFragment, bundle)
                     }
@@ -293,6 +304,8 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
 
     override fun onDestroyView() {
         super.onDestroyView()
+        announcementsListener?.remove()
+        alertsListener?.remove()
         _binding = null
     }
 }

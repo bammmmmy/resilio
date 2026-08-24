@@ -20,11 +20,32 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    private var editId: String? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCreateEmergencyAlertBinding.bind(view)
 
         setupSpinner()
+
+        arguments?.let {
+            editId = it.getString("edit_id")
+            if (editId != null) {
+                binding.etTitle.setText(it.getString("edit_title"))
+                binding.etContent.setText(it.getString("edit_content"))
+                binding.etAffectedAreas.setText(it.getString("edit_areas"))
+                binding.etEvacuationCenter.setText(it.getString("edit_evac"))
+                
+                val typeName = it.getString("edit_type")
+                val types = HazardType.values().map { t -> t.name }
+                val index = types.indexOf(typeName)
+                if (index != -1) {
+                    binding.spinnerHazardType.setSelection(index)
+                }
+                
+                binding.btnSubmitEmergencyAlert.setText(R.string.action_update_alert)
+            }
+        }
 
         binding.btnSubmitEmergencyAlert.setOnClickListener {
             submitEmergencyAlert()
@@ -76,7 +97,7 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
             return
         }
 
-        val alertId = UUID.randomUUID().toString()
+        val alertId = editId ?: UUID.randomUUID().toString()
         val alert = EmergencyAlert(
             id = alertId,
             title = title,
@@ -89,10 +110,13 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
 
         db.collection("emergency_alerts").document(alertId).set(alert)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Emergency alert submitted.", Toast.LENGTH_LONG).show()
+                if (_binding == null) return@addOnSuccessListener
+                val messageId = if (editId != null) R.string.alert_updated else R.string.alert_submitted
+                Toast.makeText(requireContext(), messageId, Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
             }
             .addOnFailureListener {
+                if (_binding == null) return@addOnFailureListener
                 Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
