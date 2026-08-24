@@ -141,6 +141,22 @@
                         app:iconPadding="12dp"
                         app:iconGravity="textStart"
                         android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChairmanAddHazard"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="ADD HAZARD"
+                        android:backgroundTint="@color/surface"
+                        android:textColor="@color/text_primary"
+                        app:strokeColor="@color/gold_accent"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_location_on"
+                        app:iconTint="@color/text_primary"
+                        app:iconPadding="12dp"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="12dp"/>
                 </LinearLayout>
 
                 <!-- BDRRMO Actions (Hidden by default) -->
@@ -192,6 +208,22 @@
                         app:strokeWidth="1.5dp"
                         app:cornerRadius="12dp"
                         app:icon="@drawable/ic_chat"
+                        app:iconTint="@color/text_primary"
+                        app:iconPadding="12dp"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddHazard"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="ADD HAZARD"
+                        android:backgroundTint="@color/surface"
+                        android:textColor="@color/text_primary"
+                        app:strokeColor="@color/gold_accent"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_location_on"
                         app:iconTint="@color/text_primary"
                         app:iconPadding="12dp"
                         app:iconGravity="textStart"

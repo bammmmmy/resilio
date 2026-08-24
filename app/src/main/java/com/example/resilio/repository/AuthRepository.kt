@@ -1,6 +1,7 @@
 package com.example.resilio.repository
 
 import com.example.resilio.model.User
+import com.example.resilio.notifications.PushNotificationManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -11,6 +12,7 @@ class AuthRepository {
     fun login(email: String, pass: String, onResult: (Result<User>) -> Unit) {
         auth.signInWithEmailAndPassword(email, pass)
             .addOnSuccessListener { result ->
+                PushNotificationManager.subscribeToTopics()
                 getUserData(result.user?.uid ?: "", onResult)
             }
             .addOnFailureListener {
@@ -32,6 +34,7 @@ class AuthRepository {
     private fun saveUserData(user: User, onResult: (Result<User>) -> Unit) {
         db.collection("users").document(user.uid).set(user)
             .addOnSuccessListener {
+                PushNotificationManager.subscribeToTopics()
                 onResult(Result.success(user))
             }
             .addOnFailureListener {
@@ -53,6 +56,7 @@ class AuthRepository {
     }
 
     fun logout() {
+        PushNotificationManager.unregisterFromPush()
         auth.signOut()
     }
 

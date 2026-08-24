@@ -1,0 +1,13 @@
+{
+  "name": "resilio-functions",
+  "description": "Push notifications for Resilio emergency alerts, announcements, and weather advisories",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.3.0"
+  },
+  "private": true
+}

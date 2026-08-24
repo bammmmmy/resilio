@@ -218,19 +218,6 @@
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_add_hazard_location"
-                    style="@style/Widget.Resilio.EvacuationActionButton.Outlined"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/add_hazard_location"
-                    android:textColor="@color/text_primary"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_location_on"
-                    app:iconTint="@color/gold_accent"
-                    app:strokeColor="@color/gold_accent" />
-
                 <TextView
                     android:id="@+id/tv_no_hazard_locations"
                     android:layout_width="match_parent"

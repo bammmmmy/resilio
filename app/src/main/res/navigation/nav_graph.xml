@@ -302,9 +302,6 @@
             android:id="@+id/action_disasterAwarenessFragment_to_disasterDetailFragment"
             app:destination="@id/disasterDetailFragment" />
         <action
-            android:id="@+id/action_disasterAwarenessFragment_to_createHazardLocationFragment"
-            app:destination="@id/createHazardLocationFragment" />
-        <action
             android:id="@+id/action_disasterAwarenessFragment_to_evacuationMapFragment"
             app:destination="@id/evacuationMapFragment" />
     </fragment>

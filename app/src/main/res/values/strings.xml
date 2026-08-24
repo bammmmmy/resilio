@@ -219,4 +219,13 @@
     <string name="dashboard_community_safety">Community\nSafety</string>
     <string name="dashboard_emergency_ready">Emergency\nReady</string>
     <string name="dashboard_safe_zones">Safe\nZones</string>
+
+    <!-- Push notifications -->
+    <string name="notification_channel_emergency">Emergency Alerts</string>
+    <string name="notification_channel_emergency_desc">Urgent emergency alerts from BDRRMO and barangay officials</string>
+    <string name="notification_channel_announcements">Announcements</string>
+    <string name="notification_channel_announcements_desc">Community announcements and updates</string>
+    <string name="notification_channel_weather">Weather Advisories</string>
+    <string name="notification_channel_weather_desc">Automatic weather advisories for Antipolo</string>
+    <string name="notification_permission_rationale">Allow notifications so you receive emergency alerts, announcements, and weather advisories even when the app is closed.</string>
 </resources>

@@ -18,14 +18,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 class DisasterAwarenessFragment : Fragment(R.layout.fragment_disaster_awareness) {
 
     private val firestore = FirebaseFirestore.getInstance()
-    private lateinit var addHazardButton: MaterialButton
     private lateinit var hazardContainer: LinearLayout
     private lateinit var noHazardsText: TextView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addHazardButton = view.findViewById(R.id.btn_add_hazard_location)
         hazardContainer = view.findViewById(R.id.hazard_location_container)
         noHazardsText = view.findViewById(R.id.tv_no_hazard_locations)
 
@@ -45,27 +43,17 @@ class DisasterAwarenessFragment : Fragment(R.layout.fragment_disaster_awareness)
             navigateToDetail("earthquake")
         }
 
-        addHazardButton.setOnClickListener {
-            findNavController().navigate(R.id.action_disasterAwarenessFragment_to_createHazardLocationFragment)
-        }
-
-        updateHazardControlsForRole()
         fetchHazardLocations()
     }
 
     override fun onResume() {
         super.onResume()
-        updateHazardControlsForRole()
         fetchHazardLocations()
     }
 
     private fun canManageHazardLocations(): Boolean {
         val currentRole = (activity as? MainActivity)?.getCurrentUserRole()
         return currentRole == UserRole.BDRRMO || currentRole == UserRole.CHAIRMAN
-    }
-
-    private fun updateHazardControlsForRole() {
-        addHazardButton.visibility = if (canManageHazardLocations()) View.VISIBLE else View.GONE
     }
 
     private fun fetchHazardLocations() {

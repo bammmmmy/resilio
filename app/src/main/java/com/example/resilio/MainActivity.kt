@@ -1,9 +1,14 @@
 package com.example.resilio
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
@@ -11,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.resilio.model.User
 import com.example.resilio.model.UserRole
+import com.example.resilio.notifications.PushNotificationManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,6 +25,14 @@ class MainActivity : AppCompatActivity() {
 
     private var currentUserRole: UserRole = UserRole.RESIDENT
     private lateinit var navController: NavController
+
+    private val requestNotificationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted && FirebaseAuth.getInstance().currentUser != null) {
+            PushNotificationManager.registerForPush(this)
+        }
+    }
 
     fun getCurrentUserRole(): UserRole = currentUserRole
 
@@ -35,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         setupNavigation()
         observeAuthState()
+        requestNotificationPermissionIfNeeded()
     }
 
     private fun setupNavigation() {
@@ -95,7 +110,19 @@ class MainActivity : AppCompatActivity() {
             val uid = auth.currentUser?.uid
             if (uid != null) {
                 fetchUserRole(uid)
+                PushNotificationManager.registerForPush(this)
             }
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
