@@ -5,10 +5,12 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentCreateEmergencyAlertBinding
 import com.example.resilio.model.EmergencyAlert
 import com.example.resilio.model.HazardType
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
@@ -21,10 +23,21 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
     private val auth = FirebaseAuth.getInstance()
 
     private var editId: String? = null
+    private var pendingHazardLat: Double = 0.0
+    private var pendingHazardLng: Double = 0.0
+    private var pendingHazardRadius: Double = 0.0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCreateEmergencyAlertBinding.bind(view)
+
+        setFragmentResultListener("hazard_location_request") { _, bundle ->
+            pendingHazardLat = bundle.getDouble("lat")
+            pendingHazardLng = bundle.getDouble("lng")
+            pendingHazardRadius = bundle.getDouble("radius")
+            updateMapButtonsState()
+            Toast.makeText(requireContext(), "Map area set.", Toast.LENGTH_SHORT).show()
+        }
 
         setupSpinner()
 
@@ -44,11 +57,17 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
                 }
                 
                 binding.btnSubmitEmergencyAlert.setText(R.string.action_update_alert)
+                
+                loadExistingMapArea(editId!!)
             }
         }
 
         binding.btnSubmitEmergencyAlert.setOnClickListener {
             submitEmergencyAlert()
+        }
+
+        binding.btnRemoveMapArea.setOnClickListener {
+            removeMapArea()
         }
 
         binding.btnSetVrMap.setOnClickListener {
@@ -59,11 +78,6 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
 
             if (content.isEmpty()) {
                 Toast.makeText(requireContext(), "Details/Description required for map location", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (address.isEmpty()) {
-                Toast.makeText(requireContext(), "Address required for map location", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -82,6 +96,48 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerHazardType.adapter = adapter
+    }
+
+    private fun loadExistingMapArea(id: String) {
+        db.collection("hazardLocations").document(id).get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    pendingHazardLat = doc.getDouble("latitude") ?: 0.0
+                    pendingHazardLng = doc.getDouble("longitude") ?: 0.0
+                    pendingHazardRadius = doc.getDouble("radius") ?: 0.0
+                    updateMapButtonsState()
+                }
+            }
+    }
+
+    private fun updateMapButtonsState() {
+        if (pendingHazardLat != 0.0) {
+            binding.btnSetVrMap.setText(R.string.action_change_map_area)
+            binding.btnRemoveMapArea.visibility = View.VISIBLE
+        } else {
+            binding.btnSetVrMap.setText(R.string.set_in_vr_map)
+            binding.btnRemoveMapArea.visibility = View.GONE
+        }
+    }
+
+    private fun removeMapArea() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Remove Map Area?")
+            .setMessage("This will remove the hazard circle from the map, but keep the alert text. Continue?")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton("Remove") { _, _ ->
+                pendingHazardLat = 0.0
+                pendingHazardLng = 0.0
+                pendingHazardRadius = 0.0
+                
+                editId?.let { id ->
+                    db.collection("hazardLocations").document(id).delete()
+                }
+                
+                updateMapButtonsState()
+                Toast.makeText(requireContext(), R.string.map_area_removed, Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 
     private fun submitEmergencyAlert() {
@@ -111,6 +167,22 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
         db.collection("emergency_alerts").document(alertId).set(alert)
             .addOnSuccessListener {
                 if (_binding == null) return@addOnSuccessListener
+                
+                // Save hazard location if set
+                if (pendingHazardLat != 0.0) {
+                    val hazard = com.example.resilio.model.HazardLocation(
+                        id = alertId,
+                        hazardType = type.name.lowercase(),
+                        description = content,
+                        address = affectedAreas,
+                        latitude = pendingHazardLat,
+                        longitude = pendingHazardLng,
+                        radius = pendingHazardRadius,
+                        createdBy = uid
+                    )
+                    db.collection("hazardLocations").document(alertId).set(hazard)
+                }
+
                 val messageId = if (editId != null) R.string.alert_updated else R.string.alert_submitted
                 Toast.makeText(requireContext(), messageId, Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()

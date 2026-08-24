@@ -95,6 +95,15 @@
             app:cornerRadius="12dp"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRemoveMapArea"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_remove_map_area"
+            android:textColor="@color/emergency_red"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmitAlert"
             android:layout_width="match_parent"
             android:layout_height="56dp"

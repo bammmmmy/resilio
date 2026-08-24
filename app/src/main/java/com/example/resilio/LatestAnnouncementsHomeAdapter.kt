@@ -25,7 +25,7 @@ class LatestAnnouncementsHomeAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = announcements[position]
         holder.tvTitle.text = item.title
-        holder.tvContent.text = item.content
+        holder.tvContent.text = item.safeContent
         
         // Use a gold color for announcements to distinguish from red alerts
         holder.tvTitle.setTextColor(holder.itemView.context.getColor(R.color.gold_accent))

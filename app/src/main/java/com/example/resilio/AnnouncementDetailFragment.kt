@@ -37,6 +37,8 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
         if (authorUid == auth.currentUser?.uid) {
             binding.layoutFabActions.visibility = View.VISIBLE
             
+            checkLinkedHazard(id)
+
             binding.fabEdit.setOnClickListener {
                 val bundle = Bundle().apply {
                     putString("edit_id", id)
@@ -81,6 +83,35 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
         }
     }
 
+    private fun checkLinkedHazard(id: String) {
+        db.collection("hazardLocations").document(id).get()
+            .addOnSuccessListener { doc ->
+                if (_binding == null) return@addOnSuccessListener
+                if (doc.exists()) {
+                    binding.btnClearMapArea.visibility = View.VISIBLE
+                    binding.btnClearMapArea.setOnClickListener {
+                        confirmClearMapArea(id)
+                    }
+                }
+            }
+    }
+
+    private fun confirmClearMapArea(id: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Clear Map Area?")
+            .setMessage("Remove the hazard circle from the VR map? The announcement text will remain.")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton("Clear") { _, _ ->
+                db.collection("hazardLocations").document(id).delete()
+                    .addOnSuccessListener {
+                        if (_binding == null) return@addOnSuccessListener
+                        Toast.makeText(requireContext(), "Map area cleared.", Toast.LENGTH_SHORT).show()
+                        binding.btnClearMapArea.visibility = View.GONE
+                    }
+            }
+            .show()
+    }
+
     private fun confirmDelete(id: String, isAlert: Boolean) {
         val ctx = context ?: return
         MaterialAlertDialogBuilder(ctx)
@@ -91,6 +122,9 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
                 val collection = if (isAlert) "emergency_alerts" else "announcements"
                 db.collection(collection).document(id).delete()
                     .addOnSuccessListener {
+                        // Also delete the linked hazard location
+                        db.collection("hazardLocations").document(id).delete()
+
                         if (_binding == null) return@addOnSuccessListener
                         Toast.makeText(context, R.string.deleted_success, Toast.LENGTH_SHORT).show()
                         if (isAdded) {

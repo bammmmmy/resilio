@@ -73,6 +73,10 @@
     <string name="delete_confirm_message">Are you sure you want to delete this? This action cannot be undone.</string>
     <string name="deleted_success">Deleted successfully.</string>
     <string name="delete_failed">Delete failed.</string>
+    <string name="action_remove_map_area">REMOVE MAP AREA</string>
+    <string name="map_area_removed">Map area removed.</string>
+    <string name="action_clear_map_area">CLEAR AREA FROM MAP</string>
+    <string name="action_change_map_area">CHANGE MAP AREA</string>
     <string name="action_update_announcement">UPDATE ANNOUNCEMENT</string>
     <string name="action_update_alert">UPDATE EMERGENCY ALERT</string>
     <string name="create_emergency_alert_title">Create Emergency Alert</string>
@@ -188,6 +192,7 @@
     <string name="no_hazard_locations">No hazard locations have been marked yet.</string>
     <string name="hazard_pin_content_description">Drag pin to set hazard location</string>
     <string name="hazard_marker_title">%1$s hazard</string>
+    <string name="hazard_area_radius">Affected Area Radius: %1$dm</string>
 
     <!-- Hotline Dialog -->
     <string name="call_confirm_title">Emergency Call</string>

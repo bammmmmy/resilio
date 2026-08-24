@@ -39,7 +39,7 @@ class ResidentViewModel : ViewModel() {
                 // Filter and sort client-side to avoid index requirement
                 val approvedSorted = allAnnouncements
                     .filter { it.status == AnnouncementStatus.APPROVED }
-                    .sortedByDescending { it.timestamp }
+                    .sortedByDescending { it.safeTimestamp }
                 
                 _announcements.postValue(approvedSorted)
             }

@@ -56,8 +56,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_latest_alerts"
             android:layout_width="match_parent"
-            android:layout_height="110dp"
-            android:nestedScrollingEnabled="true"/>
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

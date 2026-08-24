@@ -10,5 +10,6 @@ data class HazardLocation(
     val address: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val radius: Double = 0.0, // Radius in meters
     val createdBy: String = "",
 )

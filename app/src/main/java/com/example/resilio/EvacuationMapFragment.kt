@@ -15,9 +15,11 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.model.EvacuationArea
 import com.example.resilio.model.HazardLocation
@@ -30,12 +32,15 @@ import com.google.android.gms.maps.SupportStreetViewPanoramaFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.slider.Slider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -51,6 +56,11 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private lateinit var fabStreet: FloatingActionButton
     private lateinit var fabClose: FloatingActionButton
     private lateinit var fabAi: FloatingActionButton
+    
+    private lateinit var cardRadiusControl: View
+    private lateinit var tvRadiusLabel: TextView
+    private lateinit var sliderRadius: Slider
+    
     private var streetViewSelectionMode = false
     private var evacuationPinMode = false
     private var evacuationCreateMode = false
@@ -68,6 +78,8 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private var hazardMarkerIcon: BitmapDescriptor? = null
     private val evacuationMarkers = mutableListOf<Marker>()
     private val hazardMarkers = mutableListOf<Marker>()
+    private val hazardCircles = mutableListOf<Circle>()
+    private var previewHazardCircle: Circle? = null
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -82,10 +94,24 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         fabStreet = view.findViewById(R.id.fab_street_view)
         fabClose = view.findViewById(R.id.fab_close_street_view)
         fabAi = view.findViewById(R.id.fab_ai_chat)
+        
+        cardRadiusControl = view.findViewById(R.id.card_radius_control)
+        tvRadiusLabel = view.findViewById<TextView>(R.id.tv_radius_label)
+        sliderRadius = view.findViewById(R.id.slider_radius)
+
+        sliderRadius.addOnChangeListener { _, value, _ ->
+            tvRadiusLabel.text = getString(R.string.hazard_area_radius, value.toInt())
+            updatePreviewCircle()
+        }
+
         super.onViewCreated(view, savedInstanceState)
 
         evacuationCreateMode = arguments?.getBoolean("createMode", false) ?: false
         hazardCreateMode = arguments?.getBoolean("hazardCreateMode", false) ?: false
+        
+        if (hazardCreateMode) {
+            cardRadiusControl.visibility = View.VISIBLE
+        }
         areaName = arguments?.getString("areaName").orEmpty()
         areaAddress = arguments?.getString("areaAddress").orEmpty()
         hazardType = arguments?.getString("hazardType").orEmpty()
@@ -156,7 +182,13 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         confirmEvacuationButton.setOnClickListener {
             val location = pinLocation()
             if (hazardCreateMode) {
-                saveHazardLocation(location)
+                val result = Bundle().apply {
+                    putDouble("lat", location.latitude)
+                    putDouble("lng", location.longitude)
+                    putDouble("radius", sliderRadius.value.toDouble())
+                }
+                setFragmentResult("hazard_location_request", result)
+                findNavController().popBackStack()
             } else {
                 saveEvacuationArea(location)
             }
@@ -222,9 +254,11 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         // 2. Sync the mask overlay with the camera movement
         map.setOnCameraMoveListener {
             updateMask(map, sanJosePolygon)
+            updatePreviewCircle()
         }
         map.setOnCameraIdleListener {
             updateMask(map, sanJosePolygon)
+            updatePreviewCircle()
         }
         updateMask(map, sanJosePolygon)
 
@@ -260,6 +294,27 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         }
 
         loadMapMarkers()
+    }
+
+    private fun updatePreviewCircle() {
+        if (!hazardCreateMode) return
+        val map = googleMap ?: return
+        val center = pinLocation()
+        val radius = sliderRadius.value.toDouble()
+
+        if (previewHazardCircle == null) {
+            previewHazardCircle = map.addCircle(
+                CircleOptions()
+                    .center(center)
+                    .radius(radius)
+                    .strokeWidth(2f)
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.argb(70, 255, 0, 0))
+            )
+        } else {
+            previewHazardCircle?.center = center
+            previewHazardCircle?.radius = radius
+        }
     }
 
     private fun updateMask(map: GoogleMap, polygon: List<LatLng>) {
@@ -368,6 +423,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             .addOnSuccessListener { snapshot ->
                 if (!isAdded) return@addOnSuccessListener
                 clearHazardMarkers()
+                clearHazardCircles()
 
                 val icon = getHazardMarkerIcon()
 
@@ -377,9 +433,10 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                         ?: return@forEach
                     if (!hasMapLocation(hazard.latitude, hazard.longitude)) return@forEach
 
+                    val latLng = LatLng(hazard.latitude, hazard.longitude)
                     val marker = map.addMarker(
                         MarkerOptions()
-                            .position(LatLng(hazard.latitude, hazard.longitude))
+                            .position(latLng)
                             .title(hazardMarkerTitle(hazard.hazardType))
                             .snippet(hazardMarkerSnippet(hazard))
                             .icon(icon)
@@ -387,6 +444,18 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
 
                     marker.tag = hazard
                     hazardMarkers.add(marker)
+
+                    if (hazard.radius > 0) {
+                        val circle = map.addCircle(
+                            CircleOptions()
+                                .center(latLng)
+                                .radius(hazard.radius)
+                                .strokeWidth(2f)
+                                .strokeColor(Color.RED)
+                                .fillColor(Color.argb(50, 255, 0, 0))
+                        )
+                        hazardCircles.add(circle)
+                    }
                 }
 
                 focusOnRequestedLocation()
@@ -464,6 +533,13 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         hazardMarkers.clear()
     }
 
+    private fun clearHazardCircles() {
+        hazardCircles.forEach { it.remove() }
+        hazardCircles.clear()
+        previewHazardCircle?.remove()
+        previewHazardCircle = null
+    }
+
     private fun hasMapLocation(latitude: Double, longitude: Double): Boolean =
         latitude != 0.0 || longitude != 0.0
 
@@ -520,42 +596,6 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                 openStreetViewAt(panorama, location)
             }
         }
-    }
-
-    private fun saveHazardLocation(location: LatLng) {
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            Toast.makeText(requireContext(), R.string.hazard_location_save_failed, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        confirmEvacuationButton.isEnabled = false
-
-        val hazard = HazardLocation(
-            hazardType = hazardType,
-            description = hazardDescription,
-            address = hazardAddress,
-            latitude = location.latitude,
-            longitude = location.longitude,
-            createdBy = uid,
-        )
-
-        firestore.collection("hazardLocations")
-            .add(hazard)
-            .addOnSuccessListener {
-                if (!isAdded) return@addOnSuccessListener
-                Toast.makeText(requireContext(), R.string.hazard_location_saved, Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack()
-            }
-            .addOnFailureListener {
-                if (!isAdded) return@addOnFailureListener
-                confirmEvacuationButton.isEnabled = true
-                Toast.makeText(
-                    requireContext(),
-                    R.string.hazard_location_save_failed,
-                    Toast.LENGTH_SHORT,
-                ).show()
-            }
     }
 
     private fun saveEvacuationArea(location: LatLng) {

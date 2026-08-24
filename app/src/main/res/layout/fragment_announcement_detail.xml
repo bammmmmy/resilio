@@ -71,6 +71,19 @@
                         android:layout_marginTop="8dp"
                         android:visibility="gone" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearMapArea"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/action_clear_map_area"
+                        android:textColor="@color/emergency_red"
+                        app:strokeColor="@color/emergency_red"
+                        app:icon="@drawable/ic_close"
+                        app:iconTint="@color/emergency_red"
+                        android:visibility="gone" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

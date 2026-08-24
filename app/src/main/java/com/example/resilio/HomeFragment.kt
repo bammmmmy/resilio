@@ -60,7 +60,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 val allAnnouncements = value?.toObjects(Announcement::class.java) ?: emptyList()
                 val announcements = allAnnouncements
                     .filter { it.status == AnnouncementStatus.APPROVED }
-                    .sortedByDescending { it.timestamp }
+                    .sortedByDescending { it.safeTimestamp }
                     .take(3)
 
                 if (announcements.isEmpty()) {
@@ -91,12 +91,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.layoutLatestAlerts.rvLatestAlerts.layoutManager = LinearLayoutManager(requireContext())
         
         alertsListener = FirebaseFirestore.getInstance().collection("emergency_alerts")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(3)
             .addSnapshotListener { value, _ ->
                 if (_binding == null) return@addSnapshotListener
 
-                val alerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                val alerts = allAlerts
+                    .sortedByDescending { it.safeTimestamp }
+                    .take(3)
+
                 if (alerts.isEmpty()) {
                     binding.layoutLatestAlerts.root.visibility = View.GONE
                 } else {
@@ -105,7 +107,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         val bundle = Bundle().apply {
                             putString("id", alert.id)
                             putString("title", alert.title)
-                            putString("content", alert.content)
+                            putString("content", alert.safeContent)
                             putString("authorUid", alert.authorUid)
                             putString("affectedAreas", alert.affectedAreas)
                             putString("evacuationCenter", alert.evacuationCenter)

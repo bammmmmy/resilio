@@ -56,14 +56,34 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tvType"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/text_secondary"
-            android:textAllCaps="true"
-            android:layout_marginTop="4dp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/tvType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:textAllCaps="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" • "
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/tvTimestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvContent"

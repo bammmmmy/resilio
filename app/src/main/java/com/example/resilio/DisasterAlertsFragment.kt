@@ -30,11 +30,12 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
         rv.layoutManager = LinearLayoutManager(requireContext())
 
         alertsListener = db.collection("emergency_alerts")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, _ ->
                 if (getView() == null) return@addSnapshotListener
 
-                val alerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                val alerts = allAlerts.sortedByDescending { it.safeTimestamp }
+                
                 if (alerts.isEmpty()) {
                     tvEmpty.visibility = View.VISIBLE
                     rv.visibility = View.GONE
@@ -46,10 +47,10 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                         Announcement(
                             id = it.id,
                             title = it.title,
-                            content = it.content,
+                            content = it.safeContent,
                             type = it.type,
                             authorUid = it.authorUid,
-                            timestamp = it.timestamp,
+                            timestamp = it.safeTimestamp,
                             affectedAreas = it.affectedAreas,
                             evacuationCenter = it.evacuationCenter
                         )
@@ -80,6 +81,9 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
             .setPositiveButton(R.string.delete_evacuation_area) { _, _ ->
                 db.collection("emergency_alerts").document(announcement.id).delete()
                     .addOnSuccessListener {
+                        // Also delete the linked hazard location
+                        db.collection("hazardLocations").document(announcement.id).delete()
+
                         if (isAdded) {
                             Toast.makeText(requireContext(), R.string.deleted_success, Toast.LENGTH_SHORT).show()
                         }

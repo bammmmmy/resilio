@@ -66,6 +66,9 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
                 val collection = if (isAlert) "emergency_alerts" else "announcements"
                 db.collection(collection).document(announcement.id).delete()
                     .addOnSuccessListener {
+                        // Also delete the linked hazard location if it exists
+                        db.collection("hazardLocations").document(announcement.id).delete()
+
                         if (isAdded) {
                             Toast.makeText(requireContext(), R.string.deleted_success, Toast.LENGTH_SHORT).show()
                         }

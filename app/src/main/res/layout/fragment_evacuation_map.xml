@@ -19,6 +19,43 @@
         android:layout_height="match_parent"
         android:visibility="visible" />
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_radius_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="80dp"
+        android:visibility="gone"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_radius_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Affected Area Radius: 100m"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="5.0"
+                android:valueTo="10000.0"
+                android:stepSize="5.0"
+                android:value="100.0"
+                app:thumbColor="@color/gold_accent"
+                app:trackColorActive="@color/gold_accent" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <ImageView
         android:id="@+id/streetview_pin"
         android:layout_width="56dp"

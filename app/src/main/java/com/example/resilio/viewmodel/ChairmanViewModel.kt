@@ -31,7 +31,7 @@ class ChairmanViewModel : ViewModel() {
                 // Filter and sort client-side to avoid index requirement
                 val pendingSorted = allAnnouncements
                     .filter { it.status == AnnouncementStatus.PENDING }
-                    .sortedBy { it.timestamp }
+                    .sortedByDescending { it.safeTimestamp }
 
                 _pendingAnnouncements.postValue(pendingSorted)
             }

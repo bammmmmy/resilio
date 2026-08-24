@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
 import com.google.android.material.button.MaterialButton
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AnnouncementAdapter(
     private val announcements: List<Announcement>,
@@ -22,6 +24,7 @@ class AnnouncementAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvTitle)
         val tvType: TextView = view.findViewById(R.id.tvType)
+        val tvTimestamp: TextView = view.findViewById(R.id.tvTimestamp)
         val tvContent: TextView = view.findViewById(R.id.tvContent)
         val layoutActions: View = view.findViewById(R.id.layoutActions)
         val btnApprove: View = view.findViewById(R.id.btnApprove)
@@ -40,7 +43,11 @@ class AnnouncementAdapter(
         val item = announcements[position]
         holder.tvTitle.text = item.title
         holder.tvType.text = item.type.name
-        holder.tvContent.text = item.content
+        
+        val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+        holder.tvTimestamp.text = sdf.format(item.safeTimestamp.toDate())
+
+        holder.tvContent.text = item.safeContent
 
         holder.itemView.setOnClickListener { onItemClick?.invoke(item) }
 

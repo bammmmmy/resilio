@@ -7,7 +7,6 @@ import com.example.resilio.model.EmergencyAlert
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -132,7 +131,7 @@ object ResilioLiveContext {
             alerts.forEachIndexed { index, alert ->
                 appendLine("${index + 1}. Title: ${alert.title.ifBlank { "(no title)" }}")
                 appendLine("   Type: ${alert.type}")
-                appendLine("   Posted: ${formatTimestamp(alert.timestamp)}")
+                appendLine("   Posted: ${formatTimestamp(alert.safeTimestamp)}")
                 if (alert.affectedAreas.isNotBlank()) appendLine("   Affected areas: ${alert.affectedAreas}")
                 if (alert.evacuationCenter.isNotBlank()) appendLine("   Evacuation center: ${alert.evacuationCenter}")
                 appendLine("   Details: ${trimBody(alert.content)}")
@@ -153,7 +152,7 @@ object ResilioLiveContext {
             announcements.forEachIndexed { index, announcement ->
                 appendLine("${index + 1}. Title: ${announcement.title.ifBlank { "(no title)" }}")
                 appendLine("   Type: ${announcement.type}")
-                appendLine("   Posted: ${formatTimestamp(announcement.timestamp)}")
+                appendLine("   Posted: ${formatTimestamp(announcement.safeTimestamp)}")
                 if (announcement.affectedAreas.isNotBlank()) {
                     appendLine("   Affected areas: ${announcement.affectedAreas}")
                 }
@@ -169,13 +168,13 @@ object ResilioLiveContext {
         val snapshot = Tasks.await(
             FirebaseFirestore.getInstance()
                 .collection("emergency_alerts")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(MAX_ITEMS.toLong())
                 .get(),
             QUERY_TIMEOUT_SEC,
             TimeUnit.SECONDS,
         )
         return snapshot.toObjects(EmergencyAlert::class.java)
+            .sortedByDescending { it.safeTimestamp }
+            .take(MAX_ITEMS)
     }
 
     private fun fetchLatestAnnouncements(): List<Announcement> {
@@ -188,7 +187,7 @@ object ResilioLiveContext {
         )
         return snapshot.toObjects(Announcement::class.java)
             .filter { it.status == AnnouncementStatus.APPROVED }
-            .sortedByDescending { it.timestamp }
+            .sortedByDescending { it.safeTimestamp }
             .take(MAX_ITEMS)
     }
 

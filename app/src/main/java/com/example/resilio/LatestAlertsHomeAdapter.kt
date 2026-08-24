@@ -25,7 +25,7 @@ class LatestAlertsHomeAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = alerts[position]
         holder.tvTitle.text = item.title
-        holder.tvContent.text = item.content
+        holder.tvContent.text = item.safeContent
         holder.itemView.setOnClickListener { onItemClick(item) }
         
         // Hide divider for the last item
