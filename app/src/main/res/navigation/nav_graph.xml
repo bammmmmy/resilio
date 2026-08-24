@@ -232,15 +232,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/createHazardLocationFragment"
-        android:name="com.example.resilio.CreateHazardLocationFragment"
-        android:label="@string/add_hazard_location_title">
-        <action
-            android:id="@+id/action_createHazardLocationFragment_to_evacuationMapFragment"
-            app:destination="@id/evacuationMapFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/evacuationMapFragment"
         android:name="com.example.resilio.EvacuationMapFragment"
         android:label="@string/nav_evacuation_map">

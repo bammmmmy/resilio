@@ -545,7 +545,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             .addOnSuccessListener {
                 if (!isAdded) return@addOnSuccessListener
                 Toast.makeText(requireContext(), R.string.hazard_location_saved, Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack(R.id.createHazardLocationFragment, true)
+                findNavController().popBackStack()
             }
             .addOnFailureListener {
                 if (!isAdded) return@addOnFailureListener

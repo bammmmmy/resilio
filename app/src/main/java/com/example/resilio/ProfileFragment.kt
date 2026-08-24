@@ -54,9 +54,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.btnViewAnnouncements.setOnClickListener {
             findNavController().navigate(R.id.announcementsFragment)
         }
-        binding.btnAddHazard.setOnClickListener {
-            findNavController().navigate(R.id.createHazardLocationFragment)
-        }
 
         // Chairman Listeners
         binding.btnChairmanSendEmergencyAlert.setOnClickListener {
@@ -73,9 +70,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
         binding.btnVerifyResidents.setOnClickListener {
             findNavController().navigate(R.id.userManagementFragment)
-        }
-        binding.btnChairmanAddHazard.setOnClickListener {
-            findNavController().navigate(R.id.createHazardLocationFragment)
         }
 
         binding.btnLogout.setOnClickListener {

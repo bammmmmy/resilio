@@ -58,25 +58,19 @@ class HazardAiInfoBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val prompt = """
-                    Analyze this hazard in San Jose, Antipolo City:
-                    Type: $hazardType
-                    Address: $address
-                    Description: $description
-                    Coordinates: $latitude, $longitude
-                    
-                    Provide a brief safety analysis and precautions.
-                """.trimIndent()
-                
-                val result = OpenAiClient.chat(listOf(ChatMessage("user", prompt)))
-                progress.visibility = View.GONE
-                analysisView.visibility = View.VISIBLE
-                analysisView.text = result
-            } catch (_: Exception) {
-                progress.visibility = View.GONE
-                analysisView.visibility = View.VISIBLE
-                analysisView.text = getString(R.string.ai_chat_error_message)
+            val result = GeminiClient.analyzeHazard(
+                hazardType = hazardType,
+                address = address,
+                description = description,
+                latitude = latitude,
+                longitude = longitude,
+            )
+            progress.visibility = View.GONE
+            analysisView.visibility = View.VISIBLE
+            analysisView.text = when (result) {
+                is ChatResult.Success -> result.text
+                ChatResult.OffTopic -> getString(R.string.ai_chat_off_topic)
+                is ChatResult.Error -> result.message
             }
         }
     }

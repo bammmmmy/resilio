@@ -62,16 +62,16 @@ class AiChatFragment : Fragment(R.layout.fragment_ai_chat) {
         binding.btnSend.isEnabled = false
 
         lifecycleScope.launch {
-            try {
-                val reply = OpenAiClient.chat(messages)
-                binding.progressBar.visibility = View.GONE
-                binding.btnSend.isEnabled = true
-                addMessage(ChatMessage("assistant", reply))
-            } catch (_: Exception) {
-                binding.progressBar.visibility = View.GONE
-                binding.btnSend.isEnabled = true
-                addMessage(ChatMessage("assistant", getString(R.string.ai_chat_error_message)))
+            val result = GeminiClient.chatWithHistory(messages.dropLast(1), userText)
+            binding.progressBar.visibility = View.GONE
+            binding.btnSend.isEnabled = true
+
+            val reply = when (result) {
+                is ChatResult.Success -> result.text
+                ChatResult.OffTopic -> getString(R.string.ai_chat_off_topic)
+                is ChatResult.Error -> result.message
             }
+            addMessage(ChatMessage("assistant", reply))
         }
     }
 

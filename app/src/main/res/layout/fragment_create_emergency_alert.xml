@@ -97,11 +97,24 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSetVrMap"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/set_in_vr_map"
+            android:layout_marginTop="16dp"
+            app:strokeColor="@color/gold_accent"
+            android:textColor="@color/text_primary"
+            app:icon="@drawable/ic_map"
+            app:iconTint="@color/gold_accent"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmitEmergencyAlert"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="SUBMIT EMERGENCY ALERT"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
             android:backgroundTint="@color/emergency_red"
             android:textColor="@color/white"
             app:cornerRadius="12dp" />

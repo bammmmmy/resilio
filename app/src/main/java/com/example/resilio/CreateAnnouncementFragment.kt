@@ -29,6 +29,29 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
         binding.btnSubmitAlert.setOnClickListener {
             submitAnnouncement()
         }
+
+        binding.btnSetVrMap.setOnClickListener {
+            val content = binding.etContent.text.toString().trim()
+            val address = binding.etAffectedAreas.text.toString().trim()
+
+            if (content.isEmpty()) {
+                Toast.makeText(requireContext(), "Details/Description required for map location", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (address.isEmpty()) {
+                Toast.makeText(requireContext(), "Address required for map location", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val args = Bundle().apply {
+                putBoolean("hazardCreateMode", true)
+                putString("hazardType", "general_alert")
+                putString("hazardDescription", content)
+                putString("hazardAddress", address)
+            }
+            findNavController().navigate(R.id.evacuationMapFragment, args)
+        }
     }
 
     private fun submitAnnouncement() {

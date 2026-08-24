@@ -29,6 +29,31 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
         binding.btnSubmitEmergencyAlert.setOnClickListener {
             submitEmergencyAlert()
         }
+
+        binding.btnSetVrMap.setOnClickListener {
+            val title = binding.etTitle.text.toString().trim()
+            val content = binding.etContent.text.toString().trim()
+            val type = binding.spinnerHazardType.selectedItem.toString().lowercase()
+            val address = binding.etAffectedAreas.text.toString().trim()
+
+            if (content.isEmpty()) {
+                Toast.makeText(requireContext(), "Details/Description required for map location", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (address.isEmpty()) {
+                Toast.makeText(requireContext(), "Address required for map location", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val args = Bundle().apply {
+                putBoolean("hazardCreateMode", true)
+                putString("hazardType", type)
+                putString("hazardDescription", content)
+                putString("hazardAddress", address)
+            }
+            findNavController().navigate(R.id.evacuationMapFragment, args)
+        }
     }
 
     private fun setupSpinner() {

@@ -45,6 +45,8 @@ object GeminiClient {
         "pag-ulan", "ulan", "emergency kit", "evacuation center",
         "evacuation area", "evac center", "relief", "disaster risk", "drrm",
         "philippine", "phivolcs", "ndrrmc", "red cross", "hotline", "911", "117",
+        "weather", "temperature", "humidity", "precip", "advisory", "announcement",
+        "anunsyo", "babala", "update", "posted", "latest", "current condition",
     )
 
     private val obviousOffTopicKeywords = listOf(
@@ -60,22 +62,23 @@ object GeminiClient {
 
         ALWAYS answer questions about: floods, typhoons, thunderstorms, lightning, heavy rain,
         earthquakes, landslides, fires, storms, strong winds, evacuation centers/areas, emergency
-        kits, go-bags, alerts, sheltering at home, barangay safety, and before/during/after
-        disaster actions. Users do NOT need to mention Antipolo—apply Antipolo/Philippines context
-        when helpful.
+        kits, go-bags, alerts, announcements, current weather, sheltering at home, barangay safety,
+        and before/during/after disaster actions. Users do NOT need to mention Antipolo—apply
+        Antipolo/Philippines context when helpful.
 
         Reply with exactly $OFF_TOPIC_TOKEN ONLY for clearly unrelated topics (jokes, sports,
         entertainment, homework, coding, recipes, politics, shopping, etc.).
 
         RULES:
         1. If the question is about any hazard or safety during weather/disasters, you MUST answer.
-        2. Reply in 2-3 short sentences maximum. Be direct and actionable.
-        3. Do not greet, apologize, or add filler. No bullet lists unless essential.
-        4. When unsure, give the safest brief advice for the Philippines.
+        2. If the question is about current weather, an alert, an announcement, or a posted update, answer from LIVE APP DATA. Use the matching title and details. Do not invent posts.
+        3. Reply in 2-4 short sentences. Be direct and actionable.
+        4. Do not greet, apologize, or add filler. No bullet lists unless essential.
+        5. When unsure, give the safest brief advice for the Philippines.
     """.trimIndent()
 
     private val shortGenerationConfig = generationConfig {
-        maxOutputTokens = 256
+        maxOutputTokens = 320
         temperature = 0.3f
     }
 
@@ -155,11 +158,17 @@ object GeminiClient {
                 }
             }
 
+        val liveContext = runCatching { ResilioLiveContext.loadForAi() }
+            .getOrElse { error ->
+                Log.w("GeminiClient", "Live context unavailable: ${error.message}")
+                "LIVE APP DATA: unavailable right now."
+            }
+
         return try {
             val raw = requestWithFallback(
                 history = filteredHistory,
                 nextMessage = nextMessage,
-                systemInstruction = systemInstructionText,
+                systemInstruction = "$systemInstructionText\n\n$liveContext",
                 generationConfig = shortGenerationConfig,
             )
             when {
@@ -294,8 +303,8 @@ object GeminiClient {
         val withoutToken = text.replace(OFF_TOPIC_TOKEN, "", ignoreCase = true).trim()
         val sentences = withoutToken.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
         return when {
-            sentences.size <= 3 -> withoutToken
-            else -> sentences.take(3).joinToString(" ").trim()
+            sentences.size <= 4 -> withoutToken
+            else -> sentences.take(4).joinToString(" ").trim()
         }
     }
 
