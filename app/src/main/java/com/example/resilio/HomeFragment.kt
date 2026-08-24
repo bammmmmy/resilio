@@ -124,6 +124,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun fetchWeather() {
+        WeatherCache.snapshot?.let { cached ->
+            updateWeatherUI(
+                cached.tempC,
+                cached.code,
+                cached.humidity,
+                cached.windSpeed,
+                cached.windGusts,
+                cached.precipProb,
+                cached.apiTimeStr,
+            )
+        }
+        if (WeatherCache.isFresh()) return
+
         // Hardcoded Antipolo Coordinates
         val lat = 14.5845
         val lon = 121.1754
@@ -159,6 +172,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     }
                     
                     withContext(Dispatchers.Main) {
+                        WeatherCache.save(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
                         updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
                     }
                 }
