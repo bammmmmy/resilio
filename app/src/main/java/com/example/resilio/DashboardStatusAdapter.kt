@@ -10,7 +10,7 @@ class DashboardStatusAdapter(
     private val onLandslideBind: (View) -> Unit,
     private val onEarthquakeBind: (View) -> Unit
 ) : RecyclerView.Adapter<DashboardStatusAdapter.ViewHolder>() {
-/**/
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
     override fun getItemViewType(position: Int): Int = position
