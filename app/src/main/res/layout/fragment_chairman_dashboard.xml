@@ -59,13 +59,23 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Weather Card First -->
-                <include
-                    android:id="@+id/weather_card"
-                    layout="@layout/include_card_weather"
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/status_pager"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp" />
+                    android:layout_height="250dp" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/status_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="24dp"
+                    android:background="@android:color/transparent"
+                    app:tabBackground="@drawable/bg_selector"
+                    app:tabGravity="center"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabMaxWidth="12dp"
+                    app:tabRippleColor="@null" />
 
                 <include
                     android:id="@+id/layout_latest_alerts"

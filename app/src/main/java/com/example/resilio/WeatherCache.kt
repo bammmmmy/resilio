@@ -7,12 +7,14 @@ data class WeatherSnapshot(
     val windSpeed: Double,
     val windGusts: Double,
     val precipProb: Int,
+    val rain24h: Double = 0.0,
+    val currentPrecipIntensity: Double = 0.0,
     val apiTimeStr: String,
     val fetchedAtMillis: Long = System.currentTimeMillis(),
 )
 
 object WeatherCache {
-    private const val STALE_AFTER_MS = 10 * 60 * 1000L
+    private const val STALE_AFTER_MS = 5 * 60 * 1000L
 
     @Volatile
     var snapshot: WeatherSnapshot? = null
@@ -25,6 +27,8 @@ object WeatherCache {
         windSpeed: Double,
         windGusts: Double,
         precipProb: Int,
+        rain24h: Double,
+        currentPrecipIntensity: Double,
         apiTimeStr: String,
     ) {
         snapshot = WeatherSnapshot(
@@ -34,6 +38,8 @@ object WeatherCache {
             windSpeed = windSpeed,
             windGusts = windGusts,
             precipProb = precipProb,
+            rain24h = rain24h,
+            currentPrecipIntensity = currentPrecipIntensity,
             apiTimeStr = apiTimeStr,
         )
     }

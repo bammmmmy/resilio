@@ -1,6 +1,8 @@
 package com.example.resilio
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -10,8 +12,10 @@ import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.location.Location
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -20,9 +24,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.core.graphics.toColorInt
 import com.example.resilio.model.EvacuationArea
 import com.example.resilio.model.HazardLocation
+import com.example.resilio.util.PolylineDecoder
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -38,11 +46,20 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.util.Locale
 
 class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapReadyCallback {
 
@@ -72,6 +89,9 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private var hazardAddress = ""
     private var focusLatitude = 0.0
     private var focusLongitude = 0.0
+    private var showRoute = false
+    private var currentPolyline: Polyline? = null
+    private val httpClient = OkHttpClient()
     private var pinTouchOffsetX = 0f
     private var pinTouchOffsetY = 0f
     private var evacuationMarkerIcon: BitmapDescriptor? = null
@@ -119,6 +139,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         hazardAddress = arguments?.getString("hazardAddress").orEmpty()
         focusLatitude = arguments?.getFloat("focusLatitude", 0f)?.toDouble() ?: 0.0
         focusLongitude = arguments?.getFloat("focusLongitude", 0f)?.toDouble() ?: 0.0
+        showRoute = arguments?.getBoolean("showRoute", false) ?: false
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -226,6 +247,10 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            map.isMyLocationEnabled = true
+        }
 
         // Define the Brgy. San Jose polygon points (the area to keep clear)
         val sanJosePolygon = listOf(
@@ -558,11 +583,17 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         val lng = focusLongitude
         if (lat == 0.0 && lng == 0.0) return
 
+        val shouldDrawRoute = showRoute
         focusLatitude = 0.0
         focusLongitude = 0.0
+        showRoute = false
 
         val target = LatLng(lat, lng)
         animateToMarker(target)
+
+        if (shouldDrawRoute) {
+            calculateAndDrawRoute(target)
+        }
 
         evacuationMarkers.firstOrNull { marker ->
             val area = marker.tag as? EvacuationArea ?: return@firstOrNull false
@@ -573,6 +604,90 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             val hazard = marker.tag as? HazardLocation ?: return@firstOrNull false
             kotlin.math.abs(hazard.latitude - lat) < 1e-6 && kotlin.math.abs(hazard.longitude - lng) < 1e-6
         }?.showInfoWindow()
+    }
+
+    private fun calculateAndDrawRoute(destination: LatLng) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                val origin = LatLng(location.latitude, location.longitude)
+                fetchRoute(origin, destination)
+            }
+        }
+    }
+
+    private fun fetchRoute(origin: LatLng, destination: LatLng) {
+        val apiKey = try {
+            val appInfo = requireContext().packageManager.getApplicationInfo(requireContext().packageName, PackageManager.GET_META_DATA)
+            appInfo.metaData.getString("com.google.android.geo.API_KEY")
+        } catch (e: Exception) {
+            null
+        } ?: ""
+
+        val url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                "origin=${origin.latitude},${origin.longitude}" +
+                "&destination=${destination.latitude},${destination.longitude}" +
+                "&mode=walking" +
+                "&key=$apiKey"
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val request = Request.Builder().url(url).build()
+                httpClient.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@use
+                    val jsonData = response.body?.string() ?: return@use
+                    val jsonObject = JSONObject(jsonData)
+                    val routes = jsonObject.getJSONArray("routes")
+                    if (routes.length() > 0) {
+                        val route = routes.getJSONObject(0)
+                        val legs = route.getJSONArray("legs")
+                        val leg = legs.getJSONObject(0)
+                        val distanceText = leg.getJSONObject("distance").getString("text")
+                        val durationText = leg.getJSONObject("duration").getString("text")
+                        
+                        val overviewPolyline = route.getJSONObject("overview_polyline")
+                        val encodedPoints = overviewPolyline.getString("points")
+                        val points = PolylineDecoder.decode(encodedPoints)
+
+                        withContext(Dispatchers.Main) {
+                            drawPolyline(points)
+                            Toast.makeText(
+                                requireContext(),
+                                "Estimated: $distanceText ($durationText walk)",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("EvacuationMap", "Error fetching route", e)
+            }
+        }
+    }
+
+    private fun drawPolyline(points: List<LatLng>) {
+        currentPolyline?.remove()
+        val options = PolylineOptions()
+            .addAll(points)
+            .width(12f)
+            .color("#4285F4".toColorInt()) // Google Blue
+            .geodesic(true)
+            .clickable(false)
+        
+        currentPolyline = googleMap?.addPolyline(options)
+        
+        // Adjust camera to fit the whole route
+        if (points.isNotEmpty()) {
+            val boundsBuilder = LatLngBounds.Builder()
+            for (point in points) {
+                boundsBuilder.include(point)
+            }
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150))
+        }
     }
 
     private fun openStreetViewForArea(area: EvacuationArea) {

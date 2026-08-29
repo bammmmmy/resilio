@@ -26,8 +26,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["MAPS_API_KEY"] =
-            localProperties.getProperty("MAPS_API_KEY").orEmpty()
+        val mapsKey = localProperties.getProperty("MAPS_API_KEY").orEmpty()
+        manifestPlaceholders["MAPS_API_KEY"] = mapsKey
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsKey\"")
 
         val openAiKey = localProperties.getProperty("OPENAI_API_KEY").orEmpty()
         buildConfigField(
@@ -63,7 +64,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            res.srcDirs("src/main/res", "src/main/res-weather")
+            res.directories.addAll(listOf("src/main/res", "src/main/res-weather"))
         }
     }
 }
@@ -90,6 +91,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
     implementation(libs.generativeai)
+    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

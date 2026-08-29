@@ -4,6 +4,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -12,6 +15,7 @@ import com.example.resilio.databinding.FragmentChairmanDashboardBinding
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -31,12 +35,13 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
 
     private var _binding: FragmentChairmanDashboardBinding? = null
     private val binding get() = _binding!!
-    private val client = OkHttpClient()
 
     private var announcementsListener: ListenerRegistration? = null
     private var alertsListener: ListenerRegistration? = null
-
-    private var lastWeatherAdvisory: String? = null
+    
+    private var weatherView: View? = null
+    private var landslideView: View? = null
+    private var earthquakeView: View? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,9 +51,52 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
             findNavController().navigate(R.id.action_chairmanDashboardFragment_to_aiChatFragment)
         }
 
-        fetchWeather()
+        setupStatusPager()
+        startDataRefreshLoop()
+
         setupLatestAlerts()
         setupLatestAnnouncements()
+    }
+
+    private fun startDataRefreshLoop() {
+        val context = requireContext().applicationContext
+        lifecycleScope.launch {
+            while (true) {
+                DashboardUIHelper.fetchWeather(context, lifecycleScope, forceRefresh = true) {
+                    WeatherCache.snapshot?.let { 
+                        weatherView?.let { v -> DashboardUIHelper.updateWeatherUI(v, it, binding.layoutHeader, binding.tvStatusTitle, binding.tvStatusDesc) }
+                        landslideView?.let { v -> DashboardUIHelper.updateLandslideUI(v, it) }
+                    }
+                }
+                
+                DashboardUIHelper.fetchEarthquakeData(context, lifecycleScope) {
+                    EarthquakeCache.lastQuake?.let {
+                        earthquakeView?.let { v -> DashboardUIHelper.updateEarthquakeUI(v, it) }
+                    }
+                }
+                
+                kotlinx.coroutines.delay(5 * 60 * 1000L) // Refresh every 5 minutes
+            }
+        }
+    }
+
+    private fun setupStatusPager() {
+        binding.statusPager.adapter = DashboardStatusAdapter(
+            onWeatherBind = { view -> 
+                weatherView = view
+                WeatherCache.snapshot?.let { DashboardUIHelper.updateWeatherUI(view, it, binding.layoutHeader, binding.tvStatusTitle, binding.tvStatusDesc) }
+            },
+            onLandslideBind = { view -> 
+                landslideView = view
+                WeatherCache.snapshot?.let { DashboardUIHelper.updateLandslideUI(view, it) }
+            },
+            onEarthquakeBind = { view ->
+                earthquakeView = view
+                EarthquakeCache.lastQuake?.let { DashboardUIHelper.updateEarthquakeUI(view, it) }
+            }
+        )
+        
+        TabLayoutMediator(binding.statusIndicator, binding.statusPager) { _, _ -> }.attach()
     }
 
     private fun setupLatestAnnouncements() {
@@ -125,189 +173,13 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
         }
     }
 
-    private fun updateAdvisoryBanner() {
-        if (_binding == null) return
-
-        val displayAdvisory = lastWeatherAdvisory
-        if (displayAdvisory != null) {
-            binding.weatherCard.layoutWeatherAdvisory.visibility = View.VISIBLE
-            binding.weatherCard.tvWeatherAdvisory.text = displayAdvisory
-        } else {
-            binding.weatherCard.layoutWeatherAdvisory.visibility = View.GONE
-        }
-    }
-
-    private fun fetchWeather() {
-        WeatherCache.snapshot?.let { cached ->
-            updateWeatherUI(
-                cached.tempC,
-                cached.code,
-                cached.humidity,
-                cached.windSpeed,
-                cached.windGusts,
-                cached.precipProb,
-                cached.apiTimeStr,
-            )
-        }
-        if (WeatherCache.isFresh()) return
-
-        // Hardcoded Antipolo Coordinates
-        val lat = 14.5845
-        val lon = 121.1754
-        val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation&hourly=precipitation_probability&timezone=auto"
-        
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val request = Request.Builder().url(url).build()
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) return@use
-                    
-                    val jsonData = response.body?.string() ?: return@use
-                    val jsonObject = JSONObject(jsonData)
-                    
-                    val current = jsonObject.getJSONObject("current")
-                    val tempC = current.getDouble("temperature_2m")
-                    val humidity = current.getInt("relative_humidity_2m")
-                    val windSpeed = current.getDouble("wind_speed_10m")
-                    val windGusts = current.getDouble("wind_gusts_10m")
-                    val code = current.getInt("weather_code")
-                    val apiTimeStr = current.getString("time")
-                    
-                    val hourly = jsonObject.getJSONObject("hourly")
-                    val times = hourly.getJSONArray("time")
-                    val currentTimeStr = current.getString("time").substring(0, 13) + ":00"
-                    var currentPrecipProb = 0
-                    
-                    for (i in 0 until times.length()) {
-                        if (times.getString(i).startsWith(currentTimeStr)) {
-                            currentPrecipProb = hourly.getJSONArray("precipitation_probability").getInt(i)
-                            break
-                        }
-                    }
-                    
-                    withContext(Dispatchers.Main) {
-                        WeatherCache.save(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
-                        updateWeatherUI(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, apiTimeStr)
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun updateWeatherUI(tempC: Double, code: Int, humidity: Int, windSpeed: Double, windGusts: Double, precipProb: Int, apiTimeStr: String) {
-        if (_binding == null) return
-        
-        // Switch visibility from Loading UI to Weather Content
-        binding.weatherCard.layoutWeatherLoading.visibility = View.GONE
-        binding.weatherCard.layoutWeatherContent.visibility = View.VISIBLE
-        
-        binding.weatherCard.tvWeatherTemp.text = getString(R.string.temp_format_user, tempC.toInt())
-        
-        val condition = getWeatherDescription(code)
-        binding.weatherCard.tvWeatherCondition.text = condition
-        
-        binding.weatherCard.tvWeatherHumidity.text = getString(R.string.humidity_format, humidity)
-        
-        // Show wind speed and gusts for better accuracy
-        binding.weatherCard.tvWeatherWind.text = if (windGusts > windSpeed * 1.5) {
-            "Wind: ${windSpeed.toInt()}-${windGusts.toInt()} km/h"
-        } else {
-            getString(R.string.wind_format, windSpeed)
-        }
-
-        binding.weatherCard.tvWeatherPrecip.text = getString(R.string.precip_format, precipProb)
-        
-        // Set time and day from API
-        try {
-            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
-            val weatherDate = apiFormat.parse(apiTimeStr) ?: Date()
-            binding.weatherCard.tvWeatherTime.text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(weatherDate)
-            binding.weatherCard.tvWeatherDay.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(weatherDate)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // Background and Header selection
-        val (backgroundRes, headerRes) = when (code) {
-            0, 1 -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
-            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy to R.drawable.bg_header_cloudy
-            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
-            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy to R.drawable.bg_weather_sunny // Snowy also uses sunny gradient colors
-            95, 96, 99 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
-            else -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
-        }
-        
-        binding.weatherCard.layoutWeatherContainer.setBackgroundResource(backgroundRes)
-        binding.layoutHeader.setBackgroundResource(headerRes)
-
-        // Color coding for condition text and icon
-        val conditionColor = when (code) {
-            51, 53, 55, 61, 80 -> Color.parseColor("#FFEB3B") // Yellow
-            63, 81 -> Color.parseColor("#FF9800")           // Orange
-            65, 82, 95, 96, 99 -> Color.parseColor("#FF5252") // Red
-            else -> Color.WHITE
-        }
-        
-        binding.weatherCard.tvWeatherCondition.setTextColor(conditionColor)
-        binding.weatherCard.ivWeatherIcon.setColorFilter(conditionColor)
-
-        // Reset header text colors to white (standard for redesigned gradients)
-        binding.tvStatusTitle.setTextColor(Color.WHITE)
-        binding.tvStatusDesc.setTextColor(Color.parseColor("#E0E0E0"))
-
-        lastWeatherAdvisory = getAutoAdvisory(code)
-        updateAdvisoryBanner()
-        
-        val iconRes = when (code) {
-            0, 1 -> R.drawable.ic_sun
-            2, 3, in 45..48 -> R.drawable.ic_cloud
-            in 51..55, 61, 80 -> R.drawable.ic_drizzle
-            63, 81 -> R.drawable.ic_rain
-            65, 82, 95, 96, 99 -> R.drawable.ic_storm
-            else -> R.drawable.ic_cloud
-        }
-        binding.weatherCard.ivWeatherIcon.setImageResource(iconRes)
-    }
-
-    private fun getWeatherDescription(code: Int): String {
-        return when (code) {
-            0 -> "Clear Sky"
-            1 -> "Mainly Clear"
-            2 -> "Partly Cloudy"
-            3 -> "Overcast"
-            45, 48 -> "Foggy"
-            51 -> "Light Drizzle"
-            53 -> "Moderate Drizzle"
-            55 -> "Dense Drizzle"
-            61 -> "Light Rain"
-            63 -> "Moderate Rain"
-            65 -> "Heavy Rain"
-            80 -> "Light Rain Showers"
-            81 -> "Moderate Rain Showers"
-            82 -> "Violent Rain Showers"
-            95 -> "Scattered Thunderstorms"
-            96 -> "Thunderstorms with Hail"
-            99 -> "Heavy Thunderstorms"
-            else -> "Cloudy"
-        }
-    }
-
-    private fun getAutoAdvisory(code: Int): String? {
-        return when (code) {
-            51, 53, 55, 61, 80 -> "Rain Advisory: Prepare for Wet Conditions"
-            63, 81 -> "Moderate Rain Advisory: Watch for Rising Water"
-            65, 82 -> "Violent Rain Advisory: Stay Indoors"
-            95, 96, 99 -> "Severe Thunderstorm Warning: Seek Shelter"
-            else -> null
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         announcementsListener?.remove()
         alertsListener?.remove()
+        weatherView = null
+        landslideView = null
+        earthquakeView = null
         _binding = null
     }
 }

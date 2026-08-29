@@ -27,6 +27,7 @@ object PushNotificationManager {
 
     const val CHANNEL_EMERGENCY = "emergency_alerts"
     const val CHANNEL_ANNOUNCEMENTS = "announcements"
+    const val CHANNEL_DASHBOARD = "dashboard_alerts"
 
     const val EXTRA_NOTIFICATION_TYPE = "notification_type"
 
@@ -50,6 +51,14 @@ object PushNotificationManager {
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
                 description = context.getString(R.string.notification_channel_announcements_desc)
+            },
+            NotificationChannel(
+                CHANNEL_DASHBOARD,
+                "Dashboard Safety Alerts",
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = "Real-time alerts for weather, landslides, and earthquakes"
+                enableVibration(true)
             },
         )
 
@@ -110,6 +119,7 @@ object PushNotificationManager {
 
         val channelId = when (type) {
             "emergency_alert" -> CHANNEL_EMERGENCY
+            "weather_advisory", "landslide_alert", "earthquake_alert" -> CHANNEL_DASHBOARD
             else -> CHANNEL_ANNOUNCEMENTS
         }
 

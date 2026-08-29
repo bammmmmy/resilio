@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_earthquake"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_earthquake_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#1B5E20"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_earthquake_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SEISMIC MONITOR"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_earthquake_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/ic_alerts"
+            android:contentDescription="Earthquake icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_earthquake_title"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/tv_earthquake_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="NO RECENT QUAKES"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/iv_earthquake_icon"
+            app:layout_constraintStart_toEndOf="@id/iv_earthquake_icon"
+            app:layout_constraintTop_toTopOf="@id/iv_earthquake_icon" />
+
+        <TextView
+            android:id="@+id/tv_earthquake_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="No significant earthquakes detected within 100km of Antipolo City in the last 24 hours."
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_earthquake_icon" />
+
+        <LinearLayout
+            android:id="@+id/layout_earthquake_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tv_earthquake_desc">
+
+            <TextView
+                android:id="@+id/tv_latest_mag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Latest: M ---"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_quake_distance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Distance: --- km"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:gravity="end" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
