@@ -51,6 +51,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -309,7 +310,16 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
 
         map.setOnInfoWindowClickListener { marker ->
             when (val tag = marker.tag) {
-                is EvacuationArea -> openStreetViewForArea(tag)
+                is EvacuationArea -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Get Directions")
+                        .setMessage("Do you want to see the walking route to ${tag.name}?")
+                        .setNegativeButton("No") { _, _ -> openStreetViewForArea(tag) }
+                        .setPositiveButton("Yes") { _, _ ->
+                            calculateAndDrawRoute(LatLng(tag.latitude, tag.longitude))
+                        }
+                        .show()
+                }
                 is HazardLocation -> showHazardAiInfo(tag)
             }
         }
@@ -628,6 +638,8 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             null
         } ?: ""
 
+        Log.d("EvacuationMap", "Fetching route with API Key starting with: ${apiKey.take(5)}...")
+
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=${origin.latitude},${origin.longitude}" +
                 "&destination=${destination.latitude},${destination.longitude}" +
@@ -638,11 +650,14 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             try {
                 val request = Request.Builder().url(url).build()
                 httpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) return@use
                     val jsonData = response.body?.string() ?: return@use
                     val jsonObject = JSONObject(jsonData)
-                    val routes = jsonObject.getJSONArray("routes")
-                    if (routes.length() > 0) {
+                    
+                    val status = jsonObject.optString("status")
+                    Log.d("EvacuationMap", "Directions API Status: $status")
+
+                    if (status == "OK") {
+                        val routes = jsonObject.getJSONArray("routes")
                         val route = routes.getJSONObject(0)
                         val legs = route.getJSONArray("legs")
                         val leg = legs.getJSONObject(0)
@@ -661,10 +676,16 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                                 Toast.LENGTH_LONG
                             ).show()
                         }
+                    } else {
+                        val errorMsg = jsonObject.optString("error_message", "Unknown error")
+                        Log.e("EvacuationMap", "Directions API Error: $errorMsg")
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(requireContext(), "Routing error: $status", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             } catch (e: Exception) {
-                Log.e("EvacuationMap", "Error fetching route", e)
+                Log.e("EvacuationMap", "Network error fetching route", e)
             }
         }
     }

@@ -192,21 +192,27 @@ class AlertsUpdatesFragment : Fragment(R.layout.fragment_alerts_updates) {
             itemView.findViewById<TextView>(R.id.tv_evacuation_name).text = area.name
             itemView.findViewById<TextView>(R.id.tv_evacuation_address).text = area.address
             val viewMapButton = itemView.findViewById<MaterialButton>(R.id.btn_navigate_area)
-            viewMapButton.setOnClickListener { openOnVrMap(area) }
-
+            val directionsButton = itemView.findViewById<MaterialButton>(R.id.btn_get_directions)
             val deleteButton = itemView.findViewById<MaterialButton>(R.id.btn_delete_evacuation_area)
-            val viewMapParams = viewMapButton.layoutParams as LinearLayout.LayoutParams
+
+            viewMapButton.setOnClickListener { openOnVrMap(area) }
+            directionsButton.setOnClickListener { 
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Get Directions")
+                    .setMessage("Do you want to see the walking route to ${area.name}?")
+                    .setNegativeButton("No", null)
+                    .setPositiveButton("Yes") { _, _ ->
+                        openOnVrMap(area, showRoute = true)
+                    }
+                    .show()
+            }
+
             if (canManageEvacuationAreas()) {
                 deleteButton.visibility = View.VISIBLE
                 deleteButton.setOnClickListener { confirmDeleteArea(area) }
-                viewMapParams.width = 0
-                viewMapParams.weight = 1f
             } else {
                 deleteButton.visibility = View.GONE
-                viewMapParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                viewMapParams.weight = 0f
             }
-            viewMapButton.layoutParams = viewMapParams
 
             evacuationAreaContainer.addView(itemView)
         }

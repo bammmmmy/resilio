@@ -52,19 +52,34 @@
                 app:strokeColor="@color/divider_color" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_delete_evacuation_area"
+                android:id="@+id/btn_get_directions"
                 style="@style/Widget.Resilio.EvacuationActionButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:text="Directions"
+                android:textColor="@color/background"
+                app:backgroundTint="@color/gold_accent"
+                app:icon="@drawable/ic_location_on"
+                app:iconTint="@color/background" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_evacuation_area"
+                style="@style/Widget.Resilio.EvacuationActionButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
                 android:contentDescription="@string/delete_evacuation_area"
-                android:text="@string/delete_evacuation_area"
+                android:text=""
+                android:padding="0dp"
                 android:textColor="@color/white"
                 android:visibility="gone"
                 app:backgroundTint="@color/emergency_red"
                 app:icon="@drawable/ic_delete"
-                app:iconTint="@color/white" />
+                app:iconPadding="0dp"
+                app:iconTint="@color/white"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
