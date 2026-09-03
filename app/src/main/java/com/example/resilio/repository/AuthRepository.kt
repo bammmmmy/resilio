@@ -11,7 +11,7 @@ import android.net.Uri
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
+    private val storage = FirebaseStorage.getInstance("gs://resilio-ab61f.firebasestorage.app")
 
     fun login(email: String, pass: String, onResult: (Result<User>) -> Unit) {
         auth.signInWithEmailAndPassword(email, pass)

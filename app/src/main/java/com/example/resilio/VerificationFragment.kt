@@ -2,6 +2,7 @@ package com.example.resilio
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -28,7 +29,7 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
     private val binding get() = _binding!!
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
+    private val storage = FirebaseStorage.getInstance("gs://resilio-ab61f.firebasestorage.app")
     
     private var frontUri: Uri? = null
     private var backUri: Uri? = null
@@ -95,7 +96,6 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
                 binding.etFullName.setText(user.fullName)
                 binding.etAddress.setText(user.address)
                 binding.etBirthday.setText(user.birthday)
-                binding.etIdNumber.setText(user.idNumber)
                 
                 if (user.sex == "Male") binding.toggleSex.check(R.id.btnMale)
                 else if (user.sex == "Female") binding.toggleSex.check(R.id.btnFemale)
@@ -112,7 +112,6 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
     private fun validateInputs(): Boolean {
         if (binding.etFullName.text.isNullOrBlank() ||
             binding.etBirthday.text.isNullOrBlank() ||
-            binding.etIdNumber.text.isNullOrBlank() ||
             binding.etAddress.text.isNullOrBlank() ||
             binding.toggleSex.checkedButtonId == View.NO_ID
         ) {
@@ -150,20 +149,34 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
 
     private suspend fun uploadImage(uri: Uri, side: String): String? {
         val uid = auth.currentUser?.uid ?: return null
-        val ref = storage.reference.child("verification_ids/${uid}_$side.jpg")
+        val ref = storage.reference.child("verification_ids").child("${uid}_$side.jpg")
         
-        return kotlin.coroutines.suspendCoroutine { continuation ->
-            ref.putFile(uri)
-                .continueWithTask { task ->
-                    if (!task.isSuccessful) task.exception?.let { throw it }
-                    ref.downloadUrl
-                }
-                .addOnSuccessListener { downloadUrl ->
-                    continuation.resumeWith(Result.success(downloadUrl.toString()))
-                }
-                .addOnFailureListener {
-                    continuation.resumeWith(Result.failure(it))
-                }
+        android.util.Log.d("ResilioStorage", "Attempting upload to bucket: ${storage.reference.bucket}")
+
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+            val data = baos.toByteArray()
+            inputStream?.close()
+
+            kotlin.coroutines.suspendCoroutine { continuation ->
+                ref.putBytes(data)
+                    .addOnSuccessListener {
+                        ref.downloadUrl.addOnSuccessListener { downloadUrl ->
+                            continuation.resumeWith(Result.success(downloadUrl.toString()))
+                        }.addOnFailureListener {
+                            continuation.resumeWith(Result.failure(it))
+                        }
+                    }
+                    .addOnFailureListener {
+                        continuation.resumeWith(Result.failure(it))
+                    }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("ResilioStorage", "Error processing image", e)
+            null
         }
     }
 
@@ -173,7 +186,6 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
         val updates = mapOf(
             "fullName" to binding.etFullName.text.toString().trim(),
             "birthday" to binding.etBirthday.text.toString().trim(),
-            "idNumber" to binding.etIdNumber.text.toString().trim(),
             "address" to binding.etAddress.text.toString().trim(),
             "sex" to sex,
             "verificationStatus" to VerificationStatus.PENDING,

@@ -41,7 +41,7 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
     private var imageBitmap: Bitmap? = null
     private var userLocation: Location? = null
     
-    private val storage = FirebaseStorage.getInstance()
+    private val storage = FirebaseStorage.getInstance("gs://resilio-ab61f.firebasestorage.app")
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
