@@ -17,8 +17,10 @@ class ResidentVerificationAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvFullName: TextView = view.findViewById(R.id.tvFullName)
+        val tvDetails: TextView = view.findViewById(R.id.tvDetails)
         val tvAddress: TextView = view.findViewById(R.id.tvAddress)
-        val ivIdImage: ImageView = view.findViewById(R.id.ivIdImage)
+        val ivIdFront: ImageView = view.findViewById(R.id.ivIdFront)
+        val ivIdBack: ImageView = view.findViewById(R.id.ivIdBack)
         val btnApprove: View = view.findViewById(R.id.btnApprove)
         val btnReject: View = view.findViewById(R.id.btnReject)
     }
@@ -31,12 +33,18 @@ class ResidentVerificationAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = residents[position]
         holder.tvFullName.text = user.fullName
-        holder.tvAddress.text = user.address
+        holder.tvAddress.text = "Address: ${user.address}"
+        holder.tvDetails.text = "DOB: ${user.birthday} | Sex: ${user.sex}"
         
         Glide.with(holder.itemView.context)
             .load(user.idImageUrl)
-            .placeholder(R.drawable.ic_nav_placeholder)
-            .into(holder.ivIdImage)
+            .placeholder(R.drawable.logog)
+            .into(holder.ivIdFront)
+
+        Glide.with(holder.itemView.context)
+            .load(user.idBackImageUrl)
+            .placeholder(R.drawable.logog)
+            .into(holder.ivIdBack)
 
         holder.btnApprove.setOnClickListener { onApprove(user.uid) }
         holder.btnReject.setOnClickListener { onReject(user.uid) }

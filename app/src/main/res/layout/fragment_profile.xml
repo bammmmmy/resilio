@@ -246,6 +246,31 @@
                         android:layout_marginBottom="12dp"/>
                 </LinearLayout>
 
+                <!-- Resident Actions -->
+                <LinearLayout
+                    android:id="@+id/layoutResidentActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnVerifyAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="VERIFY ACCOUNT"
+                        android:backgroundTint="@color/surface"
+                        android:textColor="@color/text_primary"
+                        app:strokeColor="@color/gold_accent"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_done"
+                        app:iconTint="@color/gold_accent"
+                        app:iconPadding="12dp"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="12dp"/>
+                </LinearLayout>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"

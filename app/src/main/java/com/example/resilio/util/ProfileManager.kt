@@ -19,7 +19,10 @@ object ProfileManager {
     private val EMAIL = stringPreferencesKey("email")
     private val ADDRESS = stringPreferencesKey("address")
     private val ABOUT = stringPreferencesKey("about")
+    private val SEX = stringPreferencesKey("sex")
     private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
+    private val ID_FRONT_URI = stringPreferencesKey("id_front_uri")
+    private val ID_BACK_URI = stringPreferencesKey("id_back_uri")
 
     fun getProfile(context: Context): Flow<User> {
         return context.dataStore.data.map { prefs ->
@@ -31,7 +34,10 @@ object ProfileManager {
                 email = prefs[EMAIL] ?: "",
                 address = prefs[ADDRESS] ?: "",
                 about = prefs[ABOUT] ?: "",
+                sex = prefs[SEX] ?: "",
                 profileImageUrl = prefs[PROFILE_IMAGE_URI],
+                idImageUrl = prefs[ID_FRONT_URI],
+                idBackImageUrl = prefs[ID_BACK_URI],
                 role = UserRole.CHAIRMAN
             )
         }
@@ -46,7 +52,10 @@ object ProfileManager {
             prefs[EMAIL] = user.email
             prefs[ADDRESS] = user.address
             prefs[ABOUT] = user.about
+            prefs[SEX] = user.sex
             user.profileImageUrl?.let { prefs[PROFILE_IMAGE_URI] = it }
+            user.idImageUrl?.let { prefs[ID_FRONT_URI] = it }
+            user.idBackImageUrl?.let { prefs[ID_BACK_URI] = it }
         }
     }
     

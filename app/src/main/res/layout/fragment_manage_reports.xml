@@ -9,24 +9,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Approve Announcements"
+        android:text="Active Emergency Reports"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/gold_accent"
+        android:textColor="@color/emergency_red"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No pending announcements"
+        android:text="No active emergency reports"
         android:textColor="@color/text_secondary"
         android:gravity="center"
         android:visibility="gone"
         android:layout_marginTop="32dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPendingAnnouncements"
+        android:id="@+id/rvEmergencyReports"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

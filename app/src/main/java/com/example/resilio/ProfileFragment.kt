@@ -49,10 +49,33 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     UserRole.CHAIRMAN -> {
                         binding.layoutChairmanActions.visibility = View.VISIBLE
                         binding.layoutBdrrmoActions.visibility = View.GONE
+                        binding.layoutResidentActions.visibility = View.GONE
                     }
-                    else -> {
-                        binding.layoutBdrrmoActions.visibility = View.GONE
+                    UserRole.RESIDENT -> {
+                        binding.layoutResidentActions.visibility = View.VISIBLE
                         binding.layoutChairmanActions.visibility = View.GONE
+                        binding.layoutBdrrmoActions.visibility = View.GONE
+
+                        when (user.verificationStatus) {
+                            com.example.resilio.model.VerificationStatus.APPROVED -> {
+                                binding.btnVerifyAccount.text = "VERIFIED ACCOUNT"
+                                binding.btnVerifyAccount.isEnabled = false
+                                binding.btnVerifyAccount.setIconResource(R.drawable.ic_done)
+                                binding.btnVerifyAccount.alpha = 0.8f
+                            }
+                            com.example.resilio.model.VerificationStatus.PENDING -> {
+                                binding.btnVerifyAccount.text = "VERIFICATION PENDING"
+                                binding.btnVerifyAccount.isEnabled = false
+                                binding.btnVerifyAccount.setIconResource(R.drawable.ic_nav_placeholder)
+                                binding.btnVerifyAccount.alpha = 0.6f
+                            }
+                            else -> {
+                                binding.btnVerifyAccount.text = "VERIFY ACCOUNT"
+                                binding.btnVerifyAccount.isEnabled = true
+                                binding.btnVerifyAccount.setIconResource(R.drawable.ic_done)
+                                binding.btnVerifyAccount.alpha = 1.0f
+                            }
+                        }
                     }
                 }
             }
@@ -86,6 +109,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
         binding.btnVerifyResidents.setOnClickListener {
             findNavController().navigate(R.id.userManagementFragment)
+        }
+
+        binding.btnVerifyAccount.setOnClickListener {
+            findNavController().navigate(R.id.verificationFragment)
         }
 
         binding.btnLogout.setOnClickListener {

@@ -20,6 +20,10 @@ import com.example.resilio.model.EmergencyAlert
 import com.example.resilio.util.ProfileManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayoutMediator
+import com.example.resilio.model.User
+import com.example.resilio.model.VerificationStatus
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -56,10 +60,42 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupNavigation()
         setupCallButtons()
         
+        binding.btnReportEmergency.setOnClickListener {
+            checkVerificationAndReport()
+        }
+
         startDataRefreshLoop()
         
         setupLatestAlerts()
         setupLatestAnnouncements()
+    }
+
+    private fun checkVerificationAndReport() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        
+        FirebaseFirestore.getInstance().collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val user = doc.toObject(User::class.java)
+                if (user?.verificationStatus == VerificationStatus.APPROVED) {
+                    findNavController().navigate(R.id.createReportFragment)
+                } else {
+                    val status = user?.verificationStatus ?: VerificationStatus.NOT_SUBMITTED
+                    val message = when (status) {
+                        VerificationStatus.PENDING -> "Your verification is still being processed. Please wait for approval to report emergencies."
+                        VerificationStatus.REJECTED -> "Your verification was rejected: ${user?.rejectionReason ?: "Invalid ID"}. Please re-submit your ID."
+                        else -> "You must verify your account with a valid ID before you can send emergency reports."
+                    }
+                    
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Verification Required")
+                        .setMessage(message)
+                        .setPositiveButton("Verify Now") { _, _ ->
+                            findNavController().navigate(R.id.verificationFragment)
+                        }
+                        .setNegativeButton("Maybe Later", null)
+                        .show()
+                }
+            }
     }
 
     private fun startDataRefreshLoop() {

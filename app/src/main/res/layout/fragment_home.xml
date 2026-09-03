@@ -75,6 +75,24 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReportEmergency"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="REPORT EMERGENCY"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/emergency_red"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_alerts"
+                    app:iconTint="@color/white"
+                    app:iconSize="28dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="12dp"
+                    android:layout_marginBottom="24dp"
+                    app:elevation="4dp" />
+
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/status_pager"
                     android:layout_width="match_parent"
