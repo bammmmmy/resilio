@@ -18,35 +18,83 @@
             android:gravity="center_horizontal">
 
             <!-- Profile Header -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="60dp"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="50dp"
-                app:cardBackgroundColor="@color/warning_orange"
-                app:cardElevation="8dp"
-                app:strokeWidth="0dp">
-                <!-- Solid gold circle as seen in the image -->
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivProfileImage"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:padding="2dp"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
+                    app:strokeColor="@color/warning_orange"
+                    app:strokeWidth="2dp"
+                    android:src="@drawable/logog" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabEditProfileImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    app:fabCustomSize="32dp"
+                    app:maxImageSize="18dp"
+                    app:srcCompat="@drawable/ic_edit"
+                    app:tint="@color/white"
+                    app:backgroundTint="@color/warning_orange"
+                    android:contentDescription="Edit Photo" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Barangay Chairman"
+                android:text="Juan Dela Cruz"
                 android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="4dp"/>
+                android:layout_marginBottom="2dp"/>
 
             <TextView
-                android:id="@+id/tvProfileEmail"
+                android:id="@+id/tvProfilePosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="email@example.com"
+                android:text="Barangay Chairman"
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp"
+                android:layout_marginBottom="2dp"/>
+
+            <TextView
+                android:id="@+id/tvProfileBarangay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barangay San Jose"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditProfile"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EDIT PROFILE"
+                android:textColor="@color/text_primary"
+                app:strokeColor="@color/gold_accent"
+                app:cornerRadius="20dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/tvProfileAbout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barangay Chairman"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:gravity="center"
                 android:layout_marginBottom="32dp"/>
 
             <!-- Actions Container -->

@@ -205,7 +205,30 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_disasterAlertsFragment"
+            app:destination="@id/disasterAlertsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_createAnnouncementFragment"
+            app:destination="@id/createAnnouncementFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_announcementsFragment"
+            app:destination="@id/announcementsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageReportsFragment"
+            app:destination="@id/manageReportsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_verificationFragment"
+            app:destination="@id/verificationFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.resilio.EditProfileFragment"
+        android:label="Edit Profile" />
 
     <fragment
         android:id="@+id/createReportFragment"

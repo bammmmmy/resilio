@@ -38,4 +38,12 @@ class AuthViewModel : ViewModel() {
         repository.logout()
         _userState.postValue(null)
     }
+
+    fun updateProfile(user: User, onResult: (Result<Unit>) -> Unit) {
+        repository.updateProfile(user, onResult)
+    }
+
+    fun uploadProfileImage(uri: android.net.Uri, onResult: (Result<String>) -> Unit) {
+        repository.uploadProfileImage(uri, onResult)
+    }
 }

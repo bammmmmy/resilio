@@ -151,6 +151,31 @@
     <string name="earthquake_centers">Designated open spaces and evacuation zones.</string>
     <string name="earthquake_high_risk">Structural safety checks recommended for old buildings and high-density areas.</string>
 
+    <!-- Disaster Awareness Details -->
+    <string name="what_is_flood">What is a Flood?</string>
+    <string name="flood_long_desc">A flood happens when water overflows onto land that is normally dry. It may be caused by heavy rainfall, overflowing rivers, storm surge, or poor drainage.</string>
+    <string name="flood_before_bullets">• Monitor weather and flood warnings.\n• Prepare an emergency bag.\n• Keep important documents in waterproof containers.\n• Move valuable items to higher places.\n• Know the nearest evacuation center.</string>
+    <string name="flood_during_bullets">• Stay indoors and move to higher ground if necessary.\n• Do not walk or drive through moving floodwater.\n• Follow instructions from local authorities.\n• Turn off electricity if it is safe to do so.\n• Keep emergency supplies with you.</string>
+    <string name="flood_after_bullets">• Avoid contaminated floodwater.\n• Check your surroundings for hazards.\n• Do not use electrical equipment if it is wet.\n• Wait for authorities to declare the area safe.\n• Report damaged infrastructure when necessary.</string>
+
+    <string name="what_is_typhoon">What is a Typhoon?</string>
+    <string name="typhoon_long_desc">A typhoon is a mature tropical cyclone that develops between 180° and 100°E in the Northern Hemisphere. It brings very strong winds and heavy rain that can cause massive damage.</string>
+    <string name="typhoon_before_bullets">• Inspect and repair your house especially the roof.\n• Monitor weather reports via radio, TV, or internet.\n• Stock up on food, water, and emergency supplies.\n• Charge your mobile phones and power banks.\n• Secure pets and livestock in safe areas.</string>
+    <string name="typhoon_during_bullets">• Stay calm and stay inside the house.\n• Keep monitoring weather updates.\n• If your house is not safe, proceed to the nearest evacuation center.\n• Avoid using electronics if there is lightning.\n• Stay away from glass windows.</string>
+    <string name="typhoon_after_bullets">• Check the safety of your house before entering.\n• Avoid fallen power lines and dangling wires.\n• Beware of water-borne diseases like leptospirosis.\n• Check for structural damage to your home.\n• Help neighbors who may need assistance.</string>
+
+    <string name="what_is_landslide">What is a Landslide?</string>
+    <string name="landslide_long_desc">A landslide is the movement of a mass of rock, debris, or earth down a slope. Landslides are a type of \"mass wasting,\" which denotes any down-slope movement of soil and rock under the direct influence of gravity.</string>
+    <string name="landslide_before_bullets">• Know your area\'s risk for landslides.\n• Watch for warning signs like cracks in walls or ground.\n• Monitor heavy rainfall and unusual sounds.\n• Plant trees and vegetation to help hold soil.\n• Have an evacuation plan ready.</string>
+    <string name="landslide_during_bullets">• Evacuate immediately if you hear unusual sounds.\n• If you cannot escape, curl into a tight ball and protect your head.\n• Stay away from the path of debris.\n• Move to higher ground away from slopes.\n• Warn neighbors if possible.</string>
+    <string name="landslide_after_bullets">• Stay away from the landslide area until cleared by authorities.\n• Check for downed power lines and ruptured pipes.\n• Watch for secondary landslides or flooding.\n• Help with rescue efforts only if it is safe.\n• Report damage to local disaster officials.</string>
+
+    <string name="what_is_earthquake">What is an Earthquake?</string>
+    <string name="earthquake_long_desc">An earthquake is the shaking of the surface of the Earth resulting from a sudden release of energy in the Earth\'s lithosphere that creates seismic waves.</string>
+    <string name="earthquake_before_bullets">• Familiarize yourself with safe spots in your house.\n• Secure heavy furniture to the wall.\n• Participate in earthquake drills.\n• Prepare an emergency kit.\n• Know the location of the main circuit breaker.</string>
+    <string name="earthquake_during_bullets">• DROP, COVER, and HOLD ON.\n• Stay away from glass windows and heavy objects.\n• If outdoors, move to an open area away from buildings.\n• If driving, pull over and stay inside the car.\n• Do not use elevators.</string>
+    <string name="earthquake_after_bullets">• Expect aftershocks.\n• Check yourself and others for injuries.\n• Check for fire, gas leaks, and chemical spills.\n• Evacuate if the building is damaged.\n• Tune in to local radio for emergency instructions.</string>
+
     <!-- Navigation & Routes -->
     <string name="status_primary">PRIMARY</string>
     <string name="status_secondary">SECONDARY</string>
@@ -193,6 +218,7 @@
     <string name="hazard_pin_content_description">Drag pin to set hazard location</string>
     <string name="hazard_marker_title">%1$s hazard</string>
     <string name="hazard_area_radius">Affected Area Radius: %1$dm</string>
+    <string name="get_directions_to">Get Directions to %1$s</string>
 
     <!-- Hotline Dialog -->
     <string name="call_confirm_title">Emergency Call</string>

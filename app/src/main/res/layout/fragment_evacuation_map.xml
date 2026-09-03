@@ -177,6 +177,21 @@
         app:fabSize="normal" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_get_directions_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="32dp"
+        android:text="Get Directions"
+        android:visibility="gone"
+        app:backgroundTint="@color/gold_accent"
+        android:textColor="@color/background"
+        app:cornerRadius="24dp"
+        app:icon="@drawable/ic_location_on"
+        app:iconTint="@color/background"
+        app:elevation="8dp" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_confirm_evacuation_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

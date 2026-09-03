@@ -176,7 +176,7 @@ object ResilioLiveContext {
         }
         
         val advisory = weatherAdvisory(weather.code) ?: if (intensity > 15.0) "Heavy Rainfall Warning: Seek Shelter" else "None"
-        val timeLabel = formatApiTime(weather.apiTimeStr)
+        val timeLabel = formatApiTime(weather.fetchedAtMillis)
 
         return buildString {
             appendLine("WEATHER CARD DATA:")
@@ -344,11 +344,9 @@ object ResilioLiveContext {
     private fun formatTimestamp(timestamp: Timestamp): String =
         SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault()).format(timestamp.toDate())
 
-    private fun formatApiTime(apiTimeStr: String): String = try {
-        val parsed = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US).parse(apiTimeStr) ?: Date()
-        SimpleDateFormat("EEEE h:mm a", Locale.getDefault()).format(parsed)
-    } catch (_: Exception) {
-        apiTimeStr
+    private fun formatApiTime(fetchedAtMillis: Long): String {
+        val date = Date(fetchedAtMillis)
+        return SimpleDateFormat("EEEE h:mm a", Locale.getDefault()).format(date)
     }
 
     fun weatherDescription(code: Int): String = when (code) {

@@ -11,16 +11,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.resilio.databinding.FragmentChairmanDashboardBinding
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.util.ProfileManager
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,10 +34,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.fragment.app.viewModels
+import com.example.resilio.viewmodel.AuthViewModel
+
 class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard) {
 
     private var _binding: FragmentChairmanDashboardBinding? = null
     private val binding get() = _binding!!
+    private val authViewModel: AuthViewModel by viewModels()
 
     private var announcementsListener: ListenerRegistration? = null
     private var alertsListener: ListenerRegistration? = null
@@ -46,6 +53,8 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentChairmanDashboardBinding.bind(view)
+
+        loadHeaderProfile()
 
         binding.fabAskResilio.setOnClickListener {
             findNavController().navigate(R.id.action_chairmanDashboardFragment_to_aiChatFragment)
@@ -171,6 +180,29 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
         binding.layoutLatestAlerts.tvViewAllAlerts.setOnClickListener {
             findNavController().navigate(R.id.action_chairmanDashboardFragment_to_disasterAlertsFragment)
         }
+    }
+
+    private fun loadHeaderProfile() {
+        authViewModel.userState.observe(viewLifecycleOwner) { result ->
+            result?.onSuccess { user ->
+                if (user.fullName.isNotBlank()) {
+                    binding.tvStatusTitle.text = user.fullName
+                }
+                binding.tvStatusDesc.text = user.position.ifBlank { "Barangay Chairman" }
+                
+                user.profileImageUrl?.let {
+                    Glide.with(this@ChairmanDashboardFragment)
+                        .load(it)
+                        .placeholder(R.drawable.logog)
+                        .into(binding.ivHeaderProfileImage)
+                }
+
+                lifecycleScope.launch {
+                    ProfileManager.saveProfile(requireContext(), user)
+                }
+            }
+        }
+        authViewModel.checkAuthState()
     }
 
     override fun onDestroyView() {

@@ -192,10 +192,9 @@ object DashboardUIHelper {
         view.findViewById<TextView>(R.id.tv_rain_24h).text = String.format(Locale.US, "24h Rain: %.1f mm", snap.rain24h)
 
         try {
-            val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
-            val weatherDate = apiFormat.parse(snap.apiTimeStr) ?: Date()
-            view.findViewById<TextView>(R.id.tv_weather_time).text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(weatherDate)
-            view.findViewById<TextView>(R.id.tv_weather_day).text = SimpleDateFormat("EEEE", Locale.getDefault()).format(weatherDate)
+            val updateTime = Date(snap.fetchedAtMillis)
+            view.findViewById<TextView>(R.id.tv_weather_time).text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(updateTime)
+            view.findViewById<TextView>(R.id.tv_weather_day).text = SimpleDateFormat("EEEE", Locale.getDefault()).format(updateTime)
         } catch (e: Exception) {
             e.printStackTrace()
         }

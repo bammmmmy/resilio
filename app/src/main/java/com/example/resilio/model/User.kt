@@ -10,5 +10,11 @@ data class User(
     val role: UserRole = UserRole.RESIDENT,
     val verificationStatus: VerificationStatus = VerificationStatus.NOT_SUBMITTED,
     val idImageUrl: String? = null,
-    val fcmToken: String? = null
+    val fcmToken: String? = null,
+    // Profile Management Fields
+    val position: String = "",
+    val barangayName: String = "",
+    val contactNumber: String = "",
+    val about: String = "",
+    val profileImageUrl: String? = null
 )

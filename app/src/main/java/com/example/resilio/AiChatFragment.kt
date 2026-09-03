@@ -76,8 +76,14 @@ class AiChatFragment : Fragment(R.layout.fragment_ai_chat) {
     }
 
     private fun addMessage(message: ChatMessage) {
-        messages.add(message)
-        chatAdapter.replaceAll(messages)
+        // Ensure every new message gets a completely fresh current timestamp
+        val freshMessage = if (message.timestamp == 0L) {
+            message.copy(timestamp = System.currentTimeMillis())
+        } else {
+            message
+        }
+        messages.add(freshMessage)
+        chatAdapter.addMessage(freshMessage)
         historyStore.save(messages)
         scrollToLatest()
     }

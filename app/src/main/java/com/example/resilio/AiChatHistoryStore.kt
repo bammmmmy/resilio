@@ -21,6 +21,7 @@ class AiChatHistoryStore(context: Context) {
                         ChatMessage(
                             role = obj.getString(KEY_ROLE),
                             content = obj.getString(KEY_CONTENT),
+                            timestamp = obj.optLong(KEY_TIMESTAMP, System.currentTimeMillis())
                         ),
                     )
                 }
@@ -38,6 +39,7 @@ class AiChatHistoryStore(context: Context) {
                 JSONObject().apply {
                     put(KEY_ROLE, message.role)
                     put(KEY_CONTENT, message.content)
+                    put(KEY_TIMESTAMP, message.timestamp)
                 },
             )
         }
@@ -53,6 +55,7 @@ class AiChatHistoryStore(context: Context) {
         private const val PREFS_NAME = "ai_chat_history"
         private const val KEY_ROLE = "role"
         private const val KEY_CONTENT = "content"
+        private const val KEY_TIMESTAMP = "timestamp"
         private const val MAX_MESSAGES = 200
     }
 }

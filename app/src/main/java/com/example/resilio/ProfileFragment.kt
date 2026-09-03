@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.resilio.databinding.FragmentProfileBinding
 import com.example.resilio.model.UserRole
+import com.example.resilio.util.ProfileManager
 import com.example.resilio.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -19,10 +23,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentProfileBinding.bind(view)
 
+        loadProfileData()
+
+        binding.btnEditProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
+        binding.fabEditProfileImage.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
         authViewModel.userState.observe(viewLifecycleOwner) { result ->
             result?.onSuccess { user ->
-                binding.tvProfileName.text = user.fullName
-                binding.tvProfileEmail.text = user.email
+                // Basic fallback for name if local profile is empty
+                if (binding.tvProfileName.text == "Juan Dela Cruz") {
+                    binding.tvProfileName.text = user.fullName
+                }
 
                 // Show specific actions based on role
                 when (user.role) {
@@ -76,6 +92,30 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             authViewModel.logout()
             findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
         }
+    }
+
+    private fun loadProfileData() {
+        authViewModel.userState.observe(viewLifecycleOwner) { result ->
+            result?.onSuccess { user ->
+                binding.tvProfileName.text = user.fullName.ifBlank { "Barangay Chairman" }
+                binding.tvProfilePosition.text = user.position.ifBlank { "Barangay Chairman" }
+                binding.tvProfileBarangay.text = user.barangayName.ifBlank { "Barangay San Jose" }
+                binding.tvProfileAbout.text = user.about.ifBlank { "No description provided." }
+                
+                user.profileImageUrl?.let {
+                    Glide.with(this@ProfileFragment)
+                        .load(it)
+                        .placeholder(R.drawable.logog)
+                        .into(binding.ivProfileImage)
+                }
+
+                // Update local cache to match cloud data
+                lifecycleScope.launch {
+                    ProfileManager.saveProfile(requireContext(), user)
+                }
+            }
+        }
+        authViewModel.checkAuthState()
     }
 
     override fun onDestroyView() {

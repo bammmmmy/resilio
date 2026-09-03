@@ -12,16 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.resilio.databinding.FragmentHomeBinding
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.util.ProfileManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -46,6 +49,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
+
+        loadHeaderProfile()
 
         setupStatusPager()
         setupNavigation()
@@ -215,6 +220,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             data = Uri.parse("tel:$cleanNumber")
         }
         startActivity(intent)
+    }
+
+    private fun loadHeaderProfile() {
+        lifecycleScope.launch {
+            val user = ProfileManager.getProfile(requireContext()).first()
+            if (user.fullName.isNotBlank()) {
+                binding.tvStatusTitle.text = user.fullName
+            }
+            
+            user.profileImageUrl?.let {
+                Glide.with(this@HomeFragment)
+                    .load(it)
+                    .placeholder(R.drawable.logog)
+                    .into(binding.ivHeaderProfileImage)
+            }
+        }
     }
 
     override fun onDestroyView() {

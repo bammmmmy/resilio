@@ -46,154 +46,330 @@
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingTop="8dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="40dp">
 
-            <GridLayout
+            <!-- Disaster List -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2">
+                android:orientation="vertical">
 
-            <!-- Flood -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_flood"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/surface"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/divider_color"
-                android:clickable="true"
-                android:focusable="true">
-                <LinearLayout
+                <!-- Flood Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_flood"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🌊"
-                        android:textSize="40sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/filter_flood"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="12dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌊"
+                            android:textSize="24sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/filter_flood"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:id="@+id/iv_chevron_flood"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:tint="@color/text_secondary"
+                            android:rotation="-90"
+                            android:contentDescription="@null"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <!-- Typhoon -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_typhoon"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/surface"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/divider_color"
-                android:clickable="true"
-                android:focusable="true">
-                <LinearLayout
+                <!-- Typhoon Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_typhoon"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🌪"
-                        android:textSize="40sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/filter_typhoon"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="12dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌀"
+                            android:textSize="24sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/filter_typhoon"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:id="@+id/iv_chevron_typhoon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:tint="@color/text_secondary"
+                            android:rotation="-90"
+                            android:contentDescription="@null"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <!-- Landslide -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_landslide"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/surface"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/divider_color"
-                android:clickable="true"
-                android:focusable="true">
-                <LinearLayout
+                <!-- Landslide Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_landslide"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="⛰"
-                        android:textSize="40sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/filter_landslide"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="12dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▲"
+                            android:textSize="24sp"
+                            android:textColor="@color/emergency_red"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/filter_landslide"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:id="@+id/iv_chevron_landslide"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:tint="@color/text_secondary"
+                            android:rotation="-90"
+                            android:contentDescription="@null"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <!-- Earthquake -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_earthquake"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/surface"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/divider_color"
-                android:clickable="true"
-                android:focusable="true">
-                <LinearLayout
+                <!-- Earthquake Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_earthquake"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🌎"
-                        android:textSize="40sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/filter_earthquake"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="12dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌎"
+                            android:textSize="24sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/filter_earthquake"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:id="@+id/iv_chevron_earthquake"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_drop_down"
+                            app:tint="@color/text_secondary"
+                            android:rotation="-90"
+                            android:contentDescription="@null"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            </GridLayout>
+            </LinearLayout>
+
+            <!-- Detailed Information Section -->
+            <LinearLayout
+                android:id="@+id/layout_disaster_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider_color"
+                    android:layout_marginBottom="24dp"/>
+
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FLOOD"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/gold_accent"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tv_disaster_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"
+                    android:text="What is a Flood?"/>
+
+                <TextView
+                    android:id="@+id/tv_disaster_long_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="24dp"
+                    android:lineSpacingExtra="4dp"/>
+
+                <!-- Content Cards -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:id="@+id/tv_section1_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Safety Preparation (Before)"
+                            android:textColor="@color/gold_accent"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+                        <TextView
+                            android:id="@+id/tv_section1_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="4dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:id="@+id/tv_section2_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="During Disaster Actions"
+                            android:textColor="@color/gold_accent"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+                        <TextView
+                            android:id="@+id/tv_section2_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="4dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/divider_color">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:id="@+id/tv_section3_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="After Disaster (Recovery)"
+                            android:textColor="@color/gold_accent"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+                        <TextView
+                            android:id="@+id/tv_section3_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="4dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -74,6 +74,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private lateinit var fabStreet: FloatingActionButton
     private lateinit var fabClose: FloatingActionButton
     private lateinit var fabAi: FloatingActionButton
+    private lateinit var btnGetDirectionsOverlay: MaterialButton
     
     private lateinit var cardRadiusControl: View
     private lateinit var tvRadiusLabel: TextView
@@ -99,6 +100,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private var hazardMarkerIcon: BitmapDescriptor? = null
     private val evacuationMarkers = mutableListOf<Marker>()
     private val hazardMarkers = mutableListOf<Marker>()
+    private var selectedEvacuationArea: EvacuationArea? = null
     private val hazardCircles = mutableListOf<Circle>()
     private var previewHazardCircle: Circle? = null
 
@@ -115,6 +117,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         fabStreet = view.findViewById(R.id.fab_street_view)
         fabClose = view.findViewById(R.id.fab_close_street_view)
         fabAi = view.findViewById(R.id.fab_ai_chat)
+        btnGetDirectionsOverlay = view.findViewById(R.id.btn_get_directions_overlay)
         
         cardRadiusControl = view.findViewById(R.id.card_radius_control)
         tvRadiusLabel = view.findViewById<TextView>(R.id.tv_radius_label)
@@ -216,6 +219,13 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             }
         }
 
+        btnGetDirectionsOverlay.setOnClickListener {
+            selectedEvacuationArea?.let { area ->
+                calculateAndDrawRoute(LatLng(area.latitude, area.longitude))
+                btnGetDirectionsOverlay.visibility = View.GONE
+            }
+        }
+
         fabStreet.setOnClickListener {
             enterStreetViewSelectionMode()
         }
@@ -298,14 +308,32 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             animateToMarker(marker.position)
             when (val tag = marker.tag) {
                 is HazardLocation -> {
+                    btnGetDirectionsOverlay.visibility = View.GONE
+                    selectedEvacuationArea = null
                     showHazardAiInfo(tag)
                     true
                 }
+                is EvacuationArea -> {
+                    selectedEvacuationArea = tag
+                    btnGetDirectionsOverlay.text = getString(R.string.get_directions_to, tag.name)
+                    btnGetDirectionsOverlay.visibility = View.VISIBLE
+                    marker.showInfoWindow()
+                    true
+                }
                 else -> {
+                    btnGetDirectionsOverlay.visibility = View.GONE
+                    selectedEvacuationArea = null
                     marker.showInfoWindow()
                     true
                 }
             }
+        }
+
+        map.setOnMapClickListener {
+            btnGetDirectionsOverlay.visibility = View.GONE
+            selectedEvacuationArea = null
+            currentPolyline?.remove()
+            currentPolyline = null
         }
 
         map.setOnInfoWindowClickListener { marker ->
