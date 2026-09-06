@@ -27,6 +27,8 @@ class DisasterAwarenessFragment : Fragment(R.layout.fragment_disaster_awareness)
     private lateinit var tvSection3Title: TextView
     private lateinit var tvSection3Content: TextView
 
+    private var currentSelectedType: String? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -64,6 +66,15 @@ class DisasterAwarenessFragment : Fragment(R.layout.fragment_disaster_awareness)
     }
 
     private fun showDisasterDetail(type: String) {
+        if (currentSelectedType == type) {
+            // Toggle off if clicking the same card
+            detailLayout.visibility = View.GONE
+            resetCardHighlights()
+            currentSelectedType = null
+            return
+        }
+
+        currentSelectedType = type
         detailLayout.visibility = View.VISIBLE
         resetCardHighlights()
 

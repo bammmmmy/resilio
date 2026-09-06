@@ -12,13 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Mask Overlay -->
-    <com.example.resilio.MapMaskView
-        android:id="@+id/map_mask_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_radius_control"
         android:layout_width="match_parent"

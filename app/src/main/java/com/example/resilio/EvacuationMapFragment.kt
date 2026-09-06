@@ -65,7 +65,6 @@ import java.util.Locale
 class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapReadyCallback {
 
     private var googleMap: GoogleMap? = null
-    private lateinit var mapMaskOverlay: MapMaskView
     private lateinit var streetOverlay: View
     private lateinit var streetViewPin: ImageView
     private lateinit var streetViewConfirmButton: FloatingActionButton
@@ -108,7 +107,6 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private val auth = FirebaseAuth.getInstance()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mapMaskOverlay = view.findViewById(R.id.map_mask_overlay)
         streetOverlay = view.findViewById(R.id.street_view_container)
         streetViewPin = view.findViewById(R.id.streetview_pin)
         streetViewConfirmButton = view.findViewById(R.id.fab_confirm_street_view)
@@ -263,19 +261,6 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             map.isMyLocationEnabled = true
         }
 
-        // Define the Brgy. San Jose polygon points (the area to keep clear)
-        val sanJosePolygon = listOf(
-            LatLng(14.742485845406158, 121.31765553238483),
-            LatLng(14.73637059040346, 121.32354202789874),
-            LatLng(14.666273096361838, 121.33538220091981),
-            LatLng(14.605635467050892, 121.32619585872438),
-            LatLng(14.58657164606891, 121.27142112776289),
-            LatLng(14.564102509102275, 121.19973670763827),
-            LatLng(14.587389952822482, 121.17013717993684),
-            LatLng(14.675573485191483, 121.20950887093656),
-            LatLng(14.742485845406158, 121.31765553238483)
-        )
-
         // Restrict map panning to the entire Antipolo City area
         val antipoloCityBounds = LatLngBounds(
             LatLng(14.4272, 121.01592), // Southwest
@@ -287,16 +272,13 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         // 1. Focus on San Jose at a standard zoom level
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(SAN_JOSE_CENTER, 15.0f))
 
-        // 2. Sync the mask overlay with the camera movement
+        // 2. Sync preview circle with the camera movement
         map.setOnCameraMoveListener {
-            updateMask(map, sanJosePolygon)
             updatePreviewCircle()
         }
         map.setOnCameraIdleListener {
-            updateMask(map, sanJosePolygon)
             updatePreviewCircle()
         }
-        updateMask(map, sanJosePolygon)
 
         map.uiSettings.apply {
             isZoomControlsEnabled = true
@@ -378,15 +360,6 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             previewHazardCircle?.center = center
             previewHazardCircle?.radius = radius
         }
-    }
-
-    private fun updateMask(map: GoogleMap, polygon: List<LatLng>) {
-        val projection = map.projection
-        val screenPoints = polygon.map { latLng ->
-            val point = projection.toScreenLocation(latLng)
-            PointF(point.x.toFloat(), point.y.toFloat())
-        }
-        mapMaskOverlay.updateHole(screenPoints)
     }
 
     private fun isPinPlacementActive(): Boolean =
@@ -805,39 +778,5 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         private val SAN_JOSE_CENTER = LatLng(14.585331999115473, 121.18225227090538)
         private const val STREET_VIEW_SEARCH_RADIUS_METERS = 150
         private const val MARKER_ICON_SIZE_DP = 48
-    }
-}
-
-class MapMaskView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
-    private val maskPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(200, 30, 30, 30)
-    }
-    private val clearPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-    }
-    private val path = Path()
-    private var holePoints: List<PointF>? = null
-
-    fun updateHole(points: List<PointF>) {
-        this.holePoints = points
-        invalidate()
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        setLayerType(LAYER_TYPE_HARDWARE, null)
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), maskPaint)
-        holePoints?.let { pts ->
-            if (pts.isNotEmpty()) {
-                path.reset()
-                path.moveTo(pts[0].x, pts[0].y)
-                for (i in 1 until pts.size) {
-                    path.lineTo(pts[i].x, pts[i].y)
-                }
-                path.close()
-                canvas.drawPath(path, clearPaint)
-            }
-        }
     }
 }
