@@ -173,6 +173,7 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
                 type = type,
                 authorUid = uid,
                 status = initialStatus,
+                timestamp = null, // Firebase will fill this with ServerTimestamp
                 affectedAreas = affectedAreas,
                 evacuationCenter = evacuationCenter
             )

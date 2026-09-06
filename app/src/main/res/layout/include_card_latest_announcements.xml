@@ -59,5 +59,16 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"/>
 
+        <TextView
+            android:id="@+id/tv_empty_announcements"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No announcement currently"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone"/>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

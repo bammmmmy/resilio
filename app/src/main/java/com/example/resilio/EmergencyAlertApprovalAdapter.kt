@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.EmergencyAlert
-import java.text.SimpleDateFormat
+import com.example.resilio.util.TimeUtils
 import java.util.Locale
 
 class EmergencyAlertApprovalAdapter(
@@ -36,8 +36,7 @@ class EmergencyAlertApprovalAdapter(
         holder.tvType.text = alert.type.name
         holder.tvContent.text = alert.safeContent
         
-        val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-        holder.tvTimestamp.text = sdf.format(alert.safeTimestamp.toDate())
+        holder.tvTimestamp.text = TimeUtils.formatToPhTime(alert.safeTimestamp)
 
         holder.layoutActions.visibility = View.VISIBLE
         holder.btnApprove.setOnClickListener { onApprove(alert.id) }

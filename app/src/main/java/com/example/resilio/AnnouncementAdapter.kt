@@ -6,9 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
+import com.example.resilio.util.TimeUtils
 import com.google.android.material.button.MaterialButton
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class AnnouncementAdapter(
     private val announcements: List<Announcement>,
@@ -44,8 +43,7 @@ class AnnouncementAdapter(
         holder.tvTitle.text = item.title
         holder.tvType.text = item.type.name
         
-        val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-        holder.tvTimestamp.text = sdf.format(item.safeTimestamp.toDate())
+        holder.tvTimestamp.text = TimeUtils.formatToPhTime(item.safeTimestamp)
 
         holder.tvContent.text = item.safeContent
 

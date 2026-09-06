@@ -4,10 +4,10 @@ import android.util.Log
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.util.TimeUtils
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -116,7 +116,7 @@ object ResilioLiveContext {
                     precipProb = precipProb,
                     rain24h = rain24h,
                     currentPrecipIntensity = currentRainIntensity,
-                    apiTimeStr = current.getString("time"),
+                    apiTimeStr = current.getString("time")
                 )
             }
         }.onFailure { error ->
@@ -150,9 +150,20 @@ object ResilioLiveContext {
                     android.location.Location.distanceBetween(WEATHER_LAT, WEATHER_LON, qLat, qLon, results)
                     val distanceKm = results[0] / 1000.0
 
-                    EarthquakeCache.save(mag, place, time, distanceKm)
+                    EarthquakeCache.lastQuake = EarthquakeData(
+                        id = first.getString("id"),
+                        magnitude = mag,
+                        location = place,
+                        place = place,
+                        timeMillis = time,
+                        latitude = qLat,
+                        longitude = qLon,
+                        distanceKm = distanceKm
+                    )
+                    EarthquakeCache.lastFetched = System.currentTimeMillis()
                 } else {
-                    EarthquakeCache.save(0.0, "No recent activity in 100km", System.currentTimeMillis() - (86400000L * 2), 999.0)
+                    EarthquakeCache.lastQuake = EarthquakeData(magnitude = 0.0, location = "No recent activity in 100km")
+                    EarthquakeCache.lastFetched = System.currentTimeMillis()
                 }
             }
         }.onFailure { error ->
@@ -176,7 +187,7 @@ object ResilioLiveContext {
         }
         
         val advisory = weatherAdvisory(weather.code) ?: if (intensity > 15.0) "Heavy Rainfall Warning: Seek Shelter" else "None"
-        val timeLabel = formatApiTime(weather.fetchedAtMillis)
+        val timeLabel = TimeUtils.formatToPhTime(weather.fetchedAtMillis)
 
         return buildString {
             appendLine("WEATHER CARD DATA:")
@@ -249,7 +260,7 @@ object ResilioLiveContext {
             else -> "NO RECENT QUAKES" to "No significant earthquakes detected within 100km of Antipolo City in the last 24 hours."
         }
         
-        val timeLabel = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(quake.timeMillis))
+        val timeLabel = TimeUtils.formatToPhTime(quake.timeMillis)
         
         return buildString {
             appendLine("EARTHQUAKE MONITOR CARD DATA:")
@@ -275,7 +286,7 @@ object ResilioLiveContext {
             alerts.forEachIndexed { index, alert ->
                 appendLine("${index + 1}. Title: ${alert.title.ifBlank { "(no title)" }}")
                 appendLine("   Type: ${alert.type}")
-                appendLine("   Posted: ${formatTimestamp(alert.safeTimestamp)}")
+                appendLine("   Posted: ${TimeUtils.formatToPhTime(alert.safeTimestamp, "MMM d, yyyy h:mm a")}")
                 if (alert.affectedAreas.isNotBlank()) appendLine("   Affected areas: ${alert.affectedAreas}")
                 if (alert.evacuationCenter.isNotBlank()) appendLine("   Evacuation center: ${alert.evacuationCenter}")
                 appendLine("   Details: ${trimBody(alert.content)}")
@@ -296,7 +307,7 @@ object ResilioLiveContext {
             announcements.forEachIndexed { index, announcement ->
                 appendLine("${index + 1}. Title: ${announcement.title.ifBlank { "(no title)" }}")
                 appendLine("   Type: ${announcement.type}")
-                appendLine("   Posted: ${formatTimestamp(announcement.safeTimestamp)}")
+                appendLine("   Posted: ${TimeUtils.formatToPhTime(announcement.safeTimestamp, "MMM d, yyyy h:mm a")}")
                 if (announcement.affectedAreas.isNotBlank()) {
                     appendLine("   Affected areas: ${announcement.affectedAreas}")
                 }
@@ -339,14 +350,6 @@ object ResilioLiveContext {
         val cleaned = text.trim().ifBlank { "(no details)" }
         return if (cleaned.length <= MAX_BODY_CHARS) cleaned
         else cleaned.take(MAX_BODY_CHARS).trimEnd() + "…"
-    }
-
-    private fun formatTimestamp(timestamp: Timestamp): String =
-        SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault()).format(timestamp.toDate())
-
-    private fun formatApiTime(fetchedAtMillis: Long): String {
-        val date = Date(fetchedAtMillis)
-        return SimpleDateFormat("EEEE h:mm a", Locale.getDefault()).format(date)
     }
 
     fun weatherDescription(code: Int): String = when (code) {

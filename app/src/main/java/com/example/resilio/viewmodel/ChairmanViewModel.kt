@@ -30,9 +30,14 @@ class ChairmanViewModel : ViewModel() {
 
     fun listenToEmergencyReports() {
         db.collection("emergency_reports")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { value, _ ->
-                value?.toObjects(EmergencyReport::class.java)?.let { _emergencyReports.postValue(it) }
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    android.util.Log.e("ChairmanViewModel", "Listen reports failed.", error)
+                    return@addSnapshotListener
+                }
+                val reports = value?.toObjects(EmergencyReport::class.java) ?: emptyList()
+                val sorted = reports.sortedByDescending { it.safeTimestamp }
+                _emergencyReports.postValue(sorted)
             }
     }
 

@@ -6,14 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
+import com.example.resilio.util.TimeUtils
 import java.util.Date
-import java.util.Locale
 
 class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items = mutableListOf<ChatMessage>()
-    private val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
 
     companion object {
         private const val VIEW_TYPE_USER = 1
@@ -49,7 +47,7 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val msg = items[position]
-        val timestamp = timeFormat.format(Date(msg.timestamp))
+        val timestamp = TimeUtils.formatToPhTime(msg.timestamp, "h:mm a")
 
         if (holder is UserVH) {
             holder.text.text = msg.content

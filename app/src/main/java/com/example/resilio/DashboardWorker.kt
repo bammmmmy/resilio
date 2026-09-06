@@ -33,7 +33,6 @@ class DashboardWorker(
     }
 
     private fun fetchWeatherSync() {
-        // Hardcoded Antipolo Coordinates
         val lat = 14.5845
         val lon = 121.1754
         val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
@@ -78,7 +77,17 @@ class DashboardWorker(
                 }
             }
 
-            WeatherCache.save(tempC, code, humidity, windSpeed, windGusts, currentPrecipProb, rain24h, currentRainIntensity, apiTimeStr)
+            WeatherCache.snapshot = WeatherSnapshot(
+                tempC = tempC,
+                code = code,
+                humidity = humidity,
+                windSpeed = windSpeed,
+                windGusts = windGusts,
+                precipProb = currentPrecipProb,
+                rain24h = rain24h,
+                currentPrecipIntensity = currentRainIntensity,
+                apiTimeStr = apiTimeStr
+            )
         }
     }
 
@@ -108,11 +117,22 @@ class DashboardWorker(
                 
                 val results = FloatArray(1)
                 android.location.Location.distanceBetween(lat, lon, qLat, qLon, results)
-                val distanceKm = results[0] / 1000.0
+                val distanceKm = (results[0] / 1000.0).toDouble()
 
-                EarthquakeCache.save(mag, place, time, distanceKm)
+                EarthquakeCache.lastQuake = EarthquakeData(
+                    id = first.getString("id"),
+                    magnitude = mag,
+                    location = place,
+                    place = place,
+                    timeMillis = time,
+                    latitude = qLat,
+                    longitude = qLon,
+                    distanceKm = distanceKm
+                )
+                EarthquakeCache.lastFetched = System.currentTimeMillis()
             } else {
-                EarthquakeCache.save(0.0, "No recent activity in 100km", System.currentTimeMillis() - (86400000L * 2), 999.0)
+                EarthquakeCache.lastQuake = EarthquakeData(magnitude = 0.0, location = "No recent activity in 100km")
+                EarthquakeCache.lastFetched = System.currentTimeMillis()
             }
         }
     }

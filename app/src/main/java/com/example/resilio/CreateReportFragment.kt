@@ -169,7 +169,7 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
                     latitude = userLocation?.latitude ?: 0.0,
                     longitude = userLocation?.longitude ?: 0.0,
                     status = ReportStatus.PENDING,
-                    timestamp = Timestamp.now()
+                    timestamp = null // Let Firebase handle ServerTimestamp
                 )
 
                 db.collection("emergency_reports").document(reportId).set(report)

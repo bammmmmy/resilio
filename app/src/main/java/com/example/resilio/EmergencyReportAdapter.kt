@@ -10,9 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.resilio.model.EmergencyReport
 import com.example.resilio.model.ReportStatus
+import com.example.resilio.util.TimeUtils
 import com.google.android.material.button.MaterialButton
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class EmergencyReportAdapter(
     private val reports: List<EmergencyReport>,
@@ -44,8 +43,7 @@ class EmergencyReportAdapter(
         holder.tvSender.text = "From: ${report.senderName}"
         holder.tvDescription.text = report.description
         
-        val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-        holder.tvTime.text = sdf.format(report.timestamp.toDate())
+        holder.tvTime.text = TimeUtils.formatToPhTime(report.safeTimestamp)
 
         Glide.with(holder.itemView.context)
             .load(report.imageUrl)

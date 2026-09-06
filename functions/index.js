@@ -37,9 +37,31 @@ exports.notifyOnEmergencyAlert = functions.firestore
   .onCreate(async (snap, context) => {
     const data = snap.data();
     if (!data) return;
+    // Only notify immediately if it's already APPROVED (e.g. created by Chairman)
+    if (data.status !== "APPROVED") return;
 
     const title = data.title || "Emergency Alert";
     const body = data.content || "A new emergency alert was posted.";
+    await sendToTopic(
+      TOPIC_EMERGENCY,
+      title,
+      body,
+      "emergency_alert",
+      context.params.alertId,
+    );
+  });
+
+exports.notifyOnEmergencyAlertApproved = functions.firestore
+  .document("emergency_alerts/{alertId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    if (!before || !after) return;
+    // Only notify when status changes to APPROVED
+    if (before.status === "APPROVED" || after.status !== "APPROVED") return;
+
+    const title = after.title || "Emergency Alert";
+    const body = after.content || "A new emergency alert was posted.";
     await sendToTopic(
       TOPIC_EMERGENCY,
       title,

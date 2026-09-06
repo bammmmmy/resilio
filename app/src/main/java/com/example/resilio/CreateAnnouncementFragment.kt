@@ -153,6 +153,7 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
                     type = type,
                     status = status,
                     authorUid = uid,
+                    timestamp = null, // Firebase will fill this with ServerTimestamp
                     affectedAreas = affectedAreas,
                     evacuationCenter = evacuationCenter
                 )

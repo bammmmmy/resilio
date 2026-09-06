@@ -104,7 +104,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             while (true) {
                 DashboardUIHelper.fetchWeather(context, lifecycleScope, forceRefresh = true) {
                     WeatherCache.snapshot?.let { 
-                        weatherView?.let { v -> DashboardUIHelper.updateWeatherUI(v, it, binding.layoutHeader, binding.tvStatusTitle, binding.tvStatusDesc) }
+                        weatherView?.let { v -> DashboardUIHelper.updateWeatherUI(v, it, binding.layoutHeader) }
                         landslideView?.let { v -> DashboardUIHelper.updateLandslideUI(v, it) }
                     }
                 }
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.statusPager.adapter = DashboardStatusAdapter(
             onWeatherBind = { view -> 
                 weatherView = view
-                WeatherCache.snapshot?.let { DashboardUIHelper.updateWeatherUI(view, it, binding.layoutHeader, binding.tvStatusTitle, binding.tvStatusDesc) }
+                WeatherCache.snapshot?.let { DashboardUIHelper.updateWeatherUI(view, it, binding.layoutHeader) }
             },
             onLandslideBind = { view -> 
                 landslideView = view
@@ -152,10 +152,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     .sortedByDescending { it.safeTimestamp }
                     .take(3)
 
+                binding.layoutLatestAnnouncements.root.visibility = View.VISIBLE
                 if (announcements.isEmpty()) {
-                    binding.layoutLatestAnnouncements.root.visibility = View.GONE
+                    binding.layoutLatestAnnouncements.rvLatestAnnouncements.visibility = View.GONE
+                    binding.layoutLatestAnnouncements.tvEmptyAnnouncements.visibility = View.VISIBLE
                 } else {
-                    binding.layoutLatestAnnouncements.root.visibility = View.VISIBLE
+                    binding.layoutLatestAnnouncements.rvLatestAnnouncements.visibility = View.VISIBLE
+                    binding.layoutLatestAnnouncements.tvEmptyAnnouncements.visibility = View.GONE
                     binding.layoutLatestAnnouncements.rvLatestAnnouncements.adapter = LatestAnnouncementsHomeAdapter(announcements) { announcement ->
                         val bundle = Bundle().apply {
                             putString("id", announcement.id)
@@ -189,10 +192,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     .sortedByDescending { it.safeTimestamp }
                     .take(3)
 
+                binding.layoutLatestAlerts.root.visibility = View.VISIBLE
                 if (alerts.isEmpty()) {
-                    binding.layoutLatestAlerts.root.visibility = View.GONE
+                    binding.layoutLatestAlerts.rvLatestAlerts.visibility = View.GONE
+                    binding.layoutLatestAlerts.tvEmptyAlerts.visibility = View.VISIBLE
                 } else {
-                    binding.layoutLatestAlerts.root.visibility = View.VISIBLE
+                    binding.layoutLatestAlerts.rvLatestAlerts.visibility = View.VISIBLE
+                    binding.layoutLatestAlerts.tvEmptyAlerts.visibility = View.GONE
                     binding.layoutLatestAlerts.rvLatestAlerts.adapter = LatestAlertsHomeAdapter(alerts) { alert ->
                         val bundle = Bundle().apply {
                             putString("id", alert.id)
@@ -265,6 +271,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             if (user.fullName.isNotBlank()) {
                 binding.tvStatusTitle.text = user.fullName
             }
+            binding.tvStatusDesc.text = "Resident"
             
             user.profileImageUrl?.let {
                 Glide.with(this@HomeFragment)

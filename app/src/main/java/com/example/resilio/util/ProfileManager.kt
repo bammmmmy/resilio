@@ -20,6 +20,7 @@ object ProfileManager {
     private val ADDRESS = stringPreferencesKey("address")
     private val ABOUT = stringPreferencesKey("about")
     private val SEX = stringPreferencesKey("sex")
+    private val ROLE = stringPreferencesKey("role")
     private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
     private val ID_FRONT_URI = stringPreferencesKey("id_front_uri")
     private val ID_BACK_URI = stringPreferencesKey("id_back_uri")
@@ -28,7 +29,7 @@ object ProfileManager {
         return context.dataStore.data.map { prefs ->
             User(
                 fullName = prefs[FULL_NAME] ?: "",
-                position = prefs[POSITION] ?: "Barangay Chairman",
+                position = prefs[POSITION] ?: "",
                 barangayName = prefs[BARANGAY_NAME] ?: "Barangay San Jose",
                 contactNumber = prefs[CONTACT_NUMBER] ?: "",
                 email = prefs[EMAIL] ?: "",
@@ -38,7 +39,7 @@ object ProfileManager {
                 profileImageUrl = prefs[PROFILE_IMAGE_URI],
                 idImageUrl = prefs[ID_FRONT_URI],
                 idBackImageUrl = prefs[ID_BACK_URI],
-                role = UserRole.CHAIRMAN
+                role = UserRole.valueOf(prefs[ROLE] ?: UserRole.RESIDENT.name)
             )
         }
     }
@@ -53,6 +54,7 @@ object ProfileManager {
             prefs[ADDRESS] = user.address
             prefs[ABOUT] = user.about
             prefs[SEX] = user.sex
+            prefs[ROLE] = user.role.name
             user.profileImageUrl?.let { prefs[PROFILE_IMAGE_URI] = it }
             user.idImageUrl?.let { prefs[ID_FRONT_URI] = it }
             user.idBackImageUrl?.let { prefs[ID_BACK_URI] = it }

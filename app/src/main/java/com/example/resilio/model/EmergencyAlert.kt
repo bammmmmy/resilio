@@ -2,6 +2,7 @@ package com.example.resilio.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName
+import com.google.firebase.firestore.ServerTimestamp
 
 data class EmergencyAlert(
     val id: String = "",
@@ -10,6 +11,7 @@ data class EmergencyAlert(
     val type: HazardType = HazardType.GENERAL_ALERT,
     val status: AnnouncementStatus = AnnouncementStatus.APPROVED,
     val authorUid: String = "",
+    @ServerTimestamp
     @get:PropertyName("timestamp") @set:PropertyName("timestamp") var timestamp: Timestamp? = null,
     val affectedAreas: String = "",
     val evacuationCenter: String = ""

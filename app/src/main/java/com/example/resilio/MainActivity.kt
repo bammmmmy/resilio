@@ -127,19 +127,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchUserRole(uid: String) {
-        // Mock handling
-        when (uid) {
-            "mock_resident" -> currentUserRole = UserRole.RESIDENT
-            "mock_bdrrmo" -> currentUserRole = UserRole.BDRRMO
-            "mock_chairman" -> currentUserRole = UserRole.CHAIRMAN
-            else -> {
-                FirebaseFirestore.getInstance().collection("users").document(uid).get()
-                    .addOnSuccessListener { doc ->
-                        doc.toObject(User::class.java)?.let {
-                            currentUserRole = it.role
-                        }
+        FirebaseFirestore.getInstance().collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val user = doc.toObject(User::class.java)
+                if (user != null) {
+                    currentUserRole = user.role
+                    
+                    // Force a navigation check if we are currently on a dashboard
+                    val currentDest = navController.currentDestination?.id
+                    if (currentDest == R.id.homeFragment || 
+                        currentDest == R.id.bdrrmoDashboardFragment || 
+                        currentDest == R.id.chairmanDashboardFragment) {
+                        navigateToCorrectHome()
                     }
+                }
             }
-        }
     }
 }
