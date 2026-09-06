@@ -8,8 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentCreateEmergencyAlertBinding
+import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
 import com.example.resilio.model.HazardType
+import com.example.resilio.model.User
+import com.example.resilio.model.UserRole
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -153,44 +156,55 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
             return
         }
 
-        val alertId = editId ?: UUID.randomUUID().toString()
-        val alert = EmergencyAlert(
-            id = alertId,
-            title = title,
-            content = content,
-            type = type,
-            authorUid = uid,
-            affectedAreas = affectedAreas,
-            evacuationCenter = evacuationCenter
-        )
+        // Get user role to determine if approval is needed
+        db.collection("users").document(uid).get().addOnSuccessListener { doc ->
+            val user = doc.toObject(User::class.java)
+            val initialStatus = if (user?.role == UserRole.CHAIRMAN) {
+                AnnouncementStatus.APPROVED
+            } else {
+                AnnouncementStatus.PENDING
+            }
 
-        db.collection("emergency_alerts").document(alertId).set(alert)
-            .addOnSuccessListener {
-                if (_binding == null) return@addOnSuccessListener
-                
-                // Save hazard location if set
-                if (pendingHazardLat != 0.0) {
-                    val hazard = com.example.resilio.model.HazardLocation(
-                        id = alertId,
-                        hazardType = type.name.lowercase(),
-                        description = content,
-                        address = affectedAreas,
-                        latitude = pendingHazardLat,
-                        longitude = pendingHazardLng,
-                        radius = pendingHazardRadius,
-                        createdBy = uid
-                    )
-                    db.collection("hazardLocations").document(alertId).set(hazard)
+            val alertId = editId ?: UUID.randomUUID().toString()
+            val alert = EmergencyAlert(
+                id = alertId,
+                title = title,
+                content = content,
+                type = type,
+                authorUid = uid,
+                status = initialStatus,
+                affectedAreas = affectedAreas,
+                evacuationCenter = evacuationCenter
+            )
+
+            db.collection("emergency_alerts").document(alertId).set(alert)
+                .addOnSuccessListener {
+                    if (_binding == null) return@addOnSuccessListener
+                    
+                    // Save hazard location if set
+                    if (pendingHazardLat != 0.0) {
+                        val hazard = com.example.resilio.model.HazardLocation(
+                            id = alertId,
+                            hazardType = type.name.lowercase(),
+                            description = content,
+                            address = affectedAreas,
+                            latitude = pendingHazardLat,
+                            longitude = pendingHazardLng,
+                            radius = pendingHazardRadius,
+                            createdBy = uid
+                        )
+                        db.collection("hazardLocations").document(alertId).set(hazard)
+                    }
+
+                    val messageId = if (editId != null) R.string.alert_updated else R.string.alert_submitted
+                    Toast.makeText(requireContext(), messageId, Toast.LENGTH_LONG).show()
+                    findNavController().popBackStack()
                 }
-
-                val messageId = if (editId != null) R.string.alert_updated else R.string.alert_submitted
-                Toast.makeText(requireContext(), messageId, Toast.LENGTH_LONG).show()
-                findNavController().popBackStack()
-            }
-            .addOnFailureListener {
-                if (_binding == null) return@addOnFailureListener
-                Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
+                .addOnFailureListener {
+                    if (_binding == null) return@addOnFailureListener
+                    Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     override fun onDestroyView() {

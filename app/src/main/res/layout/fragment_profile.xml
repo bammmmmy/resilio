@@ -159,16 +159,32 @@
                         android:layout_marginBottom="12dp"/>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnReportsApproval"
+                        android:id="@+id/btnResidentReports"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
-                        android:text="REPORTS APPROVAL"
+                        android:text="RESIDENT REPORTS"
                         android:backgroundTint="@color/surface"
                         android:textColor="@color/text_primary"
                         app:strokeColor="@color/gold_accent"
                         app:strokeWidth="1.5dp"
                         app:cornerRadius="12dp"
                         app:icon="@drawable/ic_hotline"
+                        app:iconTint="@color/text_primary"
+                        app:iconPadding="12dp"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnReportsApproval"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="REPORT APPROVAL"
+                        android:backgroundTint="@color/surface"
+                        android:textColor="@color/text_primary"
+                        app:strokeColor="@color/gold_accent"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_done"
                         app:iconTint="@color/text_primary"
                         app:iconPadding="12dp"
                         app:iconGravity="textStart"

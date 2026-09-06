@@ -185,6 +185,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                 val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
                 val alerts = allAlerts
+                    .filter { it.status == AnnouncementStatus.APPROVED }
                     .sortedByDescending { it.safeTimestamp }
                     .take(3)
 

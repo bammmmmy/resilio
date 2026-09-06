@@ -22,7 +22,7 @@ data class Announcement(
     val title: String = "",
     @get:PropertyName("content") @set:PropertyName("content") var content: String = "",
     val type: HazardType = HazardType.GENERAL_ALERT,
-    val status: AnnouncementStatus = AnnouncementStatus.PENDING,
+    val status: AnnouncementStatus = AnnouncementStatus.APPROVED,
     val authorUid: String = "",
     @get:PropertyName("timestamp") @set:PropertyName("timestamp") var timestamp: Timestamp? = null,
     val affectedAreas: String = "",

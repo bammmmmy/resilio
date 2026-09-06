@@ -9,7 +9,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
+import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.model.UserRole
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -34,7 +36,10 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                 if (getView() == null) return@addSnapshotListener
 
                 val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
-                val alerts = allAlerts.sortedByDescending { it.safeTimestamp }
+                
+                // Show only approved alerts to residents.
+                val alerts = allAlerts.filter { it.status == AnnouncementStatus.APPROVED }
+                    .sortedByDescending { it.safeTimestamp }
                 
                 if (alerts.isEmpty()) {
                     tvEmpty.visibility = View.VISIBLE

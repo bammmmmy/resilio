@@ -102,10 +102,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             findNavController().navigate(R.id.createAnnouncementFragment)
         }
         binding.btnChairmanViewAnnouncements.setOnClickListener {
-            findNavController().navigate(R.id.announcementsFragment)
+            findNavController().navigate(R.id.action_profileFragment_to_announcementsFragment)
+        }
+        binding.btnResidentReports.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_residentReportsFragment)
         }
         binding.btnReportsApproval.setOnClickListener {
-            findNavController().navigate(R.id.manageReportsFragment)
+            findNavController().navigate(R.id.action_profileFragment_to_manageReportsFragment)
         }
         binding.btnVerifyResidents.setOnClickListener {
             findNavController().navigate(R.id.userManagementFragment)

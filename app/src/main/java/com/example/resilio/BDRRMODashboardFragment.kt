@@ -152,7 +152,9 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
                 if (_binding == null) return@addSnapshotListener
 
                 val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                // Responders see all alerts (Pending or Approved) in their "Latest" list
                 val alerts = allAlerts
+                    .filter { it.status == AnnouncementStatus.APPROVED || it.status == AnnouncementStatus.PENDING }
                     .sortedByDescending { it.safeTimestamp }
                     .take(3)
 

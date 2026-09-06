@@ -8,6 +8,7 @@ import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.User
 import com.example.resilio.model.VerificationStatus
 import com.example.resilio.model.EmergencyReport
+import com.example.resilio.model.EmergencyAlert
 import com.example.resilio.model.ReportStatus
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -17,6 +18,9 @@ class ChairmanViewModel : ViewModel() {
 
     private val _pendingAnnouncements = MutableLiveData<List<Announcement>>()
     val pendingAnnouncements: LiveData<List<Announcement>> = _pendingAnnouncements
+
+    private val _pendingAlerts = MutableLiveData<List<EmergencyAlert>>()
+    val pendingAlerts: LiveData<List<EmergencyAlert>> = _pendingAlerts
 
     private val _pendingResidents = MutableLiveData<List<User>>()
     val pendingResidents: LiveData<List<User>> = _pendingResidents
@@ -55,6 +59,23 @@ class ChairmanViewModel : ViewModel() {
             }
     }
 
+    fun listenToPendingAlerts() {
+        db.collection("emergency_alerts")
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    android.util.Log.e("ChairmanViewModel", "Listen failed.", error)
+                    return@addSnapshotListener
+                }
+
+                val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
+                val pendingSorted = allAlerts
+                    .filter { it.status == AnnouncementStatus.PENDING }
+                    .sortedByDescending { it.safeTimestamp }
+
+                _pendingAlerts.postValue(pendingSorted)
+            }
+    }
+
     fun listenToPendingResidents() {
         db.collection("users")
             .whereEqualTo("verificationStatus", VerificationStatus.PENDING)
@@ -65,6 +86,14 @@ class ChairmanViewModel : ViewModel() {
 
     fun approveAnnouncement(id: String) {
         db.collection("announcements").document(id).update("status", AnnouncementStatus.APPROVED)
+    }
+
+    fun approveAlert(id: String) {
+        db.collection("emergency_alerts").document(id).update("status", AnnouncementStatus.APPROVED)
+    }
+
+    fun rejectAlert(id: String) {
+        db.collection("emergency_alerts").document(id).update("status", AnnouncementStatus.REJECTED)
     }
 
     fun approveResident(uid: String) {
