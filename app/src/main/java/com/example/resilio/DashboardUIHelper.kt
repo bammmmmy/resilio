@@ -34,16 +34,32 @@ object DashboardUIHelper {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url("https://api.open-meteo.com/v1/forecast?latitude=14.65&longitude=121.05&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m&daily=precipitation_sum&timezone=Asia%2FSingapore")
-                    .build()
+                val lat = 14.5845
+                val lon = 121.1754
+                val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+                        "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m" +
+                        "&hourly=precipitation,precipitation_probability&daily=precipitation_sum&timezone=Asia%2FSingapore"
 
-                val response = client.newCall(request).execute()
+                val response = client.newCall(Request.Builder().url(url).build()).execute()
                 val json = response.body?.string() ?: return@launch
                 val root = JSONObject(json)
                 val current = root.getJSONObject("current")
                 val daily = root.getJSONObject("daily")
+                val hourly = root.getJSONObject("hourly")
                 
+                val apiTime = current.getString("time")
+                val currentTimeStr = apiTime.substring(0, 13) + ":00"
+                val times = hourly.getJSONArray("time")
+                val probs = hourly.getJSONArray("precipitation_probability")
+                
+                var currentPrecipProb = 0
+                for (i in 0 until times.length()) {
+                    if (times.getString(i).startsWith(currentTimeStr)) {
+                        currentPrecipProb = probs.getInt(i)
+                        break
+                    }
+                }
+
                 val snap = WeatherSnapshot(
                     tempC = current.getDouble("temperature_2m"),
                     humidity = current.getInt("relative_humidity_2m"),
@@ -52,7 +68,8 @@ object DashboardUIHelper {
                     windGusts = current.getDouble("wind_gusts_10m"),
                     code = current.getInt("weather_code"),
                     rain24h = daily.getJSONArray("precipitation_sum").getDouble(0),
-                    precipProb = 0,
+                    precipProb = currentPrecipProb,
+                    apiTimeStr = apiTime,
                     fetchedAtMillis = System.currentTimeMillis()
                 )
 
@@ -161,6 +178,14 @@ object DashboardUIHelper {
 
         view.findViewById<TextView>(R.id.tv_weather_precip).text = "Precipitation: ${snap.precipProb}%"
         view.findViewById<TextView>(R.id.tv_rain_24h).text = String.format(Locale.US, "24h Rain: %.1f mm", snap.rain24h)
+
+        val intensityTv = view.findViewById<TextView>(R.id.tv_rain_intensity)
+        if (snap.currentPrecipIntensity > 0) {
+            intensityTv.visibility = View.VISIBLE
+            intensityTv.text = String.format(Locale.US, "Rain Intensity: %.1f mm/h", snap.currentPrecipIntensity)
+        } else {
+            intensityTv.visibility = View.GONE
+        }
 
         // Time forced to PH Timezone
         val updateTime = Date(snap.fetchedAtMillis)
