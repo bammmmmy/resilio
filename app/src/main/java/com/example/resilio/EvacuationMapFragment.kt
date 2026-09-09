@@ -346,20 +346,43 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         val map = googleMap ?: return
         val center = pinLocation()
         val radius = sliderRadius.value.toDouble()
+        val color = getHazardColor(hazardType)
 
         if (previewHazardCircle == null) {
             previewHazardCircle = map.addCircle(
                 CircleOptions()
                     .center(center)
                     .radius(radius)
-                    .strokeWidth(2f)
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.argb(70, 255, 0, 0))
+                    .strokeWidth(3f)
+                    .strokeColor(color)
+                    .fillColor(adjustAlpha(color, 0.25f))
             )
         } else {
-            previewHazardCircle?.center = center
-            previewHazardCircle?.radius = radius
+            previewHazardCircle?.apply {
+                this.center = center
+                this.radius = radius
+                this.strokeColor = color
+                this.fillColor = adjustAlpha(color, 0.25f)
+            }
         }
+    }
+
+    private fun getHazardColor(type: String): Int {
+        return when (type.lowercase()) {
+            "flood" -> Color.BLUE
+            "typhoon" -> Color.RED
+            "landslide" -> Color.parseColor("#8B4513") // Brown
+            "earthquake" -> Color.parseColor("#FF8C00") // Orange
+            else -> Color.YELLOW // General Announcement / General Alert
+        }
+    }
+
+    private fun adjustAlpha(color: Int, factor: Float): Int {
+        val alpha = Math.round(Color.alpha(color) * factor)
+        val red = Color.red(color)
+        val green = Color.green(color)
+        val blue = Color.blue(color)
+        return Color.argb(alpha, red, green, blue)
     }
 
     private fun isPinPlacementActive(): Boolean =
@@ -482,13 +505,14 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                     hazardMarkers.add(marker)
 
                     if (hazard.radius > 0) {
+                        val color = getHazardColor(hazard.hazardType)
                         val circle = map.addCircle(
                             CircleOptions()
                                 .center(latLng)
                                 .radius(hazard.radius)
-                                .strokeWidth(2f)
-                                .strokeColor(Color.RED)
-                                .fillColor(Color.argb(50, 255, 0, 0))
+                                .strokeWidth(3f)
+                                .strokeColor(color)
+                                .fillColor(adjustAlpha(color, 0.25f))
                         )
                         hazardCircles.add(circle)
                     }
