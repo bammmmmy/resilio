@@ -252,15 +252,25 @@ object DashboardUIHelper {
             rain >= 20.0 -> "Moderate"
             else -> "Low"
         }
-        view.findViewById<TextView>(R.id.tv_soil_moisture).text = "Soil Saturation: $saturation"
+        val saturationTv = view.findViewById<TextView>(R.id.tv_soil_moisture)
+        saturationTv.text = "Soil Saturation: $saturation"
         
         val riskColor = when (risk) {
             "Critical" -> ContextCompat.getColor(view.context, R.color.emergency_red)
             "High Risk" -> ContextCompat.getColor(view.context, R.color.warning_orange)
             "Moderate" -> ContextCompat.getColor(view.context, R.color.gold_accent)
-            else -> ContextCompat.getColor(view.context, R.color.primary_green)
+            else -> Color.WHITE // Changed from primary_green to avoid clash with brown/blue
         }
         view.findViewById<TextView>(R.id.tv_landslide_status).setTextColor(riskColor)
+
+        // Set saturation color for better visual feedback
+        val saturationColor = when (saturation) {
+            "Very High" -> ContextCompat.getColor(view.context, R.color.emergency_red)
+            "High" -> ContextCompat.getColor(view.context, R.color.warning_orange)
+            "Moderate" -> ContextCompat.getColor(view.context, R.color.gold_accent)
+            else -> Color.WHITE
+        }
+        saturationTv.setTextColor(saturationColor)
     }
 
     fun updateEarthquakeUI(view: View, quake: EarthquakeData) {

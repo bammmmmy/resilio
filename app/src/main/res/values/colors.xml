@@ -47,4 +47,7 @@
     <color name="chat_gradient_start">#D4E4F7</color>
     <color name="chat_gradient_end">#F5F9FD</color>
     <color name="chat_input_hint">#C4CFD9</color>
+
+    <!-- Landslide Colors -->
+    <color name="landslide_brown">#8D6E63</color>
 </resources>
