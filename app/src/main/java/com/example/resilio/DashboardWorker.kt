@@ -33,7 +33,7 @@ class DashboardWorker(
     }
 
     private fun fetchWeatherSync() {
-        val lat = 14.5845
+            val lat = 14.5845
         val lon = 121.1754
         val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
                 "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation" +

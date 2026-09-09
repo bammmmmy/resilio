@@ -24,5 +24,6 @@ data class EmergencyReport(
 enum class ReportStatus {
     PENDING,
     RESPONDING,
-    RESOLVED
+    RESOLVED,
+    ARCHIVED
 }

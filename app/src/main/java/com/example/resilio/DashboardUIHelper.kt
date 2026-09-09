@@ -44,19 +44,30 @@ object DashboardUIHelper {
                 val json = response.body?.string() ?: return@launch
                 val root = JSONObject(json)
                 val current = root.getJSONObject("current")
-                val daily = root.getJSONObject("daily")
                 val hourly = root.getJSONObject("hourly")
                 
                 val apiTime = current.getString("time")
                 val currentTimeStr = apiTime.substring(0, 13) + ":00"
                 val times = hourly.getJSONArray("time")
                 val probs = hourly.getJSONArray("precipitation_probability")
+                val hourlyPrecip = hourly.getJSONArray("precipitation")
                 
                 var currentPrecipProb = 0
+                var currentIndex = -1
                 for (i in 0 until times.length()) {
                     if (times.getString(i).startsWith(currentTimeStr)) {
                         currentPrecipProb = probs.getInt(i)
+                        currentIndex = i
                         break
+                    }
+                }
+
+                // Rolling 24h total calculation
+                var rollingRain24h = 0.0
+                if (currentIndex != -1) {
+                    val start = (currentIndex - 23).coerceAtLeast(0)
+                    for (i in start..currentIndex) {
+                        rollingRain24h += hourlyPrecip.getDouble(i)
                     }
                 }
 
@@ -67,7 +78,7 @@ object DashboardUIHelper {
                     windSpeed = current.getDouble("wind_speed_10m"),
                     windGusts = current.getDouble("wind_gusts_10m"),
                     code = current.getInt("weather_code"),
-                    rain24h = daily.getJSONArray("precipitation_sum").getDouble(0),
+                    rain24h = rollingRain24h,
                     precipProb = currentPrecipProb,
                     apiTimeStr = apiTime,
                     fetchedAtMillis = System.currentTimeMillis()
@@ -161,7 +172,12 @@ object DashboardUIHelper {
         val advisoryLayout = view.findViewById<View>(R.id.layout_weather_advisory)
         val advisoryTv = view.findViewById<TextView>(R.id.tv_weather_advisory)
         
-        if (snap.code >= 95 || snap.rain24h > 50) {
+        // Show advisory if it's raining, OR high accumulation, OR a special code (Thunderstorm/Snow)
+        val isNotClear = snap.code > 3
+        val hasRain = snap.currentPrecipIntensity > 0
+        val significantTotal = snap.rain24h > 10.0
+
+        if (isNotClear || hasRain || significantTotal) {
             advisoryLayout.visibility = View.VISIBLE
             advisoryTv.text = "$adviceTitle: $adviceDesc"
         } else {
@@ -227,6 +243,16 @@ object DashboardUIHelper {
 
         view.findViewById<TextView>(R.id.tv_landslide_status).text = risk
         view.findViewById<TextView>(R.id.tv_landslide_desc).text = advice
+        
+        view.findViewById<TextView>(R.id.tv_24h_rainfall).text = String.format(Locale.US, "24h Rain: %.1f mm", rain)
+        
+        val saturation = when {
+            rain > 80.0 -> "Very High"
+            rain > 50.0 -> "High"
+            rain > 20.0 -> "Moderate"
+            else -> "Low"
+        }
+        view.findViewById<TextView>(R.id.tv_soil_moisture).text = "Soil Saturation: $saturation"
         
         val riskColor = when (risk) {
             "Critical" -> ContextCompat.getColor(view.context, R.color.emergency_red)

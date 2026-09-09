@@ -11,6 +11,7 @@ import com.example.resilio.databinding.FragmentProfileBinding
 import com.example.resilio.model.UserRole
 import com.example.resilio.util.ProfileManager
 import com.example.resilio.viewmodel.AuthViewModel
+import com.example.resilio.viewmodel.ChairmanViewModel
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -18,6 +19,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val authViewModel: AuthViewModel by viewModels()
+    private val chairmanViewModel: ChairmanViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,6 +33,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         binding.fabEditProfileImage.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
+        chairmanViewModel.bdrrmoApprovalRequired.observe(viewLifecycleOwner) { required ->
+            binding.switchBdrrmoApproval.isChecked = required
+        }
+
+        binding.switchBdrrmoApproval.setOnCheckedChangeListener { _, isChecked ->
+            chairmanViewModel.updateApprovalSetting(isChecked)
         }
 
         authViewModel.userState.observe(viewLifecycleOwner) { result ->
@@ -50,6 +60,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         binding.layoutChairmanActions.visibility = View.VISIBLE
                         binding.layoutBdrrmoActions.visibility = View.GONE
                         binding.layoutResidentActions.visibility = View.GONE
+                        
+                        // Start listening to settings if chairman
+                        chairmanViewModel.listenToSettings()
                     }
                     UserRole.RESIDENT -> {
                         binding.layoutResidentActions.visibility = View.VISIBLE

@@ -20,9 +20,20 @@ object DashboardNotificationHelper {
 
     private fun checkWeather(context: Context, prefs: android.content.SharedPreferences) {
         val snap = WeatherCache.snapshot ?: return
-        val advisory = getAutoAdvisory(snap.code) ?: if (snap.currentPrecipIntensity > 15.0) "Heavy Rainfall Warning" else null
+        
+        // Align with UI logic: Show advisory for any rain or high accumulation
+        val autoAdvisory = getAutoAdvisory(snap.code)
+        val intensityAdvisory = if (snap.currentPrecipIntensity > 15.0) "Heavy Rainfall Warning: Seek Shelter" 
+                                else if (snap.currentPrecipIntensity > 0) "Rain Advisory: Carry an umbrella"
+                                else null
+        val accumulationAdvisory = if (snap.rain24h > 50) "Flash Flood Warning: High rainfall detected"
+                                   else if (snap.rain24h > 10) "Flood Advisory: Saturated ground conditions"
+                                   else null
+                                   
+        val advisory = autoAdvisory ?: intensityAdvisory ?: accumulationAdvisory
         
         val lastCode = prefs.getInt(KEY_LAST_WEATHER, -1)
+        // We only notify if the condition has changed to avoid spamming the user
         if (advisory != null && snap.code != lastCode) {
             PushNotificationManager.showNotification(
                 context,

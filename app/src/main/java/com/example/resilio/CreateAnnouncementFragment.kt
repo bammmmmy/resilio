@@ -143,54 +143,78 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
                 val user = snapshot.toObject(User::class.java)
                 val isChairman = user?.role == UserRole.CHAIRMAN
                 
-                // If editing, keep the existing status or re-approve if chairman
-                val status = if (isChairman) AnnouncementStatus.APPROVED else AnnouncementStatus.PENDING
+                if (isChairman) {
+                    saveAnnouncement(announcementId, title, content, type, AnnouncementStatus.APPROVED, uid, affectedAreas, evacuationCenter, true)
+                } else {
+                    // Check if approval is required for BDRRMO
+                    db.collection("settings").document("app_config").get()
+                        .addOnSuccessListener { configDoc ->
+                            val approvalRequired = configDoc.getBoolean("bdrrmoApprovalRequired") ?: false
+                            val status = if (approvalRequired) AnnouncementStatus.PENDING else AnnouncementStatus.APPROVED
+                            saveAnnouncement(announcementId, title, content, type, status, uid, affectedAreas, evacuationCenter, !approvalRequired)
+                        }
+                        .addOnFailureListener {
+                            // Default to pending if setting not found
+                            saveAnnouncement(announcementId, title, content, type, AnnouncementStatus.PENDING, uid, affectedAreas, evacuationCenter, false)
+                        }
+                }
+            }
+            .addOnFailureListener {
+                if (_binding == null) return@addOnFailureListener
+                Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun saveAnnouncement(
+        id: String,
+        title: String,
+        content: String,
+        type: HazardType,
+        status: AnnouncementStatus,
+        uid: String,
+        affectedAreas: String,
+        evacuationCenter: String,
+        isAutoApproved: Boolean
+    ) {
+        val announcement = Announcement(
+            id = id,
+            title = title,
+            content = content,
+            type = type,
+            status = status,
+            authorUid = uid,
+            timestamp = null,
+            affectedAreas = affectedAreas,
+            evacuationCenter = evacuationCenter
+        )
+
+        db.collection("announcements").document(id).set(announcement)
+            .addOnSuccessListener {
+                if (_binding == null) return@addOnSuccessListener
                 
-                val announcement = Announcement(
-                    id = announcementId,
-                    title = title,
-                    content = content,
-                    type = type,
-                    status = status,
-                    authorUid = uid,
-                    timestamp = null, // Firebase will fill this with ServerTimestamp
-                    affectedAreas = affectedAreas,
-                    evacuationCenter = evacuationCenter
-                )
+                if (pendingHazardLat != 0.0) {
+                    val hazard = com.example.resilio.model.HazardLocation(
+                        id = id,
+                        hazardType = "general_alert",
+                        description = content,
+                        address = affectedAreas,
+                        latitude = pendingHazardLat,
+                        longitude = pendingHazardLng,
+                        radius = pendingHazardRadius,
+                        createdBy = uid
+                    )
+                    db.collection("hazardLocations").document(id).set(hazard)
+                }
 
-                db.collection("announcements").document(announcementId).set(announcement)
-                    .addOnSuccessListener {
-                        if (_binding == null) return@addOnSuccessListener
-                        
-                        // Save hazard location if set
-                        if (pendingHazardLat != 0.0) {
-                            val hazard = com.example.resilio.model.HazardLocation(
-                                id = announcementId,
-                                hazardType = "general_alert",
-                                description = content,
-                                address = affectedAreas,
-                                latitude = pendingHazardLat,
-                                longitude = pendingHazardLng,
-                                radius = pendingHazardRadius,
-                                createdBy = uid
-                            )
-                            db.collection("hazardLocations").document(announcementId).set(hazard)
-                        }
-
-                        val message = if (editId != null) {
-                            getString(R.string.announcement_updated)
-                        } else if (isChairman) {
-                            getString(R.string.announcement_published)
-                        } else {
-                            getString(R.string.announcement_submitted_pending)
-                        }
-                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-                        findNavController().popBackStack()
-                    }
-                    .addOnFailureListener {
-                        if (_binding == null) return@addOnFailureListener
-                        Toast.makeText(requireContext(), "Failed to submit: ${it.message}", Toast.LENGTH_SHORT).show()
-                    }
+                val message = if (editId != null) {
+                    getString(R.string.announcement_updated)
+                } else if (status == AnnouncementStatus.APPROVED) {
+                    getString(R.string.announcement_published)
+                } else {
+                    getString(R.string.announcement_submitted_pending)
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
             }
             .addOnFailureListener {
                 if (_binding == null) return@addOnFailureListener

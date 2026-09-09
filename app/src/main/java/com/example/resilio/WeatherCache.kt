@@ -74,6 +74,8 @@ object WeatherCache {
         return when {
             code >= 95 -> "Thunderstorm Warning" to "Stay indoors and avoid electrical appliances."
             rain > 50 -> "Heavy Rain Warning" to "Flood risk is high. Move to higher ground."
+            rain > 10 -> "Rain Advisory" to "Ground is saturated. Watch for minor flooding."
+            code in 51..82 -> "Wet Weather" to "Carry an umbrella and be careful of slippery roads."
             else -> "Weather Stable" to "Conditions are currently safe."
         }
     }

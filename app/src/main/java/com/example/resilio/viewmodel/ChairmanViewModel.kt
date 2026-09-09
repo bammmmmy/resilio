@@ -28,6 +28,27 @@ class ChairmanViewModel : ViewModel() {
     private val _emergencyReports = MutableLiveData<List<EmergencyReport>>()
     val emergencyReports: LiveData<List<EmergencyReport>> = _emergencyReports
 
+    private val _bdrrmoApprovalRequired = MutableLiveData<Boolean>()
+    val bdrrmoApprovalRequired: LiveData<Boolean> = _bdrrmoApprovalRequired
+
+    fun listenToSettings() {
+        db.collection("settings").document("app_config")
+            .addSnapshotListener { snapshot, _ ->
+                val required = snapshot?.getBoolean("bdrrmoApprovalRequired") ?: false
+                _bdrrmoApprovalRequired.postValue(required)
+            }
+    }
+
+    fun updateApprovalSetting(required: Boolean) {
+        db.collection("settings").document("app_config")
+            .update("bdrrmoApprovalRequired", required)
+            .addOnFailureListener {
+                // If document doesn't exist, create it
+                db.collection("settings").document("app_config")
+                    .set(mapOf("bdrrmoApprovalRequired" to required))
+            }
+    }
+
     fun listenToEmergencyReports() {
         db.collection("emergency_reports")
             .addSnapshotListener { value, error ->
@@ -91,6 +112,10 @@ class ChairmanViewModel : ViewModel() {
 
     fun approveAnnouncement(id: String) {
         db.collection("announcements").document(id).update("status", AnnouncementStatus.APPROVED)
+    }
+
+    fun rejectAnnouncement(id: String) {
+        db.collection("announcements").document(id).update("status", AnnouncementStatus.REJECTED)
     }
 
     fun approveAlert(id: String) {

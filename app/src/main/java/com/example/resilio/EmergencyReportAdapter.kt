@@ -27,6 +27,8 @@ class EmergencyReportAdapter(
         val ivPhoto: ImageView = view.findViewById(R.id.ivPhoto)
         val btnRespond: MaterialButton = view.findViewById(R.id.btnRespond)
         val btnResolve: MaterialButton = view.findViewById(R.id.btnResolve)
+        val btnArchive: MaterialButton = view.findViewById(R.id.btnArchive)
+        val btnUnarchive: MaterialButton = view.findViewById(R.id.btnUnarchive)
         val btnViewMap: MaterialButton = view.findViewById(R.id.btnViewMap)
         val statusBadge: View = view.findViewById(R.id.statusBadge)
     }
@@ -55,21 +57,36 @@ class EmergencyReportAdapter(
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.emergency_red))
                 holder.btnRespond.visibility = View.VISIBLE
                 holder.btnResolve.visibility = View.GONE
+                holder.btnArchive.visibility = View.GONE
+                holder.btnUnarchive.visibility = View.GONE
             }
             ReportStatus.RESPONDING -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.warning_orange))
                 holder.btnRespond.visibility = View.GONE
                 holder.btnResolve.visibility = View.VISIBLE
+                holder.btnArchive.visibility = View.GONE
+                holder.btnUnarchive.visibility = View.GONE
             }
             ReportStatus.RESOLVED -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.primary_green))
                 holder.btnRespond.visibility = View.GONE
                 holder.btnResolve.visibility = View.GONE
+                holder.btnArchive.visibility = View.VISIBLE
+                holder.btnUnarchive.visibility = View.GONE
+            }
+            ReportStatus.ARCHIVED -> {
+                holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.text_secondary))
+                holder.btnRespond.visibility = View.GONE
+                holder.btnResolve.visibility = View.GONE
+                holder.btnArchive.visibility = View.GONE
+                holder.btnUnarchive.visibility = View.VISIBLE
             }
         }
 
         holder.btnRespond.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESPONDING) }
         holder.btnResolve.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESOLVED) }
+        holder.btnArchive.setOnClickListener { onUpdateStatus(report.id, ReportStatus.ARCHIVED) }
+        holder.btnUnarchive.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESOLVED) }
         holder.btnViewMap.setOnClickListener { onViewOnMap(report.latitude, report.longitude) }
     }
 

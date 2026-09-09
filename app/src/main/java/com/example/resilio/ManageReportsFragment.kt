@@ -36,8 +36,9 @@ class ManageReportsFragment : Fragment(R.layout.fragment_manage_reports) {
                     viewModel.approveAnnouncement(id)
                     Toast.makeText(requireContext(), "Approved", Toast.LENGTH_SHORT).show()
                 },
-                onReject = { _ ->
-                    // Logic for rejection
+                onReject = { id ->
+                    viewModel.rejectAnnouncement(id)
+                    Toast.makeText(requireContext(), "Rejected", Toast.LENGTH_SHORT).show()
                 }
             )
         }

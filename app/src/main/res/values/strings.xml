@@ -63,8 +63,11 @@
     <string name="announcement_published">Announcement published.</string>
     <string name="announcement_submitted_pending">Announcement submitted for Chairman approval.</string>
     <string name="announcement_updated">Announcement updated.</string>
+    <string name="alert_published">Emergency alert published.</string>
     <string name="alert_updated">Emergency alert updated.</string>
     <string name="alert_submitted">Emergency alert submitted.</string>
+    <string name="alert_submitted_pending">Emergency alert submitted for Chairman approval.</string>
+    <string name="setting_bdrrmo_approval">BDRRMO Approval Required</string>
     <string name="edit">Edit</string>
     <string name="edit_announcement">Edit announcement</string>
     <string name="delete_announcement">Delete announcement</string>
