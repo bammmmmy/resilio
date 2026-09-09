@@ -109,6 +109,28 @@
             android:contentDescription="@string/delete_announcement" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabArchive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_done"
+            app:tint="@android:color/white"
+            app:backgroundTint="@color/gold_accent"
+            android:visibility="gone"
+            android:contentDescription="@string/action_archive" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabRestore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_swipe_arrow"
+            app:tint="@android:color/white"
+            app:backgroundTint="@color/primary_green"
+            android:visibility="gone"
+            android:contentDescription="@string/action_restore" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

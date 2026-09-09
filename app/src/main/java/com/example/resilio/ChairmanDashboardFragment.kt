@@ -137,6 +137,7 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
                             putString("affectedAreas", announcement.affectedAreas)
                             putString("evacuationCenter", announcement.evacuationCenter)
                             putBoolean("isAlert", false)
+                            putString("status", announcement.status.name)
                         }
                         findNavController().navigate(R.id.announcementDetailFragment, bundle)
                     }
@@ -179,6 +180,7 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
                             putString("evacuationCenter", alert.evacuationCenter)
                             putBoolean("isAlert", true)
                             putString("hazardType", alert.type.name)
+                            putString("status", alert.status.name)
                         }
                         findNavController().navigate(R.id.announcementDetailFragment, bundle)
                     }

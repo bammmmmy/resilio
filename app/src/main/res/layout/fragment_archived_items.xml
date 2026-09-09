@@ -11,37 +11,21 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="@string/announcements_title"
-                android:textColor="@color/text_primary"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_view_archive"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@string/view_archive"
-                android:textColor="@color/gold_accent"
-                android:visibility="gone" />
-        </RelativeLayout>
+            android:text="@string/archived_items_title"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
 
         <TextView
-            android:id="@+id/tvEmptyAnnouncements"
+            android:id="@+id/tvEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/no_announcements"
+            android:text="@string/no_archived_items"
             android:textColor="@color/text_secondary"
             android:textSize="16sp"
             android:visibility="gone"
@@ -49,7 +33,7 @@
             android:layout_marginBottom="16dp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAnnouncements"
+            android:id="@+id/rvArchived"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

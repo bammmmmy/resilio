@@ -4,11 +4,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentAnnouncementDetailBinding
+import com.example.resilio.model.AnnouncementStatus
+import com.example.resilio.model.UserRole
+import com.example.resilio.util.ProfileManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detail) {
 
@@ -29,31 +35,66 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
         val evacuationCenter = arguments?.getString("evacuationCenter").orEmpty()
         val isAlert = arguments?.getBoolean("isAlert", false) ?: false
         val hazardTypeName = arguments?.getString("hazardType").orEmpty()
+        val statusName = arguments?.getString("status").orEmpty()
 
         binding.tvAnnouncementDetailTitle.text = title
         binding.tvAnnouncementDetailContent.text = content
         binding.tvAnnouncementDetailAuthor.text = "Posted by: Loading..."
 
-        if (authorUid == auth.currentUser?.uid) {
-            binding.layoutFabActions.visibility = View.VISIBLE
-            
-            checkLinkedHazard(id)
+        lifecycleScope.launch {
+            val user = ProfileManager.getProfile(requireContext()).first()
+            val isManagement = user.role == UserRole.CHAIRMAN || user.role == UserRole.BDRRMO
+            val isAuthor = authorUid == auth.currentUser?.uid
+            val isChairman = user.role == UserRole.CHAIRMAN
+            val isArchived = statusName == AnnouncementStatus.ARCHIVED.name
 
-            binding.fabEdit.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putString("edit_id", id)
-                    putString("edit_title", title)
-                    putString("edit_content", content)
-                    putString("edit_areas", affectedAreas)
-                    putString("edit_evac", evacuationCenter)
-                    putString("edit_type", hazardTypeName)
+            if (isAuthor || isChairman) {
+                binding.layoutFabActions.visibility = View.VISIBLE
+                binding.fabEdit.visibility = if (isArchived) View.GONE else View.VISIBLE
+                binding.fabDelete.visibility = View.VISIBLE
+                
+                checkLinkedHazard(id)
+
+                binding.fabEdit.setOnClickListener {
+                    val bundle = Bundle().apply {
+                        putString("edit_id", id)
+                        putString("edit_title", title)
+                        putString("edit_content", content)
+                        putString("edit_areas", affectedAreas)
+                        putString("edit_evac", evacuationCenter)
+                        putString("edit_type", hazardTypeName)
+                        putString("edit_author_uid", authorUid)
+                    }
+                    val destination = if (isAlert) R.id.createEmergencyAlertFragment else R.id.createAnnouncementFragment
+                    findNavController().navigate(destination, bundle)
                 }
-                val destination = if (isAlert) R.id.createEmergencyAlertFragment else R.id.createAnnouncementFragment
-                findNavController().navigate(destination, bundle)
+
+                binding.fabDelete.setOnClickListener {
+                    confirmDelete(id, isAlert)
+                }
+            } else {
+                binding.fabEdit.visibility = View.GONE
+                binding.fabDelete.visibility = View.GONE
             }
 
-            binding.fabDelete.setOnClickListener {
-                confirmDelete(id, isAlert)
+            if (isManagement) {
+                binding.layoutFabActions.visibility = View.VISIBLE
+                if (isArchived) {
+                    binding.fabArchive.visibility = View.GONE
+                    binding.fabRestore.visibility = View.VISIBLE
+                    binding.fabRestore.setOnClickListener {
+                        confirmRestore(id, isAlert)
+                    }
+                } else {
+                    binding.fabArchive.visibility = View.VISIBLE
+                    binding.fabRestore.visibility = View.GONE
+                    binding.fabArchive.setOnClickListener {
+                        confirmArchive(id, isAlert)
+                    }
+                }
+            } else {
+                binding.fabArchive.visibility = View.GONE
+                binding.fabRestore.visibility = View.GONE
             }
         }
 
@@ -108,6 +149,36 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
                         Toast.makeText(requireContext(), "Map area cleared.", Toast.LENGTH_SHORT).show()
                         binding.btnClearMapArea.visibility = View.GONE
                     }
+            }
+            .show()
+    }
+
+    private fun confirmArchive(id: String, isAlert: Boolean) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.action_archive)
+            .setMessage("Archive this item? It will be moved to the archive list and hidden from the map.")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_archive) { _, _ ->
+                val collection = if (isAlert) "emergency_alerts" else "announcements"
+                db.collection(collection).document(id).update("status", AnnouncementStatus.ARCHIVED)
+                db.collection("hazardLocations").document(id).update("active", false)
+                Toast.makeText(requireContext(), "Archived", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
+            .show()
+    }
+
+    private fun confirmRestore(id: String, isAlert: Boolean) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.action_restore)
+            .setMessage("Restore this item to the active list?")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_restore) { _, _ ->
+                val collection = if (isAlert) "emergency_alerts" else "announcements"
+                db.collection(collection).document(id).update("status", AnnouncementStatus.APPROVED)
+                db.collection("hazardLocations").document(id).update("active", true)
+                Toast.makeText(requireContext(), "Restored", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
             }
             .show()
     }

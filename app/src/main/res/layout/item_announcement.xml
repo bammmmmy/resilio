@@ -37,6 +37,26 @@
                 android:visibility="gone">
 
                 <ImageButton
+                    android:id="@+id/btnArchive"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/action_archive"
+                    android:src="@drawable/ic_done"
+                    android:visibility="gone"
+                    app:tint="@color/gold_accent" />
+
+                <ImageButton
+                    android:id="@+id/btnRestore"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/action_restore"
+                    android:src="@drawable/ic_swipe_arrow"
+                    android:visibility="gone"
+                    app:tint="@color/primary_green" />
+
+                <ImageButton
                     android:id="@+id/btnEdit"
                     android:layout_width="40dp"
                     android:layout_height="40dp"

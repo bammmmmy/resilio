@@ -478,6 +478,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         val map = googleMap ?: return
 
         firestore.collection("hazardLocations")
+            .whereEqualTo("active", true)
             .get()
             .addOnSuccessListener { snapshot ->
                 if (!isAdded) return@addOnSuccessListener

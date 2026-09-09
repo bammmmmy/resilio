@@ -26,6 +26,7 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
     private val auth = FirebaseAuth.getInstance()
 
     private var editId: String? = null
+    private var originalAuthorUid: String? = null
     private var pendingHazardLat: Double = 0.0
     private var pendingHazardLng: Double = 0.0
     private var pendingHazardRadius: Double = 0.0
@@ -46,6 +47,7 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
 
         arguments?.let {
             editId = it.getString("edit_id")
+            originalAuthorUid = it.getString("edit_author_uid")
             if (editId != null) {
                 binding.etTitle.setText(it.getString("edit_title"))
                 binding.etContent.setText(it.getString("edit_content"))
@@ -163,7 +165,8 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
             val alertId = editId ?: UUID.randomUUID().toString()
 
             if (isChairman) {
-                saveEmergencyAlert(alertId, title, content, type, AnnouncementStatus.APPROVED, uid, affectedAreas, evacuationCenter)
+                val authorToUse = originalAuthorUid ?: uid
+                saveEmergencyAlert(alertId, title, content, type, AnnouncementStatus.APPROVED, authorToUse, affectedAreas, evacuationCenter)
             } else {
                 db.collection("settings").document("app_config").get()
                     .addOnSuccessListener { configDoc ->

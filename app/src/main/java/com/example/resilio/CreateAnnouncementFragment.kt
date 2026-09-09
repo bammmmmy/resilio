@@ -25,6 +25,7 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
     private val auth = FirebaseAuth.getInstance()
 
     private var editId: String? = null
+    private var originalAuthorUid: String? = null
     private var pendingHazardLat: Double = 0.0
     private var pendingHazardLng: Double = 0.0
     private var pendingHazardRadius: Double = 0.0
@@ -43,6 +44,7 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
 
         arguments?.let {
             editId = it.getString("edit_id")
+            originalAuthorUid = it.getString("edit_author_uid")
             if (editId != null) {
                 binding.etTitle.setText(it.getString("edit_title"))
                 binding.etContent.setText(it.getString("edit_content"))
@@ -144,9 +146,12 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
                 val isChairman = user?.role == UserRole.CHAIRMAN
                 
                 if (isChairman) {
-                    saveAnnouncement(announcementId, title, content, type, AnnouncementStatus.APPROVED, uid, affectedAreas, evacuationCenter, true)
+                    // Chairman edits are always auto-approved
+                    val authorToUse = originalAuthorUid ?: uid
+                    saveAnnouncement(announcementId, title, content, type, AnnouncementStatus.APPROVED, authorToUse, affectedAreas, evacuationCenter, true)
                 } else {
-                    // Check if approval is required for BDRRMO
+                    // For BDRRMO, if it's an edit, we might want to preserve the author, 
+                    // but the rule is they can only edit their own, so authorUid would be current uid anyway.
                     db.collection("settings").document("app_config").get()
                         .addOnSuccessListener { configDoc ->
                             val approvalRequired = configDoc.getBoolean("bdrrmoApprovalRequired") ?: false

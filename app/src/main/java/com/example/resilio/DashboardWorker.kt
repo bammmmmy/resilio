@@ -71,8 +71,9 @@ class DashboardWorker(
             }
 
             var rain24h = 0.0
-            if (currentIndex >= 24) {
-                for (i in (currentIndex - 23)..currentIndex) {
+            if (currentIndex != -1) {
+                val start = (currentIndex - 23).coerceAtLeast(0)
+                for (i in start..currentIndex) {
                     rain24h += precipitation.getDouble(i)
                 }
             }

@@ -22,11 +22,11 @@ object GeminiClient {
     private const val MAX_RETRIES_PER_MODEL = 3
     private const val INITIAL_RETRY_DELAY_MS = 1_000L
 
-    /** Lite model first to reduce quota usage; fall back if unavailable. */
+    /** Flash models for efficiency and speed. */
     private val modelNames = listOf(
-        "gemini-2.5-flash-lite",
+        "gemini-1.5-flash",
         "gemini-2.0-flash",
-        "gemini-flash-latest",
+        "gemini-1.5-flash-8b",
     )
 
     /** Cap history sent to the API to control input tokens and quota usage. */

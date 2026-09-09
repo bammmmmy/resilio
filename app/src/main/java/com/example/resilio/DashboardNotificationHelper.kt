@@ -54,7 +54,7 @@ object DashboardNotificationHelper {
         val risk = when {
             rain > 100.0 -> "CRITICAL"
             rain > 60.0 -> "HIGH RISK"
-            rain > 30.0 -> "MODERATE"
+            rain >= 20.0 -> "MODERATE"
             else -> "LOW RISK"
         }
 

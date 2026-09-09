@@ -7,7 +7,8 @@ import com.google.firebase.firestore.ServerTimestamp
 enum class AnnouncementStatus {
     PENDING,
     APPROVED,
-    REJECTED
+    REJECTED,
+    ARCHIVED
 }
 
 enum class HazardType {

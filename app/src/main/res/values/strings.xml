@@ -275,4 +275,15 @@
     <string name="notification_channel_weather">Weather Advisories</string>
     <string name="notification_channel_weather_desc">Automatic weather advisories for Antipolo</string>
     <string name="notification_permission_rationale">Allow notifications so you receive emergency alerts, announcements, and weather advisories even when the app is closed.</string>
+
+    <!-- Archive -->
+    <string name="action_archive">Archive</string>
+    <string name="action_restore">Restore</string>
+    <string name="view_archive">VIEW ARCHIVE</string>
+    <string name="view_archived_alerts">ARCHIVED ALERTS</string>
+    <string name="view_archived_announcements">ARCHIVED ANNOUNCE</string>
+    <string name="archived_items_title">Archived Items</string>
+    <string name="archived_alerts_title">Archived Alerts</string>
+    <string name="archived_announcements_title">Archived Announcements</string>
+    <string name="no_archived_items">No archived items found.</string>
 </resources>

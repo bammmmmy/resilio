@@ -107,6 +107,9 @@
         <action
             android:id="@+id/action_bdrrmoDashboardFragment_to_disasterAlertsFragment"
             app:destination="@id/disasterAlertsFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_archivedItemsFragment"
+            app:destination="@id/archivedItemsFragment" />
     </fragment>
 
     <fragment
@@ -134,6 +137,9 @@
         <action
             android:id="@+id/action_chairmanDashboardFragment_to_aiChatFragment"
             app:destination="@id/aiChatFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_archivedItemsFragment"
+            app:destination="@id/archivedItemsFragment" />
     </fragment>
 
     <fragment
@@ -159,7 +165,14 @@
     <fragment
         android:id="@+id/disasterAlertsFragment"
         android:name="com.example.resilio.DisasterAlertsFragment"
-        android:label="Disaster Alerts" />
+        android:label="Disaster Alerts" >
+        <action
+            android:id="@+id/action_disasterAlertsFragment_to_archivedAlertsFragment"
+            app:destination="@id/archivedAlertsFragment" />
+        <action
+            android:id="@+id/action_disasterAlertsFragment_to_announcementDetailFragment"
+            app:destination="@id/announcementDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/announcementsFragment"
@@ -168,6 +181,9 @@
         <action
             android:id="@+id/action_announcementsFragment_to_announcementDetailFragment"
             app:destination="@id/announcementDetailFragment" />
+        <action
+            android:id="@+id/action_announcementsFragment_to_archivedAnnouncementsFragment"
+            app:destination="@id/archivedAnnouncementsFragment" />
     </fragment>
 
     <fragment
@@ -346,4 +362,19 @@
         android:id="@+id/preparednessGuideFragment"
         android:name="com.example.resilio.PreparednessGuideFragment"
         android:label="Preparedness Guide" />
+
+    <fragment
+        android:id="@+id/archivedItemsFragment"
+        android:name="com.example.resilio.ArchivedItemsFragment"
+        android:label="Archived Items" />
+
+    <fragment
+        android:id="@+id/archivedAnnouncementsFragment"
+        android:name="com.example.resilio.ArchivedAnnouncementsFragment"
+        android:label="Archived Announcements" />
+
+    <fragment
+        android:id="@+id/archivedAlertsFragment"
+        android:name="com.example.resilio.ArchivedAlertsFragment"
+        android:label="Archived Alerts" />
 </navigation>

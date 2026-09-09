@@ -12,4 +12,5 @@ data class HazardLocation(
     val longitude: Double = 0.0,
     val radius: Double = 0.0, // Radius in meters
     val createdBy: String = "",
+    val active: Boolean = true
 )

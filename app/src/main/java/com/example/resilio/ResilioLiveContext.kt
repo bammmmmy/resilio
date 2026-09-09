@@ -101,8 +101,9 @@ object ResilioLiveContext {
                 }
                 
                 var rain24h = 0.0
-                if (currentIndex >= 24) {
-                    for (i in (currentIndex - 23)..currentIndex) {
+                if (currentIndex != -1) {
+                    val start = (currentIndex - 23).coerceAtLeast(0)
+                    for (i in start..currentIndex) {
                         rain24h += precipitation.getDouble(i)
                     }
                 }
@@ -213,14 +214,14 @@ object ResilioLiveContext {
         val (status, desc) = when {
             rain > 100.0 -> "CRITICAL" to "Extremely high risk! Cumulative rainfall has exceeded 100mm. Evacuate if in high-risk zones."
             rain > 60.0 -> "HIGH RISK" to "High risk of landslides due to heavy saturation. Monitor slopes and follow BDRRMO advice."
-            rain > 30.0 -> "MODERATE" to "Moderate risk. Ground is saturated. Avoid landslide-prone areas in San Jose."
+            rain >= 20.0 -> "MODERATE" to "Moderate risk. Ground is saturated. Avoid landslide-prone areas in San Jose."
             else -> "LOW RISK" to "Low risk based on current rainfall. Stay alert for any updates during rainy seasons."
         }
         
         val saturation = when {
             rain > 80.0 -> "Very High"
             rain > 50.0 -> "High"
-            rain > 20.0 -> "Moderate"
+            rain >= 20.0 -> "Moderate"
             else -> "Low"
         }
 

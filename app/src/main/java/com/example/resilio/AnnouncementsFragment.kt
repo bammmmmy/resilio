@@ -5,14 +5,19 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.resilio.databinding.FragmentAnnouncementsBinding
 import com.example.resilio.model.Announcement
+import com.example.resilio.model.UserRole
+import com.example.resilio.util.ProfileManager
 import com.example.resilio.viewmodel.ResidentViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
 
@@ -21,6 +26,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
     private val viewModel: ResidentViewModel by viewModels()
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
+    private var currentUserRole: UserRole? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,7 +34,24 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
 
         binding.rvAnnouncements.layoutManager = LinearLayoutManager(requireContext())
         binding.tvEmptyAnnouncements.visibility = View.GONE
+        
+        lifecycleScope.launch {
+            currentUserRole = ProfileManager.getProfile(requireContext()).first().role
+            
+            if (currentUserRole == UserRole.CHAIRMAN || currentUserRole == UserRole.BDRRMO) {
+                binding.btnViewArchive.visibility = View.VISIBLE
+                binding.btnViewArchive.setOnClickListener {
+                    findNavController().navigate(R.id.archivedAnnouncementsFragment)
+                }
+            }
+            
+            observeAnnouncements()
+        }
 
+        viewModel.listenToAnnouncements()
+    }
+
+    private fun observeAnnouncements() {
         viewModel.announcements.observe(viewLifecycleOwner) { list ->
             if (_binding == null) return@observe
             if (list.isNullOrEmpty()) {
@@ -48,12 +71,26 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
                     onDelete = { announcement ->
                         confirmDelete(announcement, false)
                     },
-                    currentUserId = auth.currentUser?.uid
+                    onArchive = { announcement ->
+                        confirmArchive(announcement, false)
+                    },
+                    currentUserId = auth.currentUser?.uid,
+                    userRole = currentUserRole
                 )
             }
         }
+    }
 
-        viewModel.listenToAnnouncements()
+    private fun confirmArchive(announcement: Announcement, isAlert: Boolean) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.action_archive)
+            .setMessage("Archive this announcement? It will be moved to the archive list and hidden from the map.")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_archive) { _, _ ->
+                viewModel.archiveItem(announcement.id, isAlert)
+                Toast.makeText(requireContext(), "Archived", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 
     private fun confirmDelete(announcement: Announcement, isAlert: Boolean) {
@@ -91,6 +128,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
             putString("affectedAreas", announcement.affectedAreas)
             putString("evacuationCenter", announcement.evacuationCenter)
             putBoolean("isAlert", false)
+            putString("status", announcement.status.name)
         }
         findNavController().navigate(R.id.action_announcementsFragment_to_announcementDetailFragment, bundle)
     }
@@ -102,6 +140,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
             putString("edit_content", announcement.content)
             putString("edit_areas", announcement.affectedAreas)
             putString("edit_evac", announcement.evacuationCenter)
+            putString("edit_author_uid", announcement.authorUid)
         }
         findNavController().navigate(R.id.createAnnouncementFragment, bundle)
     }

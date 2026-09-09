@@ -237,7 +237,7 @@ object DashboardUIHelper {
         val (risk, advice) = when {
             rain > 100 -> "Critical" to "Extreme danger! Evacuate immediately if in slope areas."
             rain > 60 -> "High Risk" to "Landslide likely. Stay alert and prepare to move."
-            rain > 30 -> "Moderate" to "Ground is saturated. Monitor for soil movement."
+            rain >= 20 -> "Moderate" to "Ground is saturated. Monitor for soil movement."
             else -> "Low Risk" to "Current rainfall is within safe limits for slopes."
         }
 
@@ -249,7 +249,7 @@ object DashboardUIHelper {
         val saturation = when {
             rain > 80.0 -> "Very High"
             rain > 50.0 -> "High"
-            rain > 20.0 -> "Moderate"
+            rain >= 20.0 -> "Moderate"
             else -> "Low"
         }
         view.findViewById<TextView>(R.id.tv_soil_moisture).text = "Soil Saturation: $saturation"
