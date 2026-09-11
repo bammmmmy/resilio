@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var currentUserRole: UserRole = UserRole.RESIDENT
     private lateinit var navController: NavController
     private var lastReportTime: Long = System.currentTimeMillis()
+    private var reportListener: com.google.firebase.firestore.ListenerRegistration? = null
 
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -59,8 +60,9 @@ class MainActivity : AppCompatActivity() {
     
     private fun startAdminReportListener() {
         if (currentUserRole == UserRole.RESIDENT) return
+        if (reportListener != null) return
 
-        FirebaseFirestore.getInstance().collection("emergency_reports")
+        reportListener = FirebaseFirestore.getInstance().collection("emergency_reports")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(1)
             .addSnapshotListener { value, error ->
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                         this,
                         "NEW EMERGENCY REPORT",
                         "${report.senderName} reported: ${report.type}",
-                        PushNotificationManager.CHANNEL_EMERGENCY,
+                        "emergency_alert",
                         "report_${report.id}"
                     )
                 }

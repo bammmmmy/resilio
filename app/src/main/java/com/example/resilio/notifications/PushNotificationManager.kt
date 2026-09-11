@@ -31,6 +31,9 @@ object PushNotificationManager {
 
     const val EXTRA_NOTIFICATION_TYPE = "notification_type"
 
+    private var lastNotificationHash: Int = 0
+    private var lastNotificationTime: Long = 0L
+
     fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
@@ -117,6 +120,15 @@ object PushNotificationManager {
     ) {
         if (!canPostNotifications(context)) return
 
+        // Deduplication logic: ignore exact same notification within 2 minutes
+        val contentHash = (title + body + type).hashCode()
+        val now = System.currentTimeMillis()
+        if (contentHash == lastNotificationHash && (now - lastNotificationTime) < 120_000L) {
+            return
+        }
+        lastNotificationHash = contentHash
+        lastNotificationTime = now
+
         val channelId = when (type) {
             "emergency_alert" -> CHANNEL_EMERGENCY
             "weather_advisory", "landslide_alert", "earthquake_alert" -> CHANNEL_DASHBOARD
@@ -151,9 +163,9 @@ object PushNotificationManager {
             .setContentIntent(pendingIntent)
             .build()
 
-        NotificationManagerCompat.from(context).notify(
-            (messageId ?: "${type}_${System.currentTimeMillis()}").hashCode(),
-            notification,
-        )
+        // Use a consistent ID for same content if messageId is missing to avoid piling up
+        val notificationId = messageId?.hashCode() ?: contentHash
+
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 }

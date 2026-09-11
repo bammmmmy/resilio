@@ -24,9 +24,11 @@ object GeminiClient {
 
     /** Flash models for efficiency and speed. */
     private val modelNames = listOf(
+        "gemini-3.6-flash",
         "gemini-1.5-flash",
         "gemini-2.0-flash",
         "gemini-1.5-flash-8b",
+        "gemini-1.5-pro",
     )
 
     /** Cap history sent to the API to control input tokens and quota usage. */
@@ -193,7 +195,7 @@ object GeminiClient {
 
         for (modelName in modelNames) {
             val model = createModel(modelName, systemInstruction, generationConfig)
-            repeat(MAX_RETRIES_PER_MODEL) { attempt ->
+            for (attempt in 0 until MAX_RETRIES_PER_MODEL) {
                 try {
                     val chat = model.startChat(history = history)
                     val text = chat.sendMessage(nextMessage).text?.trim().orEmpty()
@@ -225,9 +227,12 @@ object GeminiClient {
                         if (attempt < MAX_RETRIES_PER_MODEL - 1) {
                             delay(quotaRetryDelayMs(e))
                         }
-                        return@repeat
+                        continue
                     }
-                    if (!isRetryable(e)) throw e
+                    if (!isRetryable(e)) {
+                        Log.w("GeminiClient", "$modelName failed with non-retryable error: ${e.message}, falling back to next model.")
+                        break
+                    }
                     Log.w(
                         "GeminiClient",
                         "$modelName attempt ${attempt + 1} failed: ${e.message?.take(120)}",
