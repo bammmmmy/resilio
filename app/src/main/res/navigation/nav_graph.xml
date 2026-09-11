@@ -218,6 +218,11 @@
         android:label="Resident Reports" />
 
     <fragment
+        android:id="@+id/adminReportsFragment"
+        android:name="com.example.resilio.AdminReportsFragment"
+        android:label="Emergency Reports" />
+
+    <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.resilio.ProfileFragment"
         android:label="@string/nav_menu" >
@@ -247,6 +252,9 @@
         <action
             android:id="@+id/action_profileFragment_to_residentReportsFragment"
             app:destination="@id/residentReportsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_adminReportsFragment"
+            app:destination="@id/adminReportsFragment" />
     </fragment>
 
     <fragment
@@ -377,4 +385,13 @@
         android:id="@+id/archivedAlertsFragment"
         android:name="com.example.resilio.ArchivedAlertsFragment"
         android:label="Archived Alerts" />
+
+    <fragment
+        android:id="@+id/reportChatFragment"
+        android:name="com.example.resilio.ReportChatFragment"
+        android:label="Emergency Chat">
+        <argument
+            android:name="reportId"
+            app:argType="string" />
+    </fragment>
 </navigation>

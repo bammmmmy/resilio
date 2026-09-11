@@ -77,7 +77,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             .addOnSuccessListener { doc ->
                 val user = doc.toObject(User::class.java)
                 if (user?.verificationStatus == VerificationStatus.APPROVED) {
-                    findNavController().navigate(R.id.createReportFragment)
+                    findNavController().navigate(R.id.residentReportsFragment)
                 } else {
                     val status = user?.verificationStatus ?: VerificationStatus.NOT_SUBMITTED
                     val message = when (status) {

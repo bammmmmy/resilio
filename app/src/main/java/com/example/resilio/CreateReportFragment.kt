@@ -21,12 +21,14 @@ import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentCreateReportBinding
 import com.example.resilio.model.EmergencyReport
 import com.example.resilio.model.ReportStatus
+import com.example.resilio.util.ProfileManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.chip.Chip
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -157,7 +159,9 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
                 val imageUrl = uploadPhoto()
                 val reportId = UUID.randomUUID().toString()
                 val uid = auth.currentUser?.uid ?: "anonymous"
-                val name = auth.currentUser?.displayName ?: "Resident"
+                
+                val profile = ProfileManager.getProfile(requireContext()).first()
+                val name = profile.fullName.ifEmpty { "Resident" }
 
                 val report = EmergencyReport(
                     id = reportId,
@@ -174,7 +178,21 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
 
                 db.collection("emergency_reports").document(reportId).set(report)
                     .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Emergency reported! Help is on the way.", Toast.LENGTH_LONG).show()
+                        // Also create a hazard location for the VR Map
+                        val hazard = com.example.resilio.model.HazardLocation(
+                            id = reportId,
+                            hazardType = type.lowercase(),
+                            description = desc,
+                            address = "Resident Emergency Report",
+                            latitude = userLocation?.latitude ?: 0.0,
+                            longitude = userLocation?.longitude ?: 0.0,
+                            radius = 50.0, // Default 50m radius for emergency reports
+                            createdBy = uid,
+                            active = true
+                        )
+                        db.collection("hazardLocations").document(reportId).set(hazard)
+
+                        Toast.makeText(requireContext(), "Report was sent", Toast.LENGTH_LONG).show()
                         findNavController().navigateUp()
                     }
                     .addOnFailureListener {

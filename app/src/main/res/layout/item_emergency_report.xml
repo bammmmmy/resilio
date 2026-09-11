@@ -97,25 +97,15 @@
                 app:icon="@drawable/ic_location_on" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRespond"
+                android:id="@+id/btnChat"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="RESPOND"
-                android:backgroundTint="@color/warning_orange"
-                android:textColor="@color/black" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnResolve"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="RESOLVED"
-                android:backgroundTint="@color/primary_green"
-                android:textColor="@color/white"
-                android:visibility="gone" />
+                android:text="CHAT"
+                app:icon="@drawable/ic_chat"
+                android:backgroundTint="@color/secondary_blue"
+                android:textColor="@color/white" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnArchive"

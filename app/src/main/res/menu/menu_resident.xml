@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_alerts"
         android:title="Notifications" />
     <item
-        android:id="@+id/createReportFragment"
+        android:id="@+id/residentReportsFragment"
         android:icon="@drawable/ic_chat"
         android:title="Report" />
     <item

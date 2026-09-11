@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_nav_placeholder"
         android:title="Users" />
     <item
-        android:id="@+id/disasterReportsFragment"
+        android:id="@+id/adminReportsFragment"
         android:icon="@drawable/ic_alerts"
         android:title="Reports" />
     <item

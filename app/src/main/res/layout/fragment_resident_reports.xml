@@ -7,6 +7,18 @@
     android:padding="16dp"
     android:background="@color/background">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSendReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Emergency Report"
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="@color/emergency_red"
+        android:textColor="@color/white"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_alerts"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,13 +27,14 @@
         android:layout_marginBottom="16dp">
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Resident Emergency Reports"
+            android:text="Report History"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/emergency_red"/>
+            android:textColor="@color/text_primary"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnToggleArchive"
@@ -29,14 +42,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SHOW ARCHIVE"
-            android:textColor="@color/text_secondary" />
+            android:textColor="@color/text_secondary"
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No active emergency reports"
+        android:text="No Report History"
         android:textColor="@color/text_secondary"
         android:gravity="center"
         android:visibility="gone"

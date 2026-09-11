@@ -15,8 +15,10 @@ import com.google.android.material.button.MaterialButton
 
 class EmergencyReportAdapter(
     private val reports: List<EmergencyReport>,
-    private val onUpdateStatus: (String, ReportStatus) -> Unit,
-    private val onViewOnMap: (Double, Double) -> Unit
+    private val isAdmin: Boolean = false,
+    private val onUpdateStatus: ((String, ReportStatus) -> Unit)? = null,
+    private val onViewOnMap: (Double, Double) -> Unit,
+    private val onChat: (String) -> Unit
 ) : RecyclerView.Adapter<EmergencyReportAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,11 +27,10 @@ class EmergencyReportAdapter(
         val tvDescription: TextView = view.findViewById(R.id.tvDescription)
         val tvTime: TextView = view.findViewById(R.id.tvTime)
         val ivPhoto: ImageView = view.findViewById(R.id.ivPhoto)
-        val btnRespond: MaterialButton = view.findViewById(R.id.btnRespond)
-        val btnResolve: MaterialButton = view.findViewById(R.id.btnResolve)
         val btnArchive: MaterialButton = view.findViewById(R.id.btnArchive)
         val btnUnarchive: MaterialButton = view.findViewById(R.id.btnUnarchive)
         val btnViewMap: MaterialButton = view.findViewById(R.id.btnViewMap)
+        val btnChat: MaterialButton = view.findViewById(R.id.btnChat)
         val statusBadge: View = view.findViewById(R.id.statusBadge)
     }
 
@@ -52,42 +53,55 @@ class EmergencyReportAdapter(
             .placeholder(R.drawable.logog)
             .into(holder.ivPhoto)
 
+        if (isAdmin) {
+            setupAdminControls(holder, report)
+        } else {
+            setupResidentControls(holder, report)
+        }
+
+        holder.btnViewMap.setOnClickListener { onViewOnMap(report.latitude, report.longitude) }
+        holder.btnChat.setOnClickListener { onChat(report.id) }
+    }
+
+    private fun setupAdminControls(holder: ViewHolder, report: EmergencyReport) {
         when (report.status) {
             ReportStatus.PENDING -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.emergency_red))
-                holder.btnRespond.visibility = View.VISIBLE
-                holder.btnResolve.visibility = View.GONE
-                holder.btnArchive.visibility = View.GONE
+                holder.btnArchive.visibility = View.VISIBLE
                 holder.btnUnarchive.visibility = View.GONE
             }
             ReportStatus.RESPONDING -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.warning_orange))
-                holder.btnRespond.visibility = View.GONE
-                holder.btnResolve.visibility = View.VISIBLE
-                holder.btnArchive.visibility = View.GONE
+                holder.btnArchive.visibility = View.VISIBLE
                 holder.btnUnarchive.visibility = View.GONE
             }
             ReportStatus.RESOLVED -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.primary_green))
-                holder.btnRespond.visibility = View.GONE
-                holder.btnResolve.visibility = View.GONE
                 holder.btnArchive.visibility = View.VISIBLE
                 holder.btnUnarchive.visibility = View.GONE
             }
             ReportStatus.ARCHIVED -> {
                 holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.text_secondary))
-                holder.btnRespond.visibility = View.GONE
-                holder.btnResolve.visibility = View.GONE
                 holder.btnArchive.visibility = View.GONE
                 holder.btnUnarchive.visibility = View.VISIBLE
             }
         }
+        
+        holder.btnArchive.setOnClickListener { onUpdateStatus?.invoke(report.id, ReportStatus.ARCHIVED) }
+        holder.btnUnarchive.setOnClickListener { onUpdateStatus?.invoke(report.id, ReportStatus.RESOLVED) }
+    }
 
-        holder.btnRespond.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESPONDING) }
-        holder.btnResolve.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESOLVED) }
-        holder.btnArchive.setOnClickListener { onUpdateStatus(report.id, ReportStatus.ARCHIVED) }
-        holder.btnUnarchive.setOnClickListener { onUpdateStatus(report.id, ReportStatus.RESOLVED) }
-        holder.btnViewMap.setOnClickListener { onViewOnMap(report.latitude, report.longitude) }
+    private fun setupResidentControls(holder: ViewHolder, report: EmergencyReport) {
+        holder.btnArchive.visibility = View.GONE
+        holder.btnUnarchive.visibility = View.GONE
+        
+        val color = when (report.status) {
+            ReportStatus.PENDING -> R.color.emergency_red
+            ReportStatus.RESPONDING -> R.color.warning_orange
+            ReportStatus.RESOLVED -> R.color.primary_green
+            ReportStatus.ARCHIVED -> R.color.text_secondary
+        }
+        holder.statusBadge.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, color))
     }
 
     override fun getItemCount() = reports.size

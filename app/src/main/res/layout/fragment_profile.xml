@@ -293,6 +293,22 @@
                         app:iconPadding="12dp"
                         app:iconGravity="textStart"
                         android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBdrrmoResidentReports"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="RESIDENT REPORTS"
+                        android:backgroundTint="@color/surface"
+                        android:textColor="@color/text_primary"
+                        app:strokeColor="@color/gold_accent"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_hotline"
+                        app:iconTint="@color/text_primary"
+                        app:iconPadding="12dp"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="12dp"/>
                 </LinearLayout>
 
                 <!-- Resident Actions -->

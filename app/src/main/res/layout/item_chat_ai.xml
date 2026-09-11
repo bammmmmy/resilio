@@ -18,10 +18,23 @@
         android:scaleType="centerCrop" />
 
     <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Admin Name" />
+
+    <TextView
         android:id="@+id/message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:maxWidth="260dp"
         android:paddingHorizontal="16dp"
         android:paddingVertical="10dp"
@@ -30,7 +43,7 @@
         android:textSize="15sp"
         android:elevation="1dp"
         app:layout_constraintStart_toEndOf="@id/iv_avatar"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
         tools:text="Hello! I am Resilio AI. How can I help you today?" />
 
     <TextView

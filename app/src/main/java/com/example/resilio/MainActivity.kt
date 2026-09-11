@@ -20,11 +20,14 @@ import com.example.resilio.notifications.PushNotificationManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.example.resilio.model.EmergencyReport
 
 class MainActivity : AppCompatActivity() {
 
     private var currentUserRole: UserRole = UserRole.RESIDENT
     private lateinit var navController: NavController
+    private var lastReportTime: Long = System.currentTimeMillis()
 
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -50,6 +53,33 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
         observeAuthState()
         requestNotificationPermissionIfNeeded()
+        
+        PushNotificationManager.createChannels(this)
+    }
+    
+    private fun startAdminReportListener() {
+        if (currentUserRole == UserRole.RESIDENT) return
+
+        FirebaseFirestore.getInstance().collection("emergency_reports")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(1)
+            .addSnapshotListener { value, error ->
+                if (error != null || value == null || value.isEmpty) return@addSnapshotListener
+                
+                val report = value.toObjects(EmergencyReport::class.java).firstOrNull() ?: return@addSnapshotListener
+                val reportTime = report.safeTimestamp.seconds * 1000
+                
+                if (reportTime > lastReportTime) {
+                    lastReportTime = reportTime
+                    PushNotificationManager.showNotification(
+                        this,
+                        "NEW EMERGENCY REPORT",
+                        "${report.senderName} reported: ${report.type}",
+                        PushNotificationManager.CHANNEL_EMERGENCY,
+                        "report_${report.id}"
+                    )
+                }
+            }
     }
 
     private fun setupNavigation() {
@@ -132,6 +162,7 @@ class MainActivity : AppCompatActivity() {
                 val user = doc.toObject(User::class.java)
                 if (user != null) {
                     currentUserRole = user.role
+                    startAdminReportListener()
                     
                     // Force a navigation check if we are currently on a dashboard
                     val currentDest = navController.currentDestination?.id
