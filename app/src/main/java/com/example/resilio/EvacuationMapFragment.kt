@@ -13,6 +13,8 @@ import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.location.Location
+import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -21,6 +23,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -105,6 +108,31 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    
+    private var pendingDestination: LatLng? = null
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
+            googleMap?.let {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        it.isMyLocationEnabled = true
+                    } catch (e: SecurityException) {
+                        Log.e("EvacuationMap", "SecurityException setting isMyLocationEnabled", e)
+                    }
+                }
+            }
+            pendingDestination?.let { calculateAndDrawRoute(it) }
+            pendingDestination = null
+        } else {
+            Toast.makeText(requireContext(), "Location permission is required for directions", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         streetOverlay = view.findViewById(R.id.street_view_container)
@@ -257,8 +285,15 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         googleMap = map
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            map.isMyLocationEnabled = true
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                map.isMyLocationEnabled = true
+            } catch (e: SecurityException) {
+                Log.e("EvacuationMap", "SecurityException setting isMyLocationEnabled", e)
+            }
+        } else {
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
         }
 
         // Restrict map panning to the entire Antipolo City area
@@ -290,8 +325,13 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             animateToMarker(marker.position)
             when (val tag = marker.tag) {
                 is HazardLocation -> {
-                    btnGetDirectionsOverlay.visibility = View.GONE
-                    selectedEvacuationArea = null
+                    selectedEvacuationArea = EvacuationArea(
+                        name = tag.hazardType.replaceFirstChar { it.uppercase() } + " Hazard",
+                        latitude = tag.latitude,
+                        longitude = tag.longitude
+                    )
+                    btnGetDirectionsOverlay.text = getString(R.string.get_directions_to, selectedEvacuationArea?.name)
+                    btnGetDirectionsOverlay.visibility = View.VISIBLE
                     showHazardAiInfo(tag)
                     true
                 }
@@ -644,15 +684,38 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
 
     private fun calculateAndDrawRoute(destination: LatLng) {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            pendingDestination = destination
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
             return
         }
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 val origin = LatLng(location.latitude, location.longitude)
                 fetchRoute(origin, destination)
+            } else {
+                // Fallback: If internal routing fails due to null location, use External Intent
+                openGoogleMapsApp(destination)
             }
+        }.addOnFailureListener {
+            openGoogleMapsApp(destination)
+        }
+    }
+
+    private fun openGoogleMapsApp(destination: LatLng) {
+        Toast.makeText(requireContext(), "Opening Google Maps for navigation...", Toast.LENGTH_SHORT).show()
+        val gmmIntentUri = Uri.parse("google.navigation:q=${destination.latitude},${destination.longitude}&mode=w")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        
+        try {
+            startActivity(mapIntent)
+        } catch (e: Exception) {
+            // Fallback for browsers or if Maps is missing
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}&travelmode=walking"))
+            startActivity(webIntent)
         }
     }
 
