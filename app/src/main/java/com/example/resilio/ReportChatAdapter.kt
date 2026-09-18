@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.resilio.model.ReportChatMessage
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,12 +45,16 @@ class ReportChatAdapter(private val currentUid: String) : RecyclerView.Adapter<R
         val item = items[position]
         if (holder is MyMessageVH) {
             holder.tvMessage.text = item.message
+            holder.tvMessage.visibility = if (item.message.isBlank()) View.GONE else View.VISIBLE
             holder.tvTime.text = formatTime(item.safeTimestamp)
+            bindImage(holder.ivImage, item.imageUrl)
         } else if (holder is OtherMessageVH) {
             holder.tvMessage.text = item.message
+            holder.tvMessage.visibility = if (item.message.isBlank()) View.GONE else View.VISIBLE
             holder.tvTime.text = formatTime(item.safeTimestamp)
             holder.tvName.text = if (item.senderRole == "admin") "Admin: ${item.senderName}" else item.senderName
             holder.tvName.visibility = View.VISIBLE
+            bindImage(holder.ivImage, item.imageUrl)
         }
     }
 
@@ -58,14 +64,22 @@ class ReportChatAdapter(private val currentUid: String) : RecyclerView.Adapter<R
         return SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(millis))
     }
 
+    private fun bindImage(view: ImageView, url: String) {
+        if (url.isBlank()) { Glide.with(view).clear(view); view.visibility = View.GONE; return }
+        view.visibility = View.VISIBLE
+        Glide.with(view).load(url).centerCrop().into(view)
+    }
+
     class MyMessageVH(view: View) : RecyclerView.ViewHolder(view) {
         val tvMessage: TextView = view.findViewById(R.id.message_text)
         val tvTime: TextView = view.findViewById(R.id.tv_timestamp)
+        val ivImage: ImageView = view.findViewById(R.id.chat_image)
     }
 
     class OtherMessageVH(view: View) : RecyclerView.ViewHolder(view) {
         val tvMessage: TextView = view.findViewById(R.id.message_text)
         val tvTime: TextView = view.findViewById(R.id.tv_timestamp)
         val tvName: TextView = view.findViewById(R.id.tv_name)
+        val ivImage: ImageView = view.findViewById(R.id.chat_image)
     }
 }

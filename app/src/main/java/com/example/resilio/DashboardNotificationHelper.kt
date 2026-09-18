@@ -7,7 +7,7 @@ import com.example.resilio.notifications.PushNotificationManager
 object DashboardNotificationHelper {
 
     private const val PREFS_NAME = "dashboard_notifications"
-    private const val KEY_LAST_WEATHER = "last_weather_code"
+    private const val KEY_LAST_WEATHER = "last_weather_alert"
     private const val KEY_LAST_LANDSLIDE = "last_landslide_risk"
     private const val KEY_LAST_QUAKE_TIME = "last_quake_time"
 
@@ -20,61 +20,41 @@ object DashboardNotificationHelper {
 
     private fun checkWeather(context: Context, prefs: android.content.SharedPreferences) {
         val snap = WeatherCache.snapshot ?: return
-        
-        // Align with UI logic: Show advisory for any rain or high accumulation
-        val autoAdvisory = getAutoAdvisory(snap.code)
-        val intensityAdvisory = if (snap.currentPrecipIntensity > 15.0) "Heavy Rainfall Warning: Seek Shelter" 
-                                else if (snap.currentPrecipIntensity > 0) "Rain Advisory: Carry an umbrella"
-                                else null
-        val accumulationAdvisory = if (snap.rain24h > 50) "Flash Flood Warning: High rainfall detected"
-                                   else if (snap.rain24h > 10) "Flood Advisory: Saturated ground conditions"
-                                   else null
-                                   
-        val advisory = autoAdvisory ?: intensityAdvisory ?: accumulationAdvisory
-        
-        val lastCode = prefs.getInt(KEY_LAST_WEATHER, -1)
-        // We only notify if the condition has changed to avoid spamming the user
-        if (advisory != null && snap.code != lastCode) {
+        val advisory = WeatherCache.getWeatherAlert(snap.code, snap.currentPrecipIntensity, snap.rain24h)
+        val alertKey = advisory?.title ?: ""
+        val lastAlert = prefs.getString(KEY_LAST_WEATHER, "")
+        if (advisory != null && alertKey != lastAlert) {
             PushNotificationManager.showNotification(
                 context,
-                "Weather Advisory",
-                advisory,
+                advisory.title,
+                advisory.description,
                 "weather_advisory",
-                "weather_${snap.code}"
+                "weather_${alertKey}"
             )
-            prefs.edit { putInt(KEY_LAST_WEATHER, snap.code) }
+            prefs.edit { putString(KEY_LAST_WEATHER, alertKey) }
         } else if (advisory == null) {
-            prefs.edit { putInt(KEY_LAST_WEATHER, -1) }
+            prefs.edit { putString(KEY_LAST_WEATHER, "") }
         }
     }
 
     private fun checkLandslide(context: Context, prefs: android.content.SharedPreferences) {
         val snap = WeatherCache.snapshot ?: return
         val rain = snap.rain24h
-        val risk = when {
-            rain > 100.0 -> "CRITICAL"
-            rain > 60.0 -> "HIGH RISK"
-            rain >= 20.0 -> "MODERATE"
-            else -> "LOW RISK"
-        }
+        val assessment = WeatherCache.getLandslideAssessment(rain)
+        val risk = assessment.label
 
         val lastRisk = prefs.getString(KEY_LAST_LANDSLIDE, "")
-        if (risk != "LOW RISK" && risk != lastRisk) {
-            val desc = when (risk) {
-                "CRITICAL" -> "Extremely high risk! Evacuate if in high-risk zones."
-                "HIGH RISK" -> "High risk of landslides. Monitor slopes."
-                else -> "Moderate risk. Avoid landslide-prone areas."
-            }
+        if (risk != "Low risk" && risk != lastRisk) {
             PushNotificationManager.showNotification(
                 context,
-                "Landslide Risk: $risk",
-                desc,
+                risk,
+                assessment.copy,
                 "landslide_alert",
                 "landslide_$risk"
             )
             prefs.edit { putString(KEY_LAST_LANDSLIDE, risk) }
-        } else if (risk == "LOW RISK") {
-            prefs.edit { putString(KEY_LAST_LANDSLIDE, "LOW RISK") }
+        } else if (risk == "Low risk") {
+            prefs.edit { putString(KEY_LAST_LANDSLIDE, "Low risk") }
         }
     }
 
@@ -82,16 +62,16 @@ object DashboardNotificationHelper {
         val snap = EarthquakeCache.lastQuake ?: return
         if (snap.magnitude == 0.0) return
 
-        val isRecent = (System.currentTimeMillis() - snap.timeMillis) < (60 * 60 * 1000L)
-        val isSignificant = snap.magnitude > 2.5
+        val isRecent = (System.currentTimeMillis() - snap.timeMillis) < (24 * 60 * 60 * 1000L)
+        val isSignificant = snap.magnitude >= 2.0
         val isNearby = snap.distanceKm < 100.0
 
         val lastTime = prefs.getLong(KEY_LAST_QUAKE_TIME, 0L)
         if (isRecent && isSignificant && isNearby && snap.timeMillis != lastTime) {
             PushNotificationManager.showNotification(
                 context,
-                "Earthquake Detected",
-                "M ${snap.magnitude} earthquake detected ${snap.distanceKm.toInt()} km from Antipolo.",
+                "Earthquake Alert",
+                "Magnitude ${String.format(java.util.Locale.US, "%.1f", snap.magnitude)} - ${snap.place}",
                 "earthquake_alert",
                 "quake_${snap.timeMillis}"
             )
@@ -99,13 +79,4 @@ object DashboardNotificationHelper {
         }
     }
 
-    private fun getAutoAdvisory(code: Int): String? {
-        return when (code) {
-            51, 53, 55, 61, 80 -> "Rain Advisory: Prepare for Wet Conditions"
-            63, 81 -> "Moderate Rain Advisory: Watch for Rising Water"
-            65, 82 -> "Violent Rain Advisory: Stay Indoors"
-            95, 96, 99 -> "Severe Thunderstorm Warning: Seek Shelter"
-            else -> null
-        }
-    }
 }

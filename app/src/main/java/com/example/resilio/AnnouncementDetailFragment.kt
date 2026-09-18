@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.databinding.FragmentAnnouncementDetailBinding
+import com.example.resilio.model.EvacuationArea
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.UserRole
 import com.example.resilio.util.ProfileManager
@@ -122,6 +123,45 @@ class AnnouncementDetailFragment : Fragment(R.layout.fragment_announcement_detai
             binding.tvAnnouncementDetailEvacuationCenter.text = "Evacuation Center: $evacuationCenter"
             binding.tvAnnouncementDetailEvacuationCenter.visibility = View.VISIBLE
         }
+
+        if (isAlert && hazardTypeName.isNotBlank()) {
+            binding.tvAnnouncementDetailHazardType.text = "Hazard Type: ${hazardTypeName.replace('_', ' ')}"
+            binding.tvAnnouncementDetailHazardType.visibility = View.VISIBLE
+        }
+
+        if (evacuationCenter.isNotBlank()) {
+            binding.btnGetEvacuationDirections.visibility = View.VISIBLE
+            binding.btnGetEvacuationDirections.setOnClickListener {
+                openEvacuationDirections(evacuationCenter)
+            }
+        }
+    }
+
+    private fun openEvacuationDirections(centerName: String) {
+        binding.btnGetEvacuationDirections.isEnabled = false
+        db.collection("evacuationAreas")
+            .whereEqualTo("name", centerName)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                binding.btnGetEvacuationDirections.isEnabled = true
+                val document = snapshot.documents.firstOrNull()
+                val area = document?.toObject(EvacuationArea::class.java)?.copy(id = document.id)
+                if (area == null || (area.latitude == 0.0 && area.longitude == 0.0)) {
+                    Toast.makeText(requireContext(), "This evacuation center has no mapped location yet.", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+                val args = Bundle().apply {
+                    putFloat("focusLatitude", area.latitude.toFloat())
+                    putFloat("focusLongitude", area.longitude.toFloat())
+                    putBoolean("showRoute", true)
+                }
+                findNavController().navigate(R.id.evacuationMapFragment, args)
+            }
+            .addOnFailureListener {
+                binding.btnGetEvacuationDirections.isEnabled = true
+                Toast.makeText(requireContext(), "Unable to load the evacuation center location.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun checkLinkedHazard(id: String) {

@@ -337,6 +337,19 @@
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChangePassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:text="CHANGE PASSWORD"
+                    android:backgroundTint="@color/surface"
+                    android:textColor="@color/text_primary"
+                    app:strokeColor="@color/gold_accent"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"/>
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
                     android:layout_height="54dp"

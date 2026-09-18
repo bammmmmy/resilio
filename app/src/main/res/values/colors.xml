@@ -24,7 +24,7 @@
     <color name="gradient_end">#FFFFFF</color>
 
     <!-- Dashboard Redesign Colors -->
-    <color name="dashboard_header">#473F97</color>
+    <color name="dashboard_header">#12396A</color>
     <color name="dashboard_button_call">#FF4D58</color>
     <color name="dashboard_button_sms">#4D79FF</color>
     <color name="dashboard_text_white">#FFFFFF</color>
@@ -50,4 +50,7 @@
 
     <!-- Landslide Colors -->
     <color name="landslide_brown">#8D6E63</color>
+    <color name="login_blue_dark">#071E4B</color>
+    <color name="login_blue">#1768A9</color>
+    <color name="login_text">#102F5A</color>
 </resources>

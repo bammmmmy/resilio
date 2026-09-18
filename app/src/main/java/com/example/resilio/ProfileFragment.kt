@@ -2,6 +2,7 @@ package com.example.resilio
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +13,7 @@ import com.example.resilio.model.UserRole
 import com.example.resilio.util.ProfileManager
 import com.example.resilio.viewmodel.AuthViewModel
 import com.example.resilio.viewmodel.ChairmanViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -134,6 +136,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             findNavController().navigate(R.id.verificationFragment)
         }
 
+        binding.btnChangePassword.setOnClickListener {
+            sendPasswordResetEmail()
+        }
+
         binding.btnLogout.setOnClickListener {
             authViewModel.logout()
             findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
@@ -162,6 +168,27 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
         }
         authViewModel.checkAuthState()
+    }
+
+    private fun sendPasswordResetEmail() {
+        val email = FirebaseAuth.getInstance().currentUser?.email
+        if (email.isNullOrBlank()) {
+            Toast.makeText(requireContext(), "No email is linked to this account.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.btnChangePassword.isEnabled = false
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnSuccessListener {
+                if (_binding == null) return@addOnSuccessListener
+                binding.btnChangePassword.isEnabled = true
+                Toast.makeText(requireContext(), "Password reset link sent to $email.", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { error ->
+                if (_binding == null) return@addOnFailureListener
+                binding.btnChangePassword.isEnabled = true
+                Toast.makeText(requireContext(), error.message ?: "Unable to send password reset link.", Toast.LENGTH_LONG).show()
+            }
     }
 
     override fun onDestroyView() {

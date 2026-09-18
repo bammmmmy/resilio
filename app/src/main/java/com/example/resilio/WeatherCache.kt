@@ -15,6 +15,17 @@ data class WeatherSnapshot(
     val fetchedAtMillis: Long = System.currentTimeMillis(),
 )
 
+data class WeatherAlert(
+    val title: String,
+    val description: String,
+)
+
+data class LandslideAssessment(
+    val label: String,
+    val copy: String,
+    val saturation: String,
+)
+
 object WeatherCache {
     private const val STALE_AFTER_MS = 5 * 60 * 1000L
 
@@ -70,13 +81,23 @@ object WeatherCache {
         }
     }
 
-    fun getSafetyAdvice(code: Int, rain: Double): Pair<String, String> {
+    fun getWeatherAlert(code: Int, currentRain: Double, rain24h: Double): WeatherAlert? {
         return when {
-            code >= 95 -> "Thunderstorm Warning" to "Stay indoors and avoid electrical appliances."
-            rain > 50 -> "Heavy Rain Warning" to "Flood risk is high. Move to higher ground."
-            rain > 10 -> "Rain Advisory" to "Ground is saturated. Watch for minor flooding."
-            code in 51..82 -> "Wet Weather" to "Carry an umbrella and be careful of slippery roads."
-            else -> "Weather Stable" to "Conditions are currently safe."
+            code == 95 || code == 96 || code == 99 -> WeatherAlert("Severe Thunderstorm Warning", "Seek shelter indoors and monitor official updates.")
+            rain24h > 50 -> WeatherAlert("Flash Flood Warning", "High rainfall has been detected. Avoid low-lying areas and follow evacuation guidance.")
+            code == 65 || code == 82 || currentRain > 15 -> WeatherAlert("Heavy Rainfall Warning", "Heavy rain is possible. Watch for flooding in low-lying areas.")
+            code == 63 || code == 81 || rain24h > 10 -> WeatherAlert("Rain Advisory", "Rain is expected. Prepare for wet conditions and possible rising water.")
+            code in listOf(51, 53, 55, 61, 80) -> WeatherAlert("Rain Advisory", "Light rain is expected. Prepare for wet conditions.")
+            else -> null
+        }
+    }
+
+    fun getLandslideAssessment(rain24h: Double): LandslideAssessment {
+        return when {
+            rain24h > 100 -> LandslideAssessment("Critical risk", "Severe rainfall conditions may trigger slope failure. Prepare for immediate action.", "Very high")
+            rain24h > 60 -> LandslideAssessment("High risk", "Heavy rainfall is increasing slope instability. Monitor vulnerable areas closely.", "High")
+            rain24h >= 20 -> LandslideAssessment("Moderate risk", "Conditions are favorable for landslides in some areas. Keep monitoring and be prepared.", "Moderate")
+            else -> LandslideAssessment("Low risk", "Rainfall and soil conditions are currently stable. Continue routine monitoring.", "Low")
         }
     }
 

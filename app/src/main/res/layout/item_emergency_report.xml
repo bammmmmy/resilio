@@ -81,6 +81,20 @@
             android:textSize="14sp"
             android:lineSpacingExtra="2dp" />
 
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:id="@+id/photoGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp" />
+        </HorizontalScrollView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

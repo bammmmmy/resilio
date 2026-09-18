@@ -9,6 +9,7 @@ data class ReportChatMessage(
     val senderName: String = "",
     val senderRole: String = "", // user, admin
     val message: String = "",
+    val imageUrl: String = "",
     @ServerTimestamp
     val timestamp: Timestamp? = null
 ) {

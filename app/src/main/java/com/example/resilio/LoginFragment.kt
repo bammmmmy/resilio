@@ -1,11 +1,14 @@
 package com.example.resilio
 
 import android.os.Bundle
+import android.graphics.Rect
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.resilio.databinding.FragmentLoginBinding
 import com.example.resilio.model.User
 import com.example.resilio.model.UserRole
@@ -17,10 +20,24 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuthViewModel by viewModels()
+    private var imeBottom = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentLoginBinding.bind(view)
+        binding.root.setPadding(binding.root.paddingLeft, binding.root.paddingTop, binding.root.paddingRight, 0)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { root, insets ->
+            imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            if (imeBottom > 0) {
+                root.postDelayed({ keepFocusedFieldVisible() }, 100)
+            } else {
+                root.post { binding.root.smoothScrollTo(0, 0) }
+            }
+            insets
+        }
+        binding.etEmail.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.etEmail.postDelayed({ keepFocusedFieldVisible() }, 250) }
+        binding.etPassword.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.etPassword.postDelayed({ keepFocusedFieldVisible() }, 250) }
 
         viewModel.userState.observe(viewLifecycleOwner) { result ->
             if (result == null) return@observe
@@ -72,7 +89,20 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
+    private fun keepFocusedFieldVisible() {
+        val focusedField = view?.findFocus() ?: return
+        val visibleRect = Rect()
+        focusedField.getDrawingRect(visibleRect)
+        binding.root.offsetDescendantRectToMyCoords(focusedField, visibleRect)
+        val visibleBottom = binding.root.height
+        val requiredScroll = binding.root.scrollY + visibleRect.bottom - visibleBottom + 32
+        if (requiredScroll > binding.root.scrollY) binding.root.smoothScrollTo(0, requiredScroll)
+    }
+
     override fun onDestroyView() {
+        binding.root.setPadding(binding.root.paddingLeft, binding.root.paddingTop, binding.root.paddingRight, 0)
+        binding.root.smoothScrollTo(0, 0)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root, null)
         super.onDestroyView()
         _binding = null
     }

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -107,6 +108,14 @@ class MainActivity : AppCompatActivity() {
 
         // Hide BottomNav for certain fragments
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            val isLogin = destination.id == R.id.loginFragment
+            WindowCompat.setDecorFitsSystemWindows(window, !isLogin)
+            window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            if (!isLogin) {
+                val main = findViewById<View>(R.id.main)
+                main.setPadding(main.paddingLeft, main.paddingTop, main.paddingRight, 0)
+                ViewCompat.requestApplyInsets(main)
+            }
             when (destination.id) {
                 R.id.loginFragment, R.id.registerFragment, R.id.verificationFragment,
                 R.id.createAnnouncementFragment -> {

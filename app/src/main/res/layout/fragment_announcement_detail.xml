@@ -46,6 +46,16 @@
                         android:lineSpacingExtra="4dp" />
 
                     <TextView
+                        android:id="@+id/tvAnnouncementDetailHazardType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/emergency_red"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:id="@+id/tvAnnouncementDetailAuthor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -69,6 +79,17 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp"
                         android:layout_marginTop="8dp"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGetEvacuationDirections"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Get directions to evacuation center"
+                        android:textColor="@color/primary_green"
+                        app:strokeColor="@color/primary_green"
                         android:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton

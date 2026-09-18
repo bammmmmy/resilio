@@ -10,6 +10,7 @@ data class EmergencyReport(
     val type: String = "", // Medical, Fire, Flood, etc.
     val description: String = "",
     val imageUrl: String? = null,
+    val imageUrls: List<String> = emptyList(),
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val status: ReportStatus = ReportStatus.PENDING,
@@ -17,6 +18,9 @@ data class EmergencyReport(
     val timestamp: Timestamp? = null,
     val responderNotes: String? = null
 ) {
+    val allImageUrls: List<String>
+        get() = (imageUrls + listOfNotNull(imageUrl)).distinct()
+
     val safeTimestamp: Timestamp
         get() = timestamp ?: Timestamp.now()
 }

@@ -3,7 +3,11 @@ package com.example.resilio
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.app.Dialog
+import android.graphics.Color
+import android.view.Window
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +31,7 @@ class EmergencyReportAdapter(
         val tvDescription: TextView = view.findViewById(R.id.tvDescription)
         val tvTime: TextView = view.findViewById(R.id.tvTime)
         val ivPhoto: ImageView = view.findViewById(R.id.ivPhoto)
+        val photoGallery: LinearLayout = view.findViewById(R.id.photoGallery)
         val btnArchive: MaterialButton = view.findViewById(R.id.btnArchive)
         val btnUnarchive: MaterialButton = view.findViewById(R.id.btnUnarchive)
         val btnViewMap: MaterialButton = view.findViewById(R.id.btnViewMap)
@@ -48,10 +53,20 @@ class EmergencyReportAdapter(
         
         holder.tvTime.text = TimeUtils.formatToPhTime(report.safeTimestamp)
 
-        Glide.with(holder.itemView.context)
-            .load(report.imageUrl)
-            .placeholder(R.drawable.logog)
-            .into(holder.ivPhoto)
+        holder.ivPhoto.visibility = View.GONE
+        holder.photoGallery.removeAllViews()
+        report.allImageUrls.forEach { imageUrl ->
+            val imageView = ImageView(holder.itemView.context).apply {
+                layoutParams = LinearLayout.LayoutParams(96.dp(holder.itemView.context), 96.dp(holder.itemView.context)).apply {
+                    marginEnd = 8.dp(holder.itemView.context)
+                }
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundResource(R.drawable.bg_bottom_sheet)
+                setOnClickListener { showFullPhoto(holder.itemView.context, imageUrl) }
+            }
+            Glide.with(holder.itemView.context).load(imageUrl).placeholder(R.drawable.logog).into(imageView)
+            holder.photoGallery.addView(imageView)
+        }
 
         if (isAdmin) {
             setupAdminControls(holder, report)
@@ -105,4 +120,22 @@ class EmergencyReportAdapter(
     }
 
     override fun getItemCount() = reports.size
+
+    private fun showFullPhoto(context: android.content.Context, imageUrl: String) {
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val imageView = ImageView(context).apply {
+            setBackgroundColor(Color.BLACK)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            setOnClickListener { dialog.dismiss() }
+        }
+        dialog.setContentView(imageView)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.black)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        Glide.with(context).load(imageUrl).into(imageView)
+        dialog.show()
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    }
+
+    private fun Int.dp(context: android.content.Context): Int = (this * context.resources.displayMetrics.density).toInt()
 }

@@ -110,7 +110,7 @@ object DashboardUIHelper {
             try {
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=14.5995&longitude=120.9842&maxradiuskm=500&limit=1")
+                    .url("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=14.5845&longitude=121.1754&maxradiuskm=100&minmagnitude=2.0&orderby=time&limit=1")
                     .build()
 
                 val response = client.newCall(request).execute()
@@ -130,7 +130,8 @@ object DashboardUIHelper {
                         timeMillis = props.getLong("time"),
                         latitude = coords.getDouble(1),
                         longitude = coords.getDouble(0),
-                        depth = coords.getDouble(2)
+                        depth = coords.getDouble(2),
+                        distanceKm = distanceBetweenKm(14.5845, 121.1754, coords.getDouble(1), coords.getDouble(0))
                     )
                     EarthquakeCache.lastQuake = quake
                     EarthquakeCache.lastFetched = System.currentTimeMillis()
@@ -168,18 +169,13 @@ object DashboardUIHelper {
         
         view.findViewById<TextView>(R.id.tv_weather_condition).text = displayCondition
 
-        val (adviceTitle, adviceDesc) = WeatherCache.getSafetyAdvice(snap.code, snap.rain24h)
+        val weatherAlert = WeatherCache.getWeatherAlert(snap.code, snap.currentPrecipIntensity, snap.rain24h)
         val advisoryLayout = view.findViewById<View>(R.id.layout_weather_advisory)
         val advisoryTv = view.findViewById<TextView>(R.id.tv_weather_advisory)
-        
-        // Show advisory if it's raining, OR high accumulation, OR a special code (Thunderstorm/Snow)
-        val isNotClear = snap.code > 3
-        val hasRain = snap.currentPrecipIntensity > 0
-        val significantTotal = snap.rain24h > 10.0
 
-        if (isNotClear || hasRain || significantTotal) {
+        if (weatherAlert != null) {
             advisoryLayout.visibility = View.VISIBLE
-            advisoryTv.text = "$adviceTitle: $adviceDesc"
+            advisoryTv.text = "${weatherAlert.title}: ${weatherAlert.description}"
         } else {
             advisoryLayout.visibility = View.GONE
         }
@@ -209,17 +205,17 @@ object DashboardUIHelper {
         view.findViewById<TextView>(R.id.tv_weather_day).text = TimeUtils.formatToPhTime(updateTime, "EEEE")
 
         // Condition-based assets
-        val (backgroundRes, headerRes) = when (snap.code) {
-            0, 1 -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
-            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy to R.drawable.bg_header_cloudy
-            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
-            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy to R.drawable.bg_header_sunny
-            95, 96, 99 -> R.drawable.bg_weather_rainy to R.drawable.bg_header_rainy
-            else -> R.drawable.bg_weather_sunny to R.drawable.bg_header_sunny
+        val backgroundRes = when (snap.code) {
+            0, 1 -> R.drawable.bg_weather_sunny
+            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy
+            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy
+            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy
+            95, 96, 99 -> R.drawable.bg_weather_rainy
+            else -> R.drawable.bg_weather_sunny
         }
 
         view.findViewById<View>(R.id.layout_weather_container).setBackgroundResource(backgroundRes)
-        headerView?.setBackgroundResource(headerRes)
+        headerView?.setBackgroundResource(R.drawable.bg_dashboard_header)
 
         val conditionColor = when (snap.code) {
             0, 1 -> Color.parseColor("#FFD600")
@@ -234,38 +230,31 @@ object DashboardUIHelper {
 
     fun updateLandslideUI(view: View, snap: WeatherSnapshot) {
         val rain = snap.rain24h
-        val (risk, advice) = when {
-            rain > 100 -> "Critical" to "Extreme danger! Evacuate immediately if in slope areas."
-            rain > 60 -> "High Risk" to "Landslide likely. Stay alert and prepare to move."
-            rain >= 20 -> "Moderate" to "Ground is saturated. Monitor for soil movement."
-            else -> "Low Risk" to "Current rainfall is within safe limits for slopes."
-        }
+        val assessment = WeatherCache.getLandslideAssessment(rain)
+        val risk = assessment.label
 
         view.findViewById<TextView>(R.id.tv_landslide_status).text = risk
-        view.findViewById<TextView>(R.id.tv_landslide_desc).text = advice
+        view.findViewById<TextView>(R.id.tv_landslide_desc).text = assessment.copy
         
         view.findViewById<TextView>(R.id.tv_24h_rainfall).text = String.format(Locale.US, "24h Rain: %.1f mm", rain)
         
         val saturation = when {
-            rain > 80.0 -> "Very High"
-            rain > 50.0 -> "High"
-            rain >= 20.0 -> "Moderate"
-            else -> "Low"
+            else -> assessment.saturation
         }
         val saturationTv = view.findViewById<TextView>(R.id.tv_soil_moisture)
         saturationTv.text = "Soil Saturation: $saturation"
         
         val riskColor = when (risk) {
-            "Critical" -> ContextCompat.getColor(view.context, R.color.emergency_red)
-            "High Risk" -> ContextCompat.getColor(view.context, R.color.warning_orange)
-            "Moderate" -> ContextCompat.getColor(view.context, R.color.gold_accent)
+            "Critical risk" -> ContextCompat.getColor(view.context, R.color.emergency_red)
+            "High risk" -> ContextCompat.getColor(view.context, R.color.warning_orange)
+            "Moderate risk" -> ContextCompat.getColor(view.context, R.color.gold_accent)
             else -> Color.WHITE // Changed from primary_green to avoid clash with brown/blue
         }
         view.findViewById<TextView>(R.id.tv_landslide_status).setTextColor(riskColor)
 
         // Set saturation color for better visual feedback
         val saturationColor = when (saturation) {
-            "Very High" -> ContextCompat.getColor(view.context, R.color.emergency_red)
+            "Very high" -> ContextCompat.getColor(view.context, R.color.emergency_red)
             "High" -> ContextCompat.getColor(view.context, R.color.warning_orange)
             "Moderate" -> ContextCompat.getColor(view.context, R.color.gold_accent)
             else -> Color.WHITE
@@ -284,5 +273,13 @@ object DashboardUIHelper {
             else -> "#4CAF50"
         }
         view.findViewById<TextView>(R.id.tv_latest_mag).setTextColor(Color.parseColor(color))
+    }
+
+    private fun distanceBetweenKm(firstLatitude: Double, firstLongitude: Double, secondLatitude: Double, secondLongitude: Double): Double {
+        val earthRadiusKm = 6371.0
+        val latitudeDelta = Math.toRadians(secondLatitude - firstLatitude)
+        val longitudeDelta = Math.toRadians(secondLongitude - firstLongitude)
+        val a = kotlin.math.sin(latitudeDelta / 2) * kotlin.math.sin(latitudeDelta / 2) + kotlin.math.cos(Math.toRadians(firstLatitude)) * kotlin.math.cos(Math.toRadians(secondLatitude)) * kotlin.math.sin(longitudeDelta / 2) * kotlin.math.sin(longitudeDelta / 2)
+        return earthRadiusKm * 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
     }
 }

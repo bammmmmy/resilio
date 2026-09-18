@@ -1,9 +1,12 @@
 package com.example.resilio
 
 import android.os.Bundle
+import android.app.Activity
+import android.net.Uri
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,8 +18,11 @@ import com.example.resilio.util.ProfileManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.coroutines.suspendCoroutine
 
 class ReportChatFragment : Fragment(R.layout.fragment_report_chat) {
 
@@ -28,6 +34,13 @@ class ReportChatFragment : Fragment(R.layout.fragment_report_chat) {
     private lateinit var adapter: ReportChatAdapter
     private var reportId: String = ""
     private var currentUser: User? = null
+    private var selectedImageUri: Uri? = null
+    private val storage = FirebaseStorage.getInstance("gs://resilio-ab61f.firebasestorage.app")
+
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        selectedImageUri = uri
+        if (uri != null) Toast.makeText(requireContext(), "Photo attached", Toast.LENGTH_SHORT).show()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,12 +69,13 @@ class ReportChatFragment : Fragment(R.layout.fragment_report_chat) {
         }
 
         binding.btnSend.setOnClickListener {
+            if (isSending) return@setOnClickListener
             val text = binding.etMessage.text.toString().trim()
-            if (text.isNotEmpty()) {
-                sendMessage(text)
-                binding.etMessage.setText("")
+            if (text.isNotEmpty() || selectedImageUri != null) {
+                sendMessage(text, selectedImageUri)
             }
         }
+        binding.btnAttachPhoto.setOnClickListener { imagePicker.launch("image/*") }
     }
 
     private fun listenToReportStatus() {
@@ -92,20 +106,39 @@ class ReportChatFragment : Fragment(R.layout.fragment_report_chat) {
             }
     }
 
-    private fun sendMessage(text: String) {
+    private fun sendMessage(text: String, imageUri: Uri?) {
         val user = currentUser ?: return
+        setSending(true)
         val role = if (user.role == UserRole.CHAIRMAN || user.role == UserRole.BDRRMO) "admin" else "user"
-        
-        val msg = ReportChatMessage(
-            senderUid = auth.currentUser?.uid ?: "",
-            senderName = user.fullName,
-            senderRole = role,
-            message = text
-        )
+        lifecycleScope.launch {
+            try {
+                val imageUrl = imageUri?.let { uploadChatImage(it) } ?: ""
+                val msg = ReportChatMessage(senderUid = auth.currentUser?.uid ?: "", senderName = user.fullName, senderRole = role, message = text, imageUrl = imageUrl)
+                db.collection("emergency_reports").document(reportId).collection("chats").add(msg)
+                binding.etMessage.setText("")
+                selectedImageUri = null
+            } catch (error: Exception) {
+                Toast.makeText(requireContext(), "Unable to send message", Toast.LENGTH_SHORT).show()
+            } finally {
+                if (_binding != null) setSending(false)
+            }
+        }
+    }
 
-        db.collection("emergency_reports").document(reportId)
-            .collection("chats")
-            .add(msg)
+    private var isSending = false
+
+    private fun setSending(sending: Boolean) {
+        isSending = sending
+        binding.btnSend.visibility = if (sending) View.GONE else View.VISIBLE
+        binding.sendProgress.visibility = if (sending) View.VISIBLE else View.GONE
+        binding.btnSend.isEnabled = !sending
+        binding.btnAttachPhoto.isEnabled = !sending
+        binding.etMessage.isEnabled = !sending
+    }
+
+    private suspend fun uploadChatImage(uri: Uri): String = suspendCoroutine { continuation ->
+        val reference = storage.reference.child("report_chats/$reportId/${UUID.randomUUID()}.jpg")
+        reference.putFile(uri).continueWithTask { reference.downloadUrl }.addOnSuccessListener { continuation.resumeWith(Result.success(it.toString())) }.addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
     }
 
     override fun onDestroyView() {

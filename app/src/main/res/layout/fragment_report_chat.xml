@@ -60,6 +60,15 @@
             android:importantForAutofill="no" />
 
         <ImageButton
+            android:id="@+id/btnAttachPhoto"
+            android:layout_width="42dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_camera_alt"
+            android:contentDescription="Attach photo"
+            app:tint="@color/chat_user_bubble" />
+
+        <ImageButton
             android:id="@+id/btnSend"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -67,6 +76,15 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_up_send"
             app:tint="@color/chat_user_bubble" />
+
+            <ProgressBar
+                android:id="@+id/send_progress"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:visibility="gone"
+                android:contentDescription="Sending message"
+                android:indeterminate="true" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

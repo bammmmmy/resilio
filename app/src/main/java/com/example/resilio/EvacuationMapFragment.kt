@@ -99,7 +99,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private var pinTouchOffsetX = 0f
     private var pinTouchOffsetY = 0f
     private var evacuationMarkerIcon: BitmapDescriptor? = null
-    private var hazardMarkerIcon: BitmapDescriptor? = null
+    private val hazardMarkerIcons = mutableMapOf<String, BitmapDescriptor>()
     private val evacuationMarkers = mutableListOf<Marker>()
     private val hazardMarkers = mutableListOf<Marker>()
     private var selectedEvacuationArea: EvacuationArea? = null
@@ -517,20 +517,23 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private fun loadHazardLocationMarkers() {
         val map = googleMap ?: return
 
-        firestore.collection("hazardLocations")
-            .whereEqualTo("active", true)
+        firestore.collection("emergency_reports")
             .get()
-            .addOnSuccessListener { snapshot ->
+            .addOnSuccessListener { reportsSnapshot ->
+                val residentReportIds = reportsSnapshot.documents.map { it.id }.toSet()
+                firestore.collection("hazardLocations")
+                    .whereEqualTo("active", true)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
                 if (!isAdded) return@addOnSuccessListener
                 clearHazardMarkers()
                 clearHazardCircles()
-
-                val icon = getHazardMarkerIcon()
 
                 snapshot.documents.forEach { document ->
                     val hazard = document.toObject(HazardLocation::class.java)
                         ?.copy(id = document.id)
                         ?: return@forEach
+                    if (residentReportIds.contains(hazard.id)) return@forEach
                     if (!hasMapLocation(hazard.latitude, hazard.longitude)) return@forEach
 
                     val latLng = LatLng(hazard.latitude, hazard.longitude)
@@ -539,7 +542,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                             .position(latLng)
                             .title(hazardMarkerTitle(hazard.hazardType))
                             .snippet(hazardMarkerSnippet(hazard))
-                            .icon(icon)
+                            .icon(getHazardMarkerIcon(hazard.hazardType))
                     ) ?: return@forEach
 
                     marker.tag = hazard
@@ -559,7 +562,19 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
                     }
                 }
 
+                if (hasMapLocation(focusLatitude, focusLongitude)) {
+                    val reportMarker = map.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(focusLatitude, focusLongitude))
+                            .title("Resident report")
+                            .snippet("Selected resident report")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    )
+                    reportMarker?.let { hazardMarkers.add(it) }
+                }
+
                 focusOnRequestedLocation()
+                    }
             }
     }
 
@@ -599,16 +614,25 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private fun getEvacuationMarkerIcon(): BitmapDescriptor {
         evacuationMarkerIcon?.let { return it }
         if (!isAdded) return BitmapDescriptorFactory.defaultMarker()
-        val descriptor = bitmapDescriptorFromVector(R.drawable.ic_evacuation_marker, MARKER_ICON_SIZE_DP)
+        val descriptor = bitmapDescriptorFromVector(R.drawable.marker_evacuation_area, MARKER_ICON_SIZE_DP)
         evacuationMarkerIcon = descriptor
         return descriptor
     }
 
-    private fun getHazardMarkerIcon(): BitmapDescriptor {
-        hazardMarkerIcon?.let { return it }
+    private fun getHazardMarkerIcon(hazardType: String): BitmapDescriptor {
+        val normalizedType = hazardType.lowercase(Locale.ROOT)
+        hazardMarkerIcons[normalizedType]?.let { return it }
         if (!isAdded) return BitmapDescriptorFactory.defaultMarker()
-        val descriptor = bitmapDescriptorFromVector(R.drawable.ic_hazard_marker, MARKER_ICON_SIZE_DP)
-        hazardMarkerIcon = descriptor
+        val drawableResId = when {
+            normalizedType.contains("flood") -> R.drawable.marker_flood
+            normalizedType.contains("typhoon") -> R.drawable.marker_typhoon
+            normalizedType.contains("landslide") -> R.drawable.marker_landslide
+            normalizedType.contains("earthquake") -> R.drawable.marker_earthquake
+            normalizedType.contains("general") || normalizedType.contains("announcement") -> R.drawable.marker_announcement
+            else -> R.drawable.ic_hazard_marker
+        }
+        val descriptor = bitmapDescriptorFromVector(drawableResId, MARKER_ICON_SIZE_DP)
+        hazardMarkerIcons[normalizedType] = descriptor
         return descriptor
     }
 

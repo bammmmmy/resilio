@@ -39,33 +39,23 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
     private var _binding: FragmentCreateReportBinding? = null
     private val binding get() = _binding!!
     
-    private var imageUri: Uri? = null
-    private var imageBitmap: Bitmap? = null
+    private val imageUris = mutableListOf<Uri>()
+    private var pendingCameraUri: Uri? = null
     private var userLocation: Location? = null
     
     private val storage = FirebaseStorage.getInstance("gs://resilio-ab61f.firebasestorage.app")
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            imageUri = result.data?.data
-            binding.ivReportPhoto.setImageURI(imageUri)
-            binding.ivReportPhoto.setPadding(0, 0, 0, 0)
-            binding.ivReportPhoto.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-        }
+    private val pickImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
+        imageUris.addAll(uris.filterNot { imageUris.contains(it) })
+        refreshPhotoPreview()
     }
 
     private val captureImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val photoFile = File(requireContext().cacheDir, "temp_emergency_report.jpg")
-            if (photoFile.exists()) {
-                val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                imageBitmap = bitmap
-                binding.ivReportPhoto.setImageBitmap(bitmap)
-                binding.ivReportPhoto.setPadding(0, 0, 0, 0)
-                binding.ivReportPhoto.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-            }
+            pendingCameraUri?.let { imageUris.add(it) }
+            refreshPhotoPreview()
         }
     }
 
@@ -84,8 +74,11 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
         binding.btnUploadPhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickImage.launch(intent)
+            pickImages.launch("image/*")
+        }
+
+        binding.btnAddPhoto.setOnClickListener {
+            pickImages.launch("image/*")
         }
 
         binding.btnCapturePhoto.setOnClickListener {
@@ -100,12 +93,30 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
     }
 
     private fun openCamera() {
-        val photoFile = File(requireContext().cacheDir, "temp_emergency_report.jpg")
+        val photoFile = File(requireContext().cacheDir, "temp_emergency_report_${UUID.randomUUID()}.jpg")
         val uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", photoFile)
+        pendingCameraUri = uri
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, uri)
         }
         captureImage.launch(intent)
+    }
+
+    private fun refreshPhotoPreview() {
+        if (imageUris.isEmpty()) {
+            binding.ivReportPhoto.imageTintList = ContextCompat.getColorStateList(requireContext(), R.color.text_secondary)
+            binding.ivReportPhoto.setImageResource(R.drawable.ic_camera_alt)
+            binding.ivReportPhoto.setPadding(64, 64, 64, 64)
+            binding.tvPhotoCount.text = "No photos selected"
+            binding.btnAddPhoto.visibility = View.GONE
+            return
+        }
+        binding.ivReportPhoto.imageTintList = null
+        binding.ivReportPhoto.setImageURI(imageUris.first())
+        binding.ivReportPhoto.setPadding(0, 0, 0, 0)
+        binding.ivReportPhoto.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+        binding.tvPhotoCount.text = "${imageUris.size} photo${if (imageUris.size == 1) "" else "s"} selected"
+        binding.btnAddPhoto.visibility = View.VISIBLE
     }
 
     private fun checkLocationPermission() {
@@ -146,7 +157,7 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
             return
         }
 
-        if (imageUri == null && imageBitmap == null) {
+        if (imageUris.isEmpty()) {
             Toast.makeText(requireContext(), "Please include a photo of the emergency", Toast.LENGTH_SHORT).show()
             return
         }
@@ -156,8 +167,8 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
 
         lifecycleScope.launch {
             try {
-                val imageUrl = uploadPhoto()
                 val reportId = UUID.randomUUID().toString()
+                val imageUrls = uploadPhotos(reportId)
                 val uid = auth.currentUser?.uid ?: "anonymous"
                 
                 val profile = ProfileManager.getProfile(requireContext()).first()
@@ -169,7 +180,8 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
                     senderName = name,
                     type = type,
                     description = desc,
-                    imageUrl = imageUrl,
+                    imageUrl = imageUrls.firstOrNull(),
+                    imageUrls = imageUrls,
                     latitude = userLocation?.latitude ?: 0.0,
                     longitude = userLocation?.longitude ?: 0.0,
                     status = ReportStatus.PENDING,
@@ -207,28 +219,25 @@ class CreateReportFragment : Fragment(R.layout.fragment_create_report) {
         }
     }
 
-    private suspend fun uploadPhoto(): String? {
-        val reportId = UUID.randomUUID().toString()
-        val ref = storage.reference.child("emergency_photos/$reportId.jpg")
-        
-        val baos = ByteArrayOutputStream()
-        val bitmap = if (imageBitmap != null) {
-            imageBitmap!!
-        } else {
-            val inputStream = requireContext().contentResolver.openInputStream(imageUri!!)
-            BitmapFactory.decodeStream(inputStream)
-        }
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
-        val data = baos.toByteArray()
+    private suspend fun uploadPhotos(reportId: String): List<String> {
+        return imageUris.mapIndexed { index, uri ->
+            val ref = storage.reference.child("emergency_photos/$reportId/$index.jpg")
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream) ?: throw IllegalStateException("Unable to read selected photo")
+            inputStream?.close()
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+            val data = baos.toByteArray()
 
-        return kotlin.coroutines.suspendCoroutine { continuation ->
-            ref.putBytes(data).continueWithTask { task ->
-                if (!task.isSuccessful) task.exception?.let { throw it }
-                ref.downloadUrl
-            }.addOnSuccessListener { uri ->
-                continuation.resumeWith(Result.success(uri.toString()))
-            }.addOnFailureListener {
-                continuation.resumeWith(Result.failure(it))
+            kotlin.coroutines.suspendCoroutine { continuation ->
+                ref.putBytes(data).continueWithTask { task ->
+                    if (!task.isSuccessful) task.exception?.let { throw it }
+                    ref.downloadUrl
+                }.addOnSuccessListener { downloadUri ->
+                    continuation.resumeWith(Result.success(downloadUri.toString()))
+                }.addOnFailureListener {
+                    continuation.resumeWith(Result.failure(it))
+                }
             }
         }
     }
