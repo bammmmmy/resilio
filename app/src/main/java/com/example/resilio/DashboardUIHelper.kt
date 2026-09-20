@@ -168,6 +168,7 @@ object DashboardUIHelper {
         }
         
         view.findViewById<TextView>(R.id.tv_weather_condition).text = displayCondition
+        view.findViewById<TextView>(R.id.tv_weather_label).text = "WEATHER"
 
         val weatherAlert = WeatherCache.getWeatherAlert(snap.code, snap.currentPrecipIntensity, snap.rain24h)
         val advisoryLayout = view.findViewById<View>(R.id.layout_weather_advisory)
@@ -180,15 +181,15 @@ object DashboardUIHelper {
             advisoryLayout.visibility = View.GONE
         }
 
-        view.findViewById<TextView>(R.id.tv_weather_humidity).text = "Humidity: ${snap.humidity}%"
+        view.findViewById<TextView>(R.id.tv_weather_humidity).text = "♧  Humidity                                      ${snap.humidity}%"
         
         view.findViewById<TextView>(R.id.tv_weather_wind).text = if (snap.windGusts > snap.windSpeed * 1.5) {
-            "Wind: ${snap.windSpeed.toInt()} km/h (Gusts: ${snap.windGusts.toInt()})"
+            "≋  Wind speed                         ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
         } else {
-            "Wind Speed: ${snap.windSpeed.toInt()} km/h"
+            "≋  Wind speed                         ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
         }
 
-        view.findViewById<TextView>(R.id.tv_weather_precip).text = "Precipitation: ${snap.precipProb}%"
+        view.findViewById<TextView>(R.id.tv_weather_precip).text = "☔  Precipitation                         ${String.format(Locale.US, "%.1f", snap.currentPrecipIntensity)} mm"
         view.findViewById<TextView>(R.id.tv_rain_24h).text = String.format(Locale.US, "24h Rain: %.1f mm", snap.rain24h)
 
         val intensityTv = view.findViewById<TextView>(R.id.tv_rain_intensity)
@@ -204,28 +205,11 @@ object DashboardUIHelper {
         view.findViewById<TextView>(R.id.tv_weather_time).text = TimeUtils.formatToPhTime(updateTime, "h:mm a")
         view.findViewById<TextView>(R.id.tv_weather_day).text = TimeUtils.formatToPhTime(updateTime, "EEEE")
 
-        // Condition-based assets
-        val backgroundRes = when (snap.code) {
-            0, 1 -> R.drawable.bg_weather_sunny
-            2, 3, in 45..48 -> R.drawable.bg_weather_cloudy
-            in 51..65, in 80..82 -> R.drawable.bg_weather_rainy
-            in 71..77, 85, 86 -> R.drawable.bg_weather_snowy
-            95, 96, 99 -> R.drawable.bg_weather_rainy
-            else -> R.drawable.bg_weather_sunny
-        }
-
-        view.findViewById<View>(R.id.layout_weather_container).setBackgroundResource(backgroundRes)
+        view.findViewById<View>(R.id.layout_weather_container).setBackgroundColor(Color.parseColor("#F7FBFF"))
         headerView?.setBackgroundResource(R.drawable.bg_dashboard_header)
 
-        val conditionColor = when (snap.code) {
-            0, 1 -> Color.parseColor("#FFD600")
-            2, 3, in 45..48 -> Color.parseColor("#90A4AE")
-            51, 53, 55, 61, 80 -> Color.parseColor("#FFEB3B")
-            else -> Color.parseColor("#EF5350")
-        }
-
-        view.findViewById<ImageView>(R.id.iv_weather_icon).setImageResource(WeatherCache.getIcon(snap.code))
-        view.findViewById<ImageView>(R.id.iv_weather_icon).setColorFilter(conditionColor)
+        view.findViewById<ImageView>(R.id.iv_weather_icon).setImageResource(R.drawable.ic_weather_cloud)
+        view.findViewById<ImageView>(R.id.iv_weather_icon).clearColorFilter()
     }
 
     fun updateLandslideUI(view: View, snap: WeatherSnapshot) {

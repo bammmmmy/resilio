@@ -2,7 +2,9 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/archivo_black</item>
+        <item>@font/dm_sans</item>
         <item>@font/mallanna</item>
         <item>@font/poppins_thin</item>
+        <item>@font/space_grotesk</item>
     </array>
 </resources>

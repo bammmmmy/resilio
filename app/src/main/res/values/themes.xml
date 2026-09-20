@@ -2,14 +2,16 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Resilio" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/gold_accent</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/login_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/secondary_blue</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="colorTertiary">@color/primary_green</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
+        <item name="fontFamily">@font/dm_sans</item>
     </style>
 
     <style name="Theme.Resilio" parent="Base.Theme.Resilio" />

@@ -164,7 +164,7 @@ class DisasterAwarenessFragment : Fragment(R.layout.fragment_disaster_awareness)
 
     private fun highlightCard(card: MaterialCardView) {
         card.setStrokeColor(ContextCompat.getColorStateList(requireContext(), R.color.gold_accent))
-        card.setCardBackgroundColor("#FFFBF0".toColorInt()) // Very light gold/yellow
+            card.setCardBackgroundColor("#F0F7FF".toColorInt())
         card.strokeWidth = 4
     }
 }

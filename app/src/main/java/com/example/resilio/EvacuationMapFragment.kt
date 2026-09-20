@@ -413,7 +413,7 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             "typhoon" -> Color.RED
             "landslide" -> Color.parseColor("#8B4513") // Brown
             "earthquake" -> Color.parseColor("#FF8C00") // Orange
-            else -> Color.YELLOW // General Announcement / General Alert
+            else -> Color.parseColor("#1768A9") // General Announcement / General Alert
         }
     }
 

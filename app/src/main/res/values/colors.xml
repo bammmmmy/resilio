@@ -6,8 +6,8 @@
     <!-- UI/UX Semantic Colors -->
     <color name="background">#FFFFFF</color>
     <color name="surface">#F5F5F5</color>
-    <color name="gold_accent">#FFD700</color>
-    <color name="gold_accent_dark">#CFB53B</color>
+    <color name="gold_accent">#1768A9</color>
+    <color name="gold_accent_dark">#12396A</color>
     <color name="primary_green">#4CAF50</color>
     <color name="secondary_blue">#2196F3</color>
     <color name="emergency_red">#F44336</color>
@@ -19,8 +19,8 @@
     <color name="warning_orange_dark">#E65100</color>
 
     <!-- Gradient Colors for Light Mode -->
-    <color name="gradient_start">#FFF9C4</color>
-    <color name="gradient_center">#FFFDE7</color>
+    <color name="gradient_start">#DCEEFF</color>
+    <color name="gradient_center">#F0F7FF</color>
     <color name="gradient_end">#FFFFFF</color>
 
     <!-- Dashboard Redesign Colors -->
