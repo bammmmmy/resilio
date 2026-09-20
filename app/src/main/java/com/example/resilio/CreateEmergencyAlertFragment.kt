@@ -229,6 +229,13 @@ class CreateEmergencyAlertFragment : Fragment(R.layout.fragment_create_emergency
                     R.string.alert_submitted_pending
                 }
                 Toast.makeText(requireContext(), messageId, Toast.LENGTH_LONG).show()
+                ActivityLogWriter.write(
+                    action = if (editId != null) "updated" else "created",
+                    entityType = "emergency_alert",
+                    entityId = id,
+                    entityName = title,
+                    details = if (editId != null) "Emergency alert edited." else "Emergency alert published."
+                )
                 findNavController().popBackStack()
             }
             .addOnFailureListener {

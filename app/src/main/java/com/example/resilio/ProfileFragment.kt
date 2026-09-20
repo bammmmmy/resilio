@@ -131,6 +131,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.btnVerifyResidents.setOnClickListener {
             findNavController().navigate(R.id.userManagementFragment)
         }
+        binding.btnActivityLog.setOnClickListener {
+            findNavController().navigate(R.id.activityLogFragment)
+        }
+        binding.btnBdrrmoActivityLog.setOnClickListener {
+            findNavController().navigate(R.id.activityLogFragment)
+        }
 
         binding.btnVerifyAccount.setOnClickListener {
             findNavController().navigate(R.id.verificationFragment)

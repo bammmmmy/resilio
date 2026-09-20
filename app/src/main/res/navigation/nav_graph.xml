@@ -255,7 +255,15 @@
         <action
             android:id="@+id/action_profileFragment_to_adminReportsFragment"
             app:destination="@id/adminReportsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_activityLogFragment"
+            app:destination="@id/activityLogFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/activityLogFragment"
+        android:name="com.example.resilio.ActivityLogFragment"
+        android:label="Activity Log" />
 
     <fragment
         android:id="@+id/editProfileFragment"

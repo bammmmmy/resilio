@@ -126,6 +126,7 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                 db.collection("hazardLocations").document(announcement.id)
                     .update("active", false)
                 Toast.makeText(requireContext(), "Archived", Toast.LENGTH_SHORT).show()
+                ActivityLogWriter.write("archived", "emergency_alert", announcement.id, announcement.title, "Emergency alert archived.")
             }
             .show()
     }
@@ -145,6 +146,7 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                         if (isAdded) {
                             Toast.makeText(requireContext(), R.string.deleted_success, Toast.LENGTH_SHORT).show()
                         }
+                        ActivityLogWriter.write("deleted", "emergency_alert", announcement.id, announcement.title, "Emergency alert deleted.")
                     }
                     .addOnFailureListener {
                         if (isAdded) {

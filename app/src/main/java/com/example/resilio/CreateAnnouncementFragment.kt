@@ -219,6 +219,13 @@ class CreateAnnouncementFragment : Fragment(R.layout.fragment_create_announcemen
                     getString(R.string.announcement_submitted_pending)
                 }
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                ActivityLogWriter.write(
+                    action = if (editId != null) "updated" else "created",
+                    entityType = "announcement",
+                    entityId = id,
+                    entityName = title,
+                    details = if (editId != null) "Announcement edited." else "Announcement published."
+                )
                 findNavController().popBackStack()
             }
             .addOnFailureListener {

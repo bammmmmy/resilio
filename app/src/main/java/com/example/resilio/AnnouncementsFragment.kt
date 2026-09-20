@@ -89,6 +89,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
             .setPositiveButton(R.string.action_archive) { _, _ ->
                 viewModel.archiveItem(announcement.id, isAlert)
                 Toast.makeText(requireContext(), "Archived", Toast.LENGTH_SHORT).show()
+                ActivityLogWriter.write("archived", "announcement", announcement.id, announcement.title, "Announcement archived.")
             }
             .show()
     }
@@ -109,6 +110,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
                         if (isAdded) {
                             Toast.makeText(requireContext(), R.string.deleted_success, Toast.LENGTH_SHORT).show()
                         }
+                        ActivityLogWriter.write("deleted", "announcement", announcement.id, announcement.title, "Announcement deleted.")
                     }
                     .addOnFailureListener {
                         if (isAdded) {
