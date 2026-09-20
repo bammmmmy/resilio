@@ -225,9 +225,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:text="@string/action_ask_resilio"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         app:icon="@drawable/ic_chat"
-        app:iconTint="@color/black"
+        app:iconTint="@color/white"
         app:backgroundTint="@color/gold_accent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

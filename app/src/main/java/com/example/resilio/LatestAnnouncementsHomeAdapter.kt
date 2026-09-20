@@ -1,11 +1,13 @@
 package com.example.resilio
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
+import com.example.resilio.util.TimeUtils
 
 class LatestAnnouncementsHomeAdapter(
     private val announcements: List<Announcement>,
@@ -15,10 +17,13 @@ class LatestAnnouncementsHomeAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvTitle)
         val tvContent: TextView = view.findViewById(R.id.tvContent)
+        val tvType: TextView = view.findViewById(R.id.tvAlertType)
+        val tvTimestamp: TextView = view.findViewById(R.id.tvTimestamp)
+        val ivAlertIcon: View = view.findViewById(R.id.ivAlertIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_latest_alert_home, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_latest_announcement_home, parent, false)
         return ViewHolder(view)
     }
 
@@ -26,9 +31,9 @@ class LatestAnnouncementsHomeAdapter(
         val item = announcements[position]
         holder.tvTitle.text = item.title
         holder.tvContent.text = item.safeContent
-        
-        // Use a gold color for announcements to distinguish from red alerts
-        holder.tvTitle.setTextColor(holder.itemView.context.getColor(R.color.gold_accent))
+        holder.tvType.text = "Announcement"
+        holder.tvTimestamp.text = TimeUtils.formatToPhTime(item.safeTimestamp, "MMM d, yyyy, h:mm a")
+        holder.tvTitle.setTextColor(Color.parseColor("#244A72"))
         
         holder.itemView.setOnClickListener { onItemClick(item) }
         

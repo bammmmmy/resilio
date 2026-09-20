@@ -100,7 +100,7 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
             },
             onEarthquakeBind = { view ->
                 earthquakeView = view
-                EarthquakeCache.lastQuake?.let { DashboardUIHelper.updateEarthquakeUI(view, it) }
+                DashboardUIHelper.updateEarthquakeUI(view, EarthquakeCache.lastQuake)
             }
         )
         

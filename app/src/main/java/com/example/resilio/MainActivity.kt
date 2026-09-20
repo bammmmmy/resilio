@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            v.setPadding(systemBars.left, 0, systemBars.right, 0)
             insets
         }
 
@@ -109,11 +109,16 @@ class MainActivity : AppCompatActivity() {
         // Hide BottomNav for certain fragments
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isLogin = destination.id == R.id.loginFragment
-            WindowCompat.setDecorFitsSystemWindows(window, !isLogin)
+            WindowCompat.setDecorFitsSystemWindows(window, true)
+            window.statusBarColor = if (isLogin) {
+                android.graphics.Color.WHITE
+            } else {
+                android.graphics.Color.parseColor("#12396A")
+            }
             window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             if (!isLogin) {
                 val main = findViewById<View>(R.id.main)
-                main.setPadding(main.paddingLeft, main.paddingTop, main.paddingRight, 0)
+                main.setPadding(main.paddingLeft, 0, main.paddingRight, 0)
                 ViewCompat.requestApplyInsets(main)
             }
             when (destination.id) {

@@ -4,9 +4,10 @@
     android:id="@+id/card_latest_alerts"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="20dp"
-    app:cardBackgroundColor="@color/surface"
-    app:strokeColor="@color/emergency_red"
+    app:cardCornerRadius="10dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardElevation="0dp"
+    app:strokeColor="#D5E1ED"
     app:strokeWidth="1dp"
     android:visibility="gone">
 
@@ -14,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,32 +24,22 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_alerts"
-                app:tint="@color/emergency_red"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@null"/>
-
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="LATEST ALERTS"
-                android:textColor="@color/emergency_red"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"/>
+                android:text="Active Alerts"
+                android:textColor="#244A72"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_view_all_alerts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="VIEW ALL"
-                android:textColor="@color/secondary_blue"
-                android:textSize="11sp"
-                android:textStyle="bold"
+                android:text="View All  ›"
+                android:textColor="#2279D2"
+                android:textSize="9sp"
                 android:clickable="true"
                 android:focusable="true"/>
         </LinearLayout>
@@ -63,9 +54,9 @@
             android:id="@+id/tv_empty_alerts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No alert currently"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
+            android:text="No active alerts yet."
+            android:textColor="#7890A7"
+            android:textSize="10sp"
             android:gravity="center"
             android:padding="16dp"
             android:visibility="gone"/>

@@ -2,6 +2,7 @@ package com.example.resilio
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -181,15 +182,9 @@ object DashboardUIHelper {
             advisoryLayout.visibility = View.GONE
         }
 
-        view.findViewById<TextView>(R.id.tv_weather_humidity).text = "♧  Humidity                                      ${snap.humidity}%"
-        
-        view.findViewById<TextView>(R.id.tv_weather_wind).text = if (snap.windGusts > snap.windSpeed * 1.5) {
-            "≋  Wind speed                         ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
-        } else {
-            "≋  Wind speed                         ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
-        }
-
-        view.findViewById<TextView>(R.id.tv_weather_precip).text = "☔  Precipitation                         ${String.format(Locale.US, "%.1f", snap.currentPrecipIntensity)} mm"
+        view.findViewById<TextView>(R.id.tv_weather_humidity).text = "Humidity   ${snap.humidity}%"
+        view.findViewById<TextView>(R.id.tv_weather_wind).text = "Wind speed   ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
+        view.findViewById<TextView>(R.id.tv_weather_precip).text = "Precipitation   ${String.format(Locale.US, "%.1f", snap.currentPrecipIntensity)} mm"
         view.findViewById<TextView>(R.id.tv_rain_24h).text = String.format(Locale.US, "24h Rain: %.1f mm", snap.rain24h)
 
         val intensityTv = view.findViewById<TextView>(R.id.tv_rain_intensity)
@@ -215,48 +210,50 @@ object DashboardUIHelper {
     fun updateLandslideUI(view: View, snap: WeatherSnapshot) {
         val rain = snap.rain24h
         val assessment = WeatherCache.getLandslideAssessment(rain)
-        val risk = assessment.label
+        val risk = assessment.label.uppercase(Locale.US)
 
         view.findViewById<TextView>(R.id.tv_landslide_status).text = risk
-        view.findViewById<TextView>(R.id.tv_landslide_desc).text = assessment.copy
+        view.findViewById<TextView>(R.id.tv_landslide_desc).text = "Based on rainfall & soil condition"
         
-        view.findViewById<TextView>(R.id.tv_24h_rainfall).text = String.format(Locale.US, "24h Rain: %.1f mm", rain)
+        view.findViewById<TextView>(R.id.tv_24h_rainfall).text = String.format(Locale.US, "Rainfall: %.1f mm / 24h", rain)
         
         val saturation = when {
             else -> assessment.saturation
         }
         val saturationTv = view.findViewById<TextView>(R.id.tv_soil_moisture)
-        saturationTv.text = "Soil Saturation: $saturation"
+        saturationTv.text = "Soil condition: $saturation"
         
         val riskColor = when (risk) {
-            "Critical risk" -> ContextCompat.getColor(view.context, R.color.emergency_red)
-            "High risk" -> ContextCompat.getColor(view.context, R.color.warning_orange)
-            "Moderate risk" -> ContextCompat.getColor(view.context, R.color.gold_accent)
-            else -> Color.WHITE // Changed from primary_green to avoid clash with brown/blue
+            "CRITICAL RISK", "HIGH RISK" -> Color.parseColor("#B5332E")
+            else -> Color.parseColor("#B77200")
         }
-        view.findViewById<TextView>(R.id.tv_landslide_status).setTextColor(riskColor)
+        val riskStatus = view.findViewById<TextView>(R.id.tv_landslide_status)
+        riskStatus.setTextColor(riskColor)
+        (riskStatus.background as? GradientDrawable)?.setColor(
+            if (risk == "CRITICAL RISK" || risk == "HIGH RISK") Color.parseColor("#FFFFE0D8") else Color.parseColor("#FFFFF0CC")
+        )
 
         // Set saturation color for better visual feedback
         val saturationColor = when (saturation) {
-            "Very high" -> ContextCompat.getColor(view.context, R.color.emergency_red)
-            "High" -> ContextCompat.getColor(view.context, R.color.warning_orange)
-            "Moderate" -> ContextCompat.getColor(view.context, R.color.gold_accent)
-            else -> Color.WHITE
+            "Very high" -> Color.parseColor("#B5332E")
+            "High" -> Color.parseColor("#C47300")
+            "Moderate" -> Color.parseColor("#B77200")
+            else -> Color.parseColor("#315678")
         }
         saturationTv.setTextColor(saturationColor)
     }
 
-    fun updateEarthquakeUI(view: View, quake: EarthquakeData) {
-        view.findViewById<TextView>(R.id.tv_latest_mag).text = String.format(Locale.US, "Latest: M %.1f", quake.magnitude)
-        view.findViewById<TextView>(R.id.tv_earthquake_desc).text = quake.location
-        
-        val color = when {
-            quake.magnitude >= 6.0 -> "#B71C1C"
-            quake.magnitude >= 5.0 -> "#EF5350"
-            quake.magnitude >= 4.0 -> "#FF9800"
-            else -> "#4CAF50"
-        }
-        view.findViewById<TextView>(R.id.tv_latest_mag).setTextColor(Color.parseColor(color))
+    fun updateEarthquakeUI(view: View, quake: EarthquakeData?) {
+        val active = quake != null
+        view.findViewById<TextView>(R.id.tv_earthquake_status).text = if (active) "Recent activity detected" else "No recent earthquake"
+        view.findViewById<TextView>(R.id.tv_earthquake_desc).text = quake?.location ?: "affecting the area"
+        view.findViewById<TextView>(R.id.tv_latest_mag).text = quake?.let { String.format(Locale.US, "%.1f", it.magnitude) } ?: "--"
+        view.findViewById<TextView>(R.id.tv_quake_distance).text = quake?.location ?: "--"
+        view.findViewById<TextView>(R.id.tv_quake_time).text = quake?.let { TimeUtils.formatToPhTime(Date(it.timeMillis), "h:mm a") } ?: "--"
+
+        val status = view.findViewById<TextView>(R.id.tv_earthquake_status)
+        status.setTextColor(Color.parseColor(if (active) "#137D58" else "#687E91"))
+        (status.background as? GradientDrawable)?.setColor(Color.parseColor(if (active) "#FFDFF6EA" else "#FFEDF2F6"))
     }
 
     private fun distanceBetweenKm(firstLatitude: Double, firstLongitude: Double, secondLatitude: Double, secondLongitude: Double): Double {

@@ -4,91 +4,121 @@
     android:id="@+id/card_landslide"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
-    app:strokeWidth="0dp">
+    app:cardBackgroundColor="#FFFAF0"
+    app:cardCornerRadius="11dp"
+    app:cardElevation="7dp"
+    app:strokeColor="#D5E1ED"
+    app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:id="@+id/layout_landslide_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/landslide_brown"
-        android:padding="16dp">
+        android:background="#FFFAF0">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.5"
+            android:contentDescription=""
+            android:scaleType="centerCrop"
+            android:src="@drawable/landslidebackground" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_landslide_image_fade"
+            android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/iv_landslide_icon"
+            android:layout_width="39dp"
+            android:layout_height="39dp"
+            android:background="@drawable/bg_landslide_icon"
+            android:padding="9dp"
+            android:src="@drawable/ic_landslide"
+            android:contentDescription="Landslide risk"
+            app:layout_constraintStart_toStartOf="parent"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/tv_landslide_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="LANDSLIDE RISK"
-            android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textColor="#C47300"
+            android:textSize="12sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/iv_landslide_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp"
-            android:src="@drawable/ic_landslide"
-            android:contentDescription="Landslide icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_landslide_title"
-            app:tint="@color/white" />
-
-        <TextView
-            android:id="@+id/tv_landslide_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="LOW RISK"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/iv_landslide_icon"
             app:layout_constraintStart_toEndOf="@id/iv_landslide_icon"
             app:layout_constraintTop_toTopOf="@id/iv_landslide_icon" />
 
         <TextView
             android:id="@+id/tv_landslide_desc"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Based on current rainfall data in Antipolo City. Stay alert for signs of ground movement."
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:text="Based on rainfall &amp; soil condition"
+            android:textColor="#7890A7"
+            android:textSize="9sp"
+            app:layout_constraintStart_toEndOf="@id/iv_landslide_icon"
+            app:layout_constraintTop_toBottomOf="@id/tv_landslide_title" />
+
+        <TextView
+            android:id="@+id/tv_landslide_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/bg_landslide_risk_pill"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:text="LOW RISK"
+            android:textColor="#B77200"
+            android:textSize="11sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_landslide_icon" />
 
         <LinearLayout
             android:id="@+id/layout_rainfall_stats"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/tv_landslide_desc">
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_landslide_status">
 
             <TextView
                 android:id="@+id/tv_24h_rainfall"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="24h Rain: 0.0mm"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
+                android:text="Rainfall: 0.0 mm / 24h"
+                android:textColor="#7890A7"
+                android:textSize="9sp" />
 
             <TextView
                 android:id="@+id/tv_soil_moisture"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Soil Saturation: Low"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:gravity="end" />
+                android:layout_marginTop="8dp"
+                android:text="Soil condition: Low"
+                android:textColor="#7890A7"
+                android:textSize="9sp" />
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="Calculated from weather data"
+                android:textColor="#7890A7"
+                android:textSize="8sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

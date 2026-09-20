@@ -36,6 +36,8 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
         val rv = view.findViewById<RecyclerView>(R.id.rvAlerts)
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
         val btnViewArchive = view.findViewById<MaterialButton>(R.id.btn_view_archive)
+        val adminActions = view.findViewById<View>(R.id.layout_admin_actions)
+        val btnCreateAlert = view.findViewById<MaterialButton>(R.id.btn_create_alert)
         
         rv.layoutManager = LinearLayoutManager(requireContext())
 
@@ -43,9 +45,13 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
             currentUserRole = ProfileManager.getProfile(requireContext()).first().role
             
             if (currentUserRole == UserRole.CHAIRMAN || currentUserRole == UserRole.BDRRMO) {
+                adminActions.visibility = View.VISIBLE
                 btnViewArchive.visibility = View.VISIBLE
                 btnViewArchive.setOnClickListener {
                     findNavController().navigate(R.id.archivedAlertsFragment)
+                }
+                btnCreateAlert.setOnClickListener {
+                    findNavController().navigate(R.id.createEmergencyAlertFragment)
                 }
             }
             
@@ -61,7 +67,10 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                 val allAlerts = value?.toObjects(EmergencyAlert::class.java) ?: emptyList()
                 
                 // Show only approved alerts (non-archived)
-                val alerts = allAlerts.filter { it.status == AnnouncementStatus.APPROVED }
+                val isManagement = currentUserRole == UserRole.CHAIRMAN || currentUserRole == UserRole.BDRRMO
+                val alerts = allAlerts.filter {
+                    it.status == AnnouncementStatus.APPROVED || (isManagement && it.status == AnnouncementStatus.PENDING)
+                }
                     .sortedByDescending { it.safeTimestamp }
                 
                 if (alerts.isEmpty()) {
@@ -99,7 +108,8 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                             confirmArchive(announcement)
                         },
                         currentUserId = auth.currentUser?.uid,
-                        userRole = currentUserRole
+                        userRole = currentUserRole,
+                        managementCanEditAll = true
                     )
                 }
             }

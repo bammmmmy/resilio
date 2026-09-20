@@ -3,141 +3,126 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@color/surface">
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="9dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#D5E1ED"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="15dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/ivAlertIcon"
+            android:layout_width="39dp"
+            android:layout_height="39dp"
+            android:background="@drawable/bg_alert_row_icon"
+            android:contentDescription="Emergency alert"
+            android:padding="10dp"
+            android:src="@drawable/ic_alerts"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="13dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="#244A72"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="#147651"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_alert_status" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvContent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/layoutAuthorActions"
-                android:textColor="@color/gold_accent"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="7dp"
+                android:textColor="#617C95"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="3"
+                android:ellipsize="end" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tvType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#7890A7"
+                    android:textSize="9sp"
+                    android:textAllCaps="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  •  "
+                    android:textColor="#B2C0CC"
+                    android:textSize="9sp" />
+                <TextView
+                    android:id="@+id/tvTimestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#9AABBA"
+                    android:textSize="9sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutAuthorActions"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:gravity="end"
                 android:orientation="horizontal"
                 android:visibility="gone">
-
-                <ImageButton
-                    android:id="@+id/btnArchive"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/action_archive"
-                    android:src="@drawable/ic_done"
-                    android:visibility="gone"
-                    app:tint="@color/gold_accent" />
-
-                <ImageButton
-                    android:id="@+id/btnRestore"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/action_restore"
-                    android:src="@drawable/ic_swipe_arrow"
-                    android:visibility="gone"
-                    app:tint="@color/primary_green" />
-
-                <ImageButton
-                    android:id="@+id/btnEdit"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/edit"
-                    android:src="@drawable/ic_edit"
-                    app:tint="@color/text_secondary" />
-
-                <ImageButton
-                    android:id="@+id/btnDelete"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/delete_evacuation_area"
-                    android:src="@drawable/ic_delete"
-                    app:tint="@color/emergency_red" />
+                <ImageButton android:id="@+id/btnArchive" android:layout_width="34dp" android:layout_height="34dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/action_archive" android:src="@drawable/ic_archive" android:visibility="gone" app:tint="#A56800" />
+                <ImageButton android:id="@+id/btnRestore" android:layout_width="34dp" android:layout_height="34dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/action_restore" android:src="@drawable/ic_swipe_arrow" android:visibility="gone" app:tint="#17744F" />
+                <ImageButton android:id="@+id/btnEdit" android:layout_width="34dp" android:layout_height="34dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/edit" android:src="@drawable/ic_edit" android:visibility="gone" app:tint="#54728C" />
+                <ImageButton android:id="@+id/btnDelete" android:layout_width="34dp" android:layout_height="34dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/delete_evacuation_area" android:src="@drawable/ic_delete" android:visibility="gone" app:tint="#E53D4E" />
             </LinearLayout>
-        </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
-
-            <TextView
-                android:id="@+id/tvType"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/layoutActions"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/text_secondary"
-                android:textAllCaps="true"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" • "
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/tvTimestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/text_secondary"/>
+                android:orientation="horizontal"
+                android:visibility="gone">
+                <Button android:id="@+id/btnApprove" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="APPROVE" />
+                <Button android:id="@+id/btnReject" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="REJECT" />
+            </LinearLayout>
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="8dp"/>
-
-        <LinearLayout
-            android:id="@+id/layoutActions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btnApprove"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="APPROVE"
-                android:backgroundTint="@color/primary_green"
-                android:layout_marginEnd="8dp"/>
-
-            <Button
-                android:id="@+id/btnReject"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="REJECT"
-                android:backgroundTint="@color/emergency_red"/>
-        </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

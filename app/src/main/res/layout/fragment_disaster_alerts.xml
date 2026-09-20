@@ -6,31 +6,55 @@
     android:padding="16dp"
     android:background="@color/background">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginBottom="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="Active Emergency Alerts"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/emergency_red" />
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Emergency management"
+                android:textColor="#7890A7"
+                android:textSize="10sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Emergency Alerts"
+                android:textColor="#183A63"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_view_archive"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+        <LinearLayout
+            android:id="@+id/layout_admin_actions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="@string/view_archive"
-            android:textColor="@color/emergency_red"
-            android:visibility="gone" />
-    </RelativeLayout>
+            android:orientation="vertical"
+            android:visibility="gone">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_view_archive"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_archive"
+                android:textColor="#2279D2" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_create_alert"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create emergency alert"
+                android:textColor="#2279D2" />
+        </LinearLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvEmpty"

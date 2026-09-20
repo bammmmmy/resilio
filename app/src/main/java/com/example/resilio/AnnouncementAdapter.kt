@@ -3,7 +3,9 @@ package com.example.resilio
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.graphics.Color
 import android.widget.TextView
+import android.graphics.drawable.GradientDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
@@ -21,7 +23,8 @@ class AnnouncementAdapter(
     private val onArchive: ((Announcement) -> Unit)? = null,
     private val onRestore: ((Announcement) -> Unit)? = null,
     private val currentUserId: String? = null,
-    private val userRole: UserRole? = null
+    private val userRole: UserRole? = null,
+    private val managementCanEditAll: Boolean = false
 ) : RecyclerView.Adapter<AnnouncementAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,6 +32,8 @@ class AnnouncementAdapter(
         val tvType: TextView = view.findViewById(R.id.tvType)
         val tvTimestamp: TextView = view.findViewById(R.id.tvTimestamp)
         val tvContent: TextView = view.findViewById(R.id.tvContent)
+        val tvStatus: TextView = view.findViewById(R.id.tvStatus)
+        val ivAlertIcon: View = view.findViewById(R.id.ivAlertIcon)
         val layoutActions: View = view.findViewById(R.id.layoutActions)
         val btnApprove: View = view.findViewById(R.id.btnApprove)
         val btnReject: View = view.findViewById(R.id.btnReject)
@@ -50,6 +55,17 @@ class AnnouncementAdapter(
         holder.tvType.text = item.type.name
         holder.tvTimestamp.text = TimeUtils.formatToPhTime(item.safeTimestamp)
         holder.tvContent.text = item.safeContent
+        val status = item.status.name.lowercase().replaceFirstChar { it.uppercase() }
+        holder.tvStatus.text = status
+        val statusColor = if (item.status == AnnouncementStatus.PENDING) "#A56800" else "#147651"
+        (holder.tvStatus.background as? GradientDrawable)?.setColor(Color.parseColor(if (item.status == AnnouncementStatus.PENDING) "#FFFFF2D5" else "#FFE4F7ED"))
+        holder.tvStatus.setTextColor(Color.parseColor(statusColor))
+        val iconColor = when (item.type.name) {
+            "FLOOD", "LANDSLIDE" -> "#F58C18"
+            "EARTHQUAKE" -> "#6651CA"
+            else -> "#EF4050"
+        }
+        (holder.ivAlertIcon.background as? GradientDrawable)?.setColor(Color.parseColor(iconColor))
 
         holder.itemView.setOnClickListener { onItemClick?.invoke(item) }
 
@@ -68,7 +84,7 @@ class AnnouncementAdapter(
         val isArchived = item.status == AnnouncementStatus.ARCHIVED
 
         // Control visibility of author actions (Edit/Delete)
-        if ((isAuthor || isChairman) && !isArchived) {
+        if ((isAuthor || isChairman || (isBdrrmo && managementCanEditAll)) && !isArchived) {
             holder.layoutAuthorActions.visibility = View.VISIBLE
             holder.btnEdit.visibility = View.VISIBLE
             holder.btnDelete.visibility = View.VISIBLE
