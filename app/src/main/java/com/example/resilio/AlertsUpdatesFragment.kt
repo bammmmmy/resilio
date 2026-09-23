@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.resilio.model.EvacuationArea
 import com.example.resilio.model.UserRole
@@ -21,6 +22,12 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
 
 import java.util.Locale
 
@@ -31,6 +38,13 @@ class AlertsUpdatesFragment : Fragment(R.layout.fragment_alerts_updates) {
     private lateinit var addButton: MaterialButton
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val firestore = FirebaseFirestore.getInstance()
+    private val routeHttpClient = OkHttpClient()
+
+    private data class RouteCandidate(
+        val area: EvacuationArea,
+        val distanceKm: Double,
+        val durationMinutes: Int
+    )
 
     private val requestLocationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -128,38 +142,121 @@ class AlertsUpdatesFragment : Fragment(R.layout.fragment_alerts_updates) {
             .addOnSuccessListener { snapshot ->
                 val areas = snapshot.mapNotNull { document ->
                     document.toObject(EvacuationArea::class.java).copy(id = document.id)
-                }
-                
+                }.filter { it.latitude != 0.0 || it.longitude != 0.0 }
+
                 if (areas.isEmpty()) {
                     Toast.makeText(requireContext(), "No evacuation centers available.", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
-                var nearestArea: EvacuationArea? = null
-                var minDistance = Float.MAX_VALUE
-
-                for (area in areas) {
-                    val results = FloatArray(1)
-                    Location.distanceBetween(
-                        userLocation.latitude, userLocation.longitude,
-                        area.latitude, area.longitude,
-                        results
-                    )
-                    val distance = results[0]
-                    if (distance < minDistance) {
-                        minDistance = distance
-                        nearestArea = area
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val roadCandidates = mutableListOf<RouteCandidate>()
+                    for (area in areas) {
+                        val roadDistance = fetchRoadDistanceKm(userLocation, area)
+                        if (roadDistance != null) {
+                            roadCandidates.add(roadDistance)
+                        }
                     }
-                }
 
-                nearestArea?.let {
-                    Toast.makeText(requireContext(), "Found: ${it.name} (${String.format(Locale.getDefault(), "%.1f", minDistance / 1000)} km away)", Toast.LENGTH_LONG).show()
-                    openOnVrMap(it, showRoute = true)
+                    val nearest = if (roadCandidates.isNotEmpty()) {
+                        roadCandidates.minByOrNull { it.distanceKm }
+                    } else {
+                        null
+                    }
+
+                    val fallback = if (nearest == null) {
+                        areas.minByOrNull { area ->
+                            val results = FloatArray(1)
+                            Location.distanceBetween(
+                                userLocation.latitude,
+                                userLocation.longitude,
+                                area.latitude,
+                                area.longitude,
+                                results
+                            )
+                            results[0]
+                        }
+                    } else {
+                        null
+                    }
+
+                    val selected = nearest?.area ?: fallback
+                    val selectedDistance = nearest?.distanceKm?.let { it } ?: run {
+                        if (fallback != null) {
+                            val results = FloatArray(1)
+                            Location.distanceBetween(
+                                userLocation.latitude,
+                                userLocation.longitude,
+                                fallback.latitude,
+                                fallback.longitude,
+                                results
+                            )
+                            results[0] / 1000.0
+                        } else {
+                            0.0
+                        }
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        if (selected == null) {
+                            Toast.makeText(requireContext(), "No valid evacuation centers were found.", Toast.LENGTH_SHORT).show()
+                            return@withContext
+                        }
+
+                        val label = if (nearest != null) {
+                            "Nearest by road"
+                        } else {
+                            "Nearest by straight line"
+                        }
+                        Toast.makeText(
+                            requireContext(),
+                            "Found: ${selected.name} (${label}; ${String.format(Locale.getDefault(), "%.1f", selectedDistance)} km away)",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        openOnVrMap(selected, showRoute = true)
+                    }
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Unable to load evacuation areas.", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun fetchRoadDistanceKm(userLocation: Location, area: EvacuationArea): RouteCandidate? {
+        val apiKey = try {
+            val appInfo = requireContext().packageManager.getApplicationInfo(requireContext().packageName, PackageManager.GET_META_DATA)
+            appInfo.metaData.getString("com.google.android.geo.API_KEY")
+        } catch (e: Exception) {
+            null
+        } ?: return null
+
+        if (apiKey.isBlank()) return null
+
+        val url = "https://maps.googleapis.com/maps/api/directions/json?" +
+            "origin=${userLocation.latitude},${userLocation.longitude}" +
+            "&destination=${area.latitude},${area.longitude}" +
+            "&mode=walking" +
+            "&key=$apiKey"
+
+        return try {
+            val request = Request.Builder().url(url).build()
+            val response = routeHttpClient.newCall(request).execute()
+            val jsonData = response.body?.string() ?: return null
+            val jsonObject = JSONObject(jsonData)
+            if (jsonObject.optString("status") != "OK") return null
+            val routes = jsonObject.optJSONArray("routes") ?: return null
+            if (routes.length() == 0) return null
+            val leg = routes.getJSONObject(0).optJSONArray("legs")?.getJSONObject(0) ?: return null
+            val distanceMeters = leg.getJSONObject("distance").getDouble("value")
+            val durationSeconds = leg.getJSONObject("duration").getInt("value")
+            RouteCandidate(
+                area = area,
+                distanceKm = distanceMeters / 1000.0,
+                durationMinutes = (durationSeconds / 60.0).toInt().coerceAtLeast(1)
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun fetchEvacuationAreas() {

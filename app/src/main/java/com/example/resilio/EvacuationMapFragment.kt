@@ -110,6 +110,12 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     private val auth = FirebaseAuth.getInstance()
     
     private var pendingDestination: LatLng? = null
+    private data class RouteResult(
+        val destination: LatLng,
+        val points: List<LatLng>,
+        val distanceKm: Double,
+        val durationMinutes: Int,
+    )
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -246,10 +252,12 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         }
 
         btnGetDirectionsOverlay.setOnClickListener {
-            selectedEvacuationArea?.let { area ->
-                calculateAndDrawRoute(LatLng(area.latitude, area.longitude))
+            if (selectedEvacuationArea != null) {
+                calculateAndDrawRoute(LatLng(selectedEvacuationArea!!.latitude, selectedEvacuationArea!!.longitude))
                 btnGetDirectionsOverlay.visibility = View.GONE
+                return@setOnClickListener
             }
+            findNearestEvacuationAreaByRoad()
         }
 
         fabStreet.setOnClickListener {
@@ -714,17 +722,90 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
         }
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        
+
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 val origin = LatLng(location.latitude, location.longitude)
                 fetchRoute(origin, destination)
             } else {
-                // Fallback: If internal routing fails due to null location, use External Intent
                 openGoogleMapsApp(destination)
             }
         }.addOnFailureListener {
             openGoogleMapsApp(destination)
+        }
+    }
+
+    private fun findNearestEvacuationAreaByRoad() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            return
+        }
+
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location == null) {
+                Toast.makeText(requireContext(), "Unable to detect your current location for route planning.", Toast.LENGTH_SHORT).show()
+                return@addOnSuccessListener
+            }
+
+            val origin = LatLng(location.latitude, location.longitude)
+            firestore.collection("evacuationAreas")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val areas = snapshot.documents.mapNotNull { document ->
+                        runCatching { document.toObject(EvacuationArea::class.java)?.copy(id = document.id) }.getOrNull()
+                    }.filter { it.latitude != 0.0 || it.longitude != 0.0 }
+
+                    if (areas.isEmpty()) {
+                        Toast.makeText(requireContext(), "No evacuation areas are available right now.", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val candidates = mutableListOf<RouteResult>()
+                        for (area in areas) {
+                            val route = fetchRouteNetwork(origin, LatLng(area.latitude, area.longitude))
+                            if (route != null) candidates.add(route)
+                        }
+
+                        val nearest = candidates.minByOrNull { it.distanceKm }
+                        if (nearest == null) {
+                            val fallback = areas.minByOrNull { calculateStraightLineDistanceKm(origin, LatLng(it.latitude, it.longitude)) }
+                            if (fallback != null) {
+                                withContext(Dispatchers.Main) {
+                                    selectedEvacuationArea = fallback
+                                    btnGetDirectionsOverlay.text = getString(R.string.get_directions_to, fallback.name)
+                                    btnGetDirectionsOverlay.visibility = View.VISIBLE
+                                    calculateAndDrawRoute(LatLng(fallback.latitude, fallback.longitude))
+                                }
+                            }
+                            return@launch
+                        }
+
+                        withContext(Dispatchers.Main) {
+                            selectedEvacuationArea = areas.firstOrNull { it.latitude == nearest.destination.latitude && it.longitude == nearest.destination.longitude }
+                            if (selectedEvacuationArea == null) {
+                                selectedEvacuationArea = EvacuationArea(
+                                    name = "Nearest evacuation area",
+                                    latitude = nearest.destination.latitude,
+                                    longitude = nearest.destination.longitude,
+                                )
+                            }
+                            btnGetDirectionsOverlay.text = getString(R.string.get_directions_to, selectedEvacuationArea!!.name)
+                            btnGetDirectionsOverlay.visibility = View.VISIBLE
+                            drawPolyline(nearest.points)
+                            animateToMarker(nearest.destination)
+                            Toast.makeText(
+                                requireContext(),
+                                "Nearest evacuation area by road: ${selectedEvacuationArea!!.name} (${String.format(Locale.US, "%.1f", nearest.distanceKm)} km, ${nearest.durationMinutes} min)",
+                                Toast.LENGTH_LONG,
+                            ).show()
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Unable to load evacuation centers for routing.", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
@@ -744,6 +825,25 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
     }
 
     private fun fetchRoute(origin: LatLng, destination: LatLng) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = fetchRouteNetwork(origin, destination)
+            withContext(Dispatchers.Main) {
+                if (result == null) {
+                    Toast.makeText(requireContext(), "Unable to calculate road route.", Toast.LENGTH_SHORT).show()
+                    openGoogleMapsApp(destination)
+                    return@withContext
+                }
+                drawPolyline(result.points)
+                Toast.makeText(
+                    requireContext(),
+                    "Estimated: ${String.format(Locale.US, "%.1f", result.distanceKm)} km (${result.durationMinutes} min walk)",
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
+        }
+    }
+
+    private fun fetchRouteNetwork(origin: LatLng, destination: LatLng): RouteResult? {
         val apiKey = try {
             val appInfo = requireContext().packageManager.getApplicationInfo(requireContext().packageName, PackageManager.GET_META_DATA)
             appInfo.metaData.getString("com.google.android.geo.API_KEY")
@@ -751,56 +851,47 @@ class EvacuationMapFragment : Fragment(R.layout.fragment_evacuation_map), OnMapR
             null
         } ?: ""
 
-        Log.d("EvacuationMap", "Fetching route with API Key starting with: ${apiKey.take(5)}...")
+        if (apiKey.isBlank()) return null
 
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                "origin=${origin.latitude},${origin.longitude}" +
-                "&destination=${destination.latitude},${destination.longitude}" +
-                "&mode=walking" +
-                "&key=$apiKey"
+            "origin=${origin.latitude},${origin.longitude}" +
+            "&destination=${destination.latitude},${destination.longitude}" +
+            "&mode=walking" +
+            "&key=$apiKey"
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val request = Request.Builder().url(url).build()
-                httpClient.newCall(request).execute().use { response ->
-                    val jsonData = response.body?.string() ?: return@use
-                    val jsonObject = JSONObject(jsonData)
-                    
-                    val status = jsonObject.optString("status")
-                    Log.d("EvacuationMap", "Directions API Status: $status")
+        return try {
+            val request = Request.Builder().url(url).build()
+            val response = httpClient.newCall(request).execute()
+            val jsonData = response.body?.string() ?: return null
+            val jsonObject = JSONObject(jsonData)
+            val status = jsonObject.optString("status")
+            if (status != "OK") return null
 
-                    if (status == "OK") {
-                        val routes = jsonObject.getJSONArray("routes")
-                        val route = routes.getJSONObject(0)
-                        val legs = route.getJSONArray("legs")
-                        val leg = legs.getJSONObject(0)
-                        val distanceText = leg.getJSONObject("distance").getString("text")
-                        val durationText = leg.getJSONObject("duration").getString("text")
-                        
-                        val overviewPolyline = route.getJSONObject("overview_polyline")
-                        val encodedPoints = overviewPolyline.getString("points")
-                        val points = PolylineDecoder.decode(encodedPoints)
-
-                        withContext(Dispatchers.Main) {
-                            drawPolyline(points)
-                            Toast.makeText(
-                                requireContext(),
-                                "Estimated: $distanceText ($durationText walk)",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    } else {
-                        val errorMsg = jsonObject.optString("error_message", "Unknown error")
-                        Log.e("EvacuationMap", "Directions API Error: $errorMsg")
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(requireContext(), "Routing error: $status", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("EvacuationMap", "Network error fetching route", e)
-            }
+            val routes = jsonObject.getJSONArray("routes")
+            if (routes.length() == 0) return null
+            val route = routes.getJSONObject(0)
+            val legs = route.getJSONArray("legs")
+            if (legs.length() == 0) return null
+            val leg = legs.getJSONObject(0)
+            val distanceMeters = leg.getJSONObject("distance").getDouble("value")
+            val durationSeconds = leg.getJSONObject("duration").getInt("value")
+            val polyline = route.getJSONObject("overview_polyline").getString("points")
+            RouteResult(
+                destination = destination,
+                points = PolylineDecoder.decode(polyline),
+                distanceKm = distanceMeters / 1000.0,
+                durationMinutes = (durationSeconds / 60.0).toInt().coerceAtLeast(1),
+            )
+        } catch (e: Exception) {
+            Log.e("EvacuationMap", "Network error fetching route", e)
+            null
         }
+    }
+
+    private fun calculateStraightLineDistanceKm(origin: LatLng, destination: LatLng): Double {
+        val results = FloatArray(1)
+        Location.distanceBetween(origin.latitude, origin.longitude, destination.latitude, destination.longitude, results)
+        return results[0] / 1000.0
     }
 
     private fun drawPolyline(points: List<LatLng>) {

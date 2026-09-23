@@ -90,6 +90,24 @@
                     app:iconSize="28dp"
                     app:iconGravity="textStart"
                     app:iconPadding="12dp"
+                    android:layout_marginBottom="12dp"
+                    app:elevation="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnHazardPrediction"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="AI HAZARD PREDICTION"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/gold_accent"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_chat"
+                    app:iconTint="@color/white"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="12dp"
                     android:layout_marginBottom="24dp"
                     app:elevation="4dp" />
 

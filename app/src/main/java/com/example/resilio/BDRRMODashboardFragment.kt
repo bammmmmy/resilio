@@ -59,6 +59,10 @@ class BDRRMODashboardFragment : Fragment(R.layout.fragment_bdrrmo_dashboard) {
             findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_aiChatFragment)
         }
 
+        binding.btnHazardPrediction.setOnClickListener {
+            findNavController().navigate(R.id.action_bdrrmoDashboardFragment_to_hazardPredictionFragment)
+        }
+
         setupStatusPager()
         startDataRefreshLoop()
 

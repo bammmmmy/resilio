@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -34,25 +35,41 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_admin_actions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:gravity="end">
+
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_view_archive"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/btn_filter_alerts"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/view_archive"
-                android:textColor="#2279D2" />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_create_alert"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:text="Filter: All"
+                android:textColor="#183A63"
+                android:textAllCaps="false" />
+
+            <LinearLayout
+                android:id="@+id/layout_admin_actions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create emergency alert"
-                android:textColor="#2279D2" />
+                android:orientation="vertical"
+                android:visibility="gone">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_view_archive"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/view_archive"
+                    android:textColor="#2279D2" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_create_alert"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create emergency alert"
+                    android:textColor="#2279D2" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

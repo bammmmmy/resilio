@@ -65,6 +65,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             checkVerificationAndReport()
         }
 
+        binding.btnHazardPrediction.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_hazardPredictionFragment)
+        }
+
         startDataRefreshLoop()
         
         setupLatestAlerts()

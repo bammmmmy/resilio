@@ -1,12 +1,20 @@
 package com.example.resilio
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.model.EmergencyReport
+import com.example.resilio.model.EvacuationArea
+import com.example.resilio.model.User
 import com.example.resilio.util.TimeUtils
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 import java.util.Locale
@@ -51,9 +59,13 @@ object ResilioLiveContext {
     }
 
     private fun buildFresh(): String = buildString {
-        appendLine("LIVE APP DATA (use this to answer user questions about weather, landslides, earthquakes, alerts, or announcements):")
+        appendLine("LIVE APP DATA (use this to answer user questions about weather, landslides, earthquakes, alerts, announcements, resident verification, emergency reports, and nearby evacuation areas):")
+        appendLine()
+        append(residentContextBlock())
         appendLine()
         append(weatherBlock())
+        appendLine()
+        append(forecastBlock())
         appendLine()
         append(landslideBlock())
         appendLine()
@@ -274,6 +286,93 @@ object ResilioLiveContext {
         }
     }
 
+    private fun currentResidentLocation(): Pair<Double, Double>? {
+        val context = ResilioApp.instance
+        val hasFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarseLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!hasFineLocation && !hasCoarseLocation) return null
+
+        val locationManager = context.getSystemService(LocationManager::class.java) as? LocationManager ?: return null
+        val providers = listOfNotNull(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+
+        return providers
+            .mapNotNull { provider ->
+                runCatching { locationManager.getLastKnownLocation(provider) }
+                    .getOrNull()
+            }
+            .maxByOrNull { it.time }
+            ?.let { it.latitude to it.longitude }
+    }
+
+    private fun residentContextBlock(): String {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return "RESIDENT CONTEXT: User is not signed in."
+        val db = FirebaseFirestore.getInstance()
+
+        val resident = runCatching {
+            val snapshot = Tasks.await(
+                db.collection("users").document(uid).get(),
+                QUERY_TIMEOUT_SEC,
+                TimeUnit.SECONDS,
+            )
+            if (!snapshot.exists()) null else snapshot.toObject(User::class.java)
+        }.getOrElse { null }
+
+        val latestReport = runCatching {
+            val snapshot = Tasks.await(
+                db.collection("emergency_reports")
+                    .whereEqualTo("senderUid", uid)
+                    .get(),
+                QUERY_TIMEOUT_SEC,
+                TimeUnit.SECONDS,
+            )
+            snapshot.toObjects(EmergencyReport::class.java)
+                .sortedByDescending { it.safeTimestamp.toDate().time }
+                .firstOrNull()
+        }.getOrElse { null }
+
+        val currentLocation = currentResidentLocation()
+        val latestReportLocation = latestReport?.takeIf { it.latitude != 0.0 || it.longitude != 0.0 }?.let { it.latitude to it.longitude }
+        val referenceLocation = currentLocation ?: latestReportLocation ?: (WEATHER_LAT to WEATHER_LON)
+        val referenceLat = referenceLocation.first
+        val referenceLng = referenceLocation.second
+        val nearestArea = runCatching { fetchNearestEvacuationArea(referenceLat, referenceLng) }.getOrElse { null }
+        val nearbyReports = runCatching { fetchNearbyResidentReports(referenceLat, referenceLng) }.getOrElse { emptyList() }
+
+        val name = resident?.fullName?.ifBlank { "Resident" } ?: "Resident"
+        val verification = resident?.verificationStatus?.toString()?.replace('_', ' ')?.lowercase(Locale.US) ?: "unknown"
+        val reportStatus = latestReport?.status?.toString()?.replace('_', ' ')?.lowercase(Locale.US) ?: "no submitted report"
+        val reportType = latestReport?.type?.ifBlank { "Emergency" } ?: "Emergency"
+        val locationSource = when {
+            currentLocation != null -> "current device location"
+            latestReportLocation != null -> "latest emergency report location"
+            else -> "default Antipolo monitoring point"
+        }
+        val reportLocationText = when {
+            currentLocation != null -> "lat ${currentLocation.first}, lng ${currentLocation.second}"
+            latestReportLocation != null -> "lat ${latestReportLocation.first}, lng ${latestReportLocation.second}"
+            else -> "no precise location available"
+        }
+
+        return buildString {
+            appendLine("RESIDENT CONTEXT:")
+            appendLine("- Resident: $name")
+            appendLine("- Verification status: $verification")
+            appendLine("- Latest emergency report: $reportType — status $reportStatus")
+            appendLine("- Resident location source: $locationSource")
+            appendLine("- Resident location: $reportLocationText")
+            if (nearestArea != null) {
+                appendLine("- Nearest evacuation area: ${nearestArea.name} (${nearestArea.address}) — ${String.format(Locale.US, "%.1f", nearestAreaDistanceKm(referenceLat, referenceLng, nearestArea.latitude, nearestArea.longitude))} km away")
+            } else {
+                appendLine("- Nearest evacuation area: no evacuation area available in the database")
+            }
+            if (nearbyReports.isNotEmpty()) {
+                appendLine("- Nearby emergency reports: ${nearbyReports.size} report(s) within 5 km of the resident's current reference location")
+            } else {
+                appendLine("- Nearby emergency reports: none within 5 km of the resident's current reference location")
+            }
+        }
+    }
+
     private fun alertsBlock(): String {
         val alerts = runCatching { fetchLatestAlerts() }.getOrElse { error ->
             Log.w(TAG, "Failed to load alerts: ${error.message}")
@@ -292,6 +391,23 @@ object ResilioLiveContext {
                 if (alert.evacuationCenter.isNotBlank()) appendLine("   Evacuation center: ${alert.evacuationCenter}")
                 appendLine("   Details: ${trimBody(alert.content)}")
             }
+        }
+    }
+
+    private fun forecastBlock(): String {
+        val forecast = runCatching { fetchWeatherForecast() }.getOrElse { error ->
+            Log.w(TAG, "Failed to load weather forecast: ${error.message}")
+            return "WEATHER FORECAST: Unable to load right now."
+        }
+
+        if (forecast == null) {
+            return "WEATHER FORECAST: Not available right now."
+        }
+
+        return buildString {
+            appendLine("WEATHER FORECAST (resident area):")
+            appendLine("- Next 6 hours: ${forecast.hourly.joinToString(" | ")}")
+            appendLine("- Next 5 days: ${forecast.daily.joinToString(" | ")}")
         }
     }
 
@@ -332,6 +448,104 @@ object ResilioLiveContext {
             .sortedByDescending { it.safeTimestamp }
             .take(MAX_ITEMS)
     }
+
+    private fun fetchNearestEvacuationArea(lat: Double, lng: Double): EvacuationArea? {
+        val snapshot = Tasks.await(
+            FirebaseFirestore.getInstance()
+                .collection("evacuation_areas")
+                .get(),
+            QUERY_TIMEOUT_SEC,
+            TimeUnit.SECONDS,
+        )
+        return snapshot.toObjects(EvacuationArea::class.java)
+            .filter { it.latitude != 0.0 || it.longitude != 0.0 }
+            .minByOrNull { nearestAreaDistanceKm(lat, lng, it.latitude, it.longitude) }
+    }
+
+    private fun fetchNearbyResidentReports(lat: Double, lng: Double): List<EmergencyReport> {
+        val snapshot = Tasks.await(
+            FirebaseFirestore.getInstance()
+                .collection("emergency_reports")
+                .get(),
+            QUERY_TIMEOUT_SEC,
+            TimeUnit.SECONDS,
+        )
+        return snapshot.toObjects(EmergencyReport::class.java)
+            .filter { it.latitude != 0.0 || it.longitude != 0.0 }
+            .filter { nearestAreaDistanceKm(lat, lng, it.latitude, it.longitude) <= 5.0 }
+            .sortedByDescending { it.safeTimestamp }
+            .take(3)
+    }
+
+    private fun nearestAreaDistanceKm(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+        val result = FloatArray(1)
+        android.location.Location.distanceBetween(lat1, lng1, lat2, lng2, result)
+        return result[0] / 1000.0
+    }
+
+    private fun fetchWeatherForecast(): ForecastSnapshot? {
+        val url = "https://api.open-meteo.com/v1/forecast?latitude=$WEATHER_LAT&longitude=$WEATHER_LON" +
+            "&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=5&timezone=auto"
+        val request = Request.Builder().url(url).build()
+        val response = httpClient.newCall(request).execute()
+        if (!response.isSuccessful) return null
+        val jsonObject = JSONObject(response.body?.string().orEmpty())
+
+        val hourlyObj = jsonObject.optJSONObject("hourly") ?: return null
+        val dailyObj = jsonObject.optJSONObject("daily") ?: return null
+
+        val hourlyTimes = hourlyObj.optJSONArray("time") ?: return null
+        val hourlyTemps = hourlyObj.optJSONArray("temperature_2m") ?: return null
+        val hourlyCodes = hourlyObj.optJSONArray("weather_code") ?: return null
+        val hourlyRain = hourlyObj.optJSONArray("precipitation_probability") ?: return null
+
+        val dailyTimes = dailyObj.optJSONArray("time") ?: return null
+        val dailyHigh = dailyObj.optJSONArray("temperature_2m_max") ?: return null
+        val dailyLow = dailyObj.optJSONArray("temperature_2m_min") ?: return null
+        val dailyRain = dailyObj.optJSONArray("precipitation_probability_max") ?: return null
+        val dailyCodes = dailyObj.optJSONArray("weather_code") ?: return null
+
+        val hourlySummary = mutableListOf<String>()
+        val hourlyFormatter = java.text.SimpleDateFormat("MMM d, h a", Locale.US)
+        hourlyFormatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        for (i in 0 until minOf(hourlyTimes.length(), 6)) {
+            val timeStr = hourlyTimes.getString(i)
+            val hourLabel = try {
+                val date = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US).parse(timeStr)
+                if (date != null) hourlyFormatter.format(date) else timeStr
+            } catch (_: Exception) {
+                timeStr
+            }
+            val temp = hourlyTemps.optDouble(i, 0.0)
+            val code = hourlyCodes.optInt(i, 0)
+            val rain = hourlyRain.optInt(i, 0)
+            hourlySummary.add("$hourLabel: ${temp.toInt()}°C, ${weatherDescription(code)}, $rain% rain")
+        }
+
+        val dailySummary = mutableListOf<String>()
+        val dayFormatter = java.text.SimpleDateFormat("EEE", Locale.US)
+        dayFormatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        for (i in 0 until minOf(dailyTimes.length(), 5)) {
+            val dayLabel = try {
+                val date = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dailyTimes.getString(i))
+                if (date != null) dayFormatter.format(date) else dailyTimes.getString(i)
+            } catch (_: Exception) {
+                dailyTimes.getString(i)
+            }
+            val high = dailyHigh.optDouble(i, 0.0)
+            val low = dailyLow.optDouble(i, 0.0)
+            val rain = dailyRain.optInt(i, 0)
+            val code = dailyCodes.optInt(i, 0)
+            dailySummary.add("$dayLabel: ${high.toInt()}°/${low.toInt()}°, ${weatherDescription(code)}, $rain% rain")
+        }
+
+        return ForecastSnapshot(hourlySummary, dailySummary)
+    }
+
+    private data class ForecastSnapshot(
+        val hourly: List<String>,
+        val daily: List<String>,
+    )
 
     private fun fetchLatestAnnouncements(): List<Announcement> {
         val snapshot = Tasks.await(

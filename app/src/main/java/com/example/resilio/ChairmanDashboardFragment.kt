@@ -60,6 +60,10 @@ class ChairmanDashboardFragment : Fragment(R.layout.fragment_chairman_dashboard)
             findNavController().navigate(R.id.action_chairmanDashboardFragment_to_aiChatFragment)
         }
 
+        binding.btnHazardPrediction.setOnClickListener {
+            findNavController().navigate(R.id.action_chairmanDashboardFragment_to_hazardPredictionFragment)
+        }
+
         setupStatusPager()
         startDataRefreshLoop()
 

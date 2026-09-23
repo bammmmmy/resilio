@@ -86,7 +86,15 @@
         <action
             android:id="@+id/action_homeFragment_to_disasterAlertsFragment"
             app:destination="@id/disasterAlertsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_hazardPredictionFragment"
+            app:destination="@id/hazardPredictionFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/hazardPredictionFragment"
+        android:name="com.example.resilio.HazardPredictionFragment"
+        android:label="AI Hazard Prediction" />
 
     <fragment
         android:id="@+id/weatherDetailFragment"
@@ -132,6 +140,9 @@
         <action
             android:id="@+id/action_bdrrmoDashboardFragment_to_archivedItemsFragment"
             app:destination="@id/archivedItemsFragment" />
+        <action
+            android:id="@+id/action_bdrrmoDashboardFragment_to_hazardPredictionFragment"
+            app:destination="@id/hazardPredictionFragment" />
     </fragment>
 
     <fragment
@@ -162,6 +173,9 @@
         <action
             android:id="@+id/action_chairmanDashboardFragment_to_archivedItemsFragment"
             app:destination="@id/archivedItemsFragment" />
+        <action
+            android:id="@+id/action_chairmanDashboardFragment_to_hazardPredictionFragment"
+            app:destination="@id/hazardPredictionFragment" />
     </fragment>
 
     <fragment

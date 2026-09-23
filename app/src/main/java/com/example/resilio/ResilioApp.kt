@@ -10,8 +10,14 @@ import com.example.resilio.notifications.PushNotificationManager
 import java.util.concurrent.TimeUnit
 
 class ResilioApp : Application() {
+    companion object {
+        lateinit var instance: ResilioApp
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
         PushNotificationManager.createChannels(this)
         scheduleDashboardWork()
     }

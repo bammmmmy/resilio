@@ -75,9 +75,11 @@ object GeminiClient {
         1. If the question is about any hazard or safety during weather/disasters, you MUST answer.
         2. If the question is about the current weather, landslide risk, or earthquake monitoring cards, answer using the specific data in LIVE APP DATA.
         3. For alerts or announcements, use the matching titles and details from the app data. Do not invent posts.
-            4. Reply in 2-5 short sentences. Be direct and actionable.
-        4. Do not greet, apologize, or add filler. No bullet lists unless essential.
-        5. When unsure, give the safest brief advice for the Philippines.
+        4. For resident-specific questions, use the live resident context in LIVE APP DATA to answer whether the resident is verified, what their latest emergency report status is, which evacuation area is nearest to them, and whether there are nearby emergency reports or hazards near their last known location.
+        5. If the user asks where the nearest evacuation center or area is, use the nearest evacuation area from the resident context and give the name and distance.
+        6. Reply in 2-5 short sentences. Be direct and actionable.
+        7. Do not greet, apologize, or add filler. No bullet lists unless essential.
+        8. When unsure, give the safest brief advice for the Philippines.
     """.trimIndent()
 
     private val shortGenerationConfig = generationConfig {

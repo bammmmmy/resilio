@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.resilio.model.Announcement
 import com.example.resilio.model.AnnouncementStatus
 import com.example.resilio.model.EmergencyAlert
+import com.example.resilio.model.HazardType
 import com.example.resilio.model.UserRole
 import com.example.resilio.util.ProfileManager
 import com.google.android.material.button.MaterialButton
@@ -30,6 +31,8 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
     private var alertsListener: ListenerRegistration? = null
     private var currentUserRole: UserRole? = null
     private var alertsAdapter: AnnouncementAdapter? = null
+    private var allMappedAlerts: List<Announcement> = emptyList()
+    private val selectedHazardTypes = mutableSetOf<HazardType>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,6 +42,10 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
         val btnViewArchive = view.findViewById<MaterialButton>(R.id.btn_view_archive)
         val adminActions = view.findViewById<View>(R.id.layout_admin_actions)
         val btnCreateAlert = view.findViewById<MaterialButton>(R.id.btn_create_alert)
+        val btnFilterAlerts = view.findViewById<MaterialButton>(R.id.btn_filter_alerts)
+
+        btnFilterAlerts.setOnClickListener { showHazardFilterDialog(tvEmpty) }
+        updateFilterButtonLabel()
         
         rv.layoutManager = LinearLayoutManager(requireContext())
 
@@ -84,29 +91,77 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                 }
                     .sortedByDescending { it.safeTimestamp }
                 
-                if (alerts.isEmpty()) {
-                    tvEmpty.visibility = View.VISIBLE
-                    rv.visibility = View.GONE
+                val mapped = alerts.map {
+                    Announcement(
+                        id = it.id,
+                        title = it.title,
+                        content = it.safeContent,
+                        type = it.type,
+                        status = it.status,
+                        authorUid = it.authorUid,
+                        timestamp = it.safeTimestamp,
+                        affectedAreas = it.affectedAreas,
+                        evacuationCenter = it.evacuationCenter
+                    )
+                }
+                allMappedAlerts = mapped
+                applyAlertFilter(tvEmpty, rv)
+            }
+    }
+
+    private fun showHazardFilterDialog(tvEmpty: TextView) {
+        val hazardTypes = HazardType.values()
+        val checkedItems = BooleanArray(hazardTypes.size) { index ->
+            selectedHazardTypes.contains(hazardTypes[index])
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Filter alerts by hazard type")
+            .setMultiChoiceItems(hazardTypes.map { it.name.replace("_", " ").lowercase().replaceFirstChar { ch -> ch.uppercase() } }.toTypedArray(), checkedItems) { _, which, isChecked ->
+                val chosenType = hazardTypes[which]
+                if (isChecked) {
+                    selectedHazardTypes.add(chosenType)
                 } else {
-                    tvEmpty.visibility = View.GONE
-                    rv.visibility = View.VISIBLE
-                    
-                    val mapped = alerts.map { 
-                        Announcement(
-                            id = it.id,
-                            title = it.title,
-                            content = it.safeContent,
-                            type = it.type,
-                            status = it.status,
-                            authorUid = it.authorUid,
-                            timestamp = it.safeTimestamp,
-                            affectedAreas = it.affectedAreas,
-                            evacuationCenter = it.evacuationCenter
-                        )
-                    }
-                    alertsAdapter?.updateItems(mapped)
+                    selectedHazardTypes.remove(chosenType)
                 }
             }
+            .setNeutralButton("Reset") { _, _ ->
+                selectedHazardTypes.clear()
+                updateFilterButtonLabel()
+                applyAlertFilter(tvEmpty, requireView().findViewById(R.id.rvAlerts))
+            }
+            .setPositiveButton("Apply") { _, _ ->
+                updateFilterButtonLabel()
+                applyAlertFilter(tvEmpty, requireView().findViewById(R.id.rvAlerts))
+            }
+            .show()
+    }
+
+    private fun applyAlertFilter(tvEmpty: TextView, rv: RecyclerView) {
+        val filtered = if (selectedHazardTypes.isEmpty()) {
+            allMappedAlerts
+        } else {
+            allMappedAlerts.filter { it.type in selectedHazardTypes }
+        }
+
+        if (filtered.isEmpty()) {
+            tvEmpty.visibility = View.VISIBLE
+            rv.visibility = View.GONE
+            alertsAdapter?.updateItems(emptyList())
+        } else {
+            tvEmpty.visibility = View.GONE
+            rv.visibility = View.VISIBLE
+            alertsAdapter?.updateItems(filtered)
+        }
+    }
+
+    private fun updateFilterButtonLabel() {
+        val filterButton = view?.findViewById<MaterialButton>(R.id.btn_filter_alerts) ?: return
+        filterButton.text = if (selectedHazardTypes.isEmpty()) {
+            "Filter: All"
+        } else {
+            "Filter: ${selectedHazardTypes.joinToString(", ") { it.name.lowercase().replaceFirstChar { ch -> ch.uppercase() } }}"
+        }
     }
 
     private fun confirmArchive(announcement: Announcement) {
