@@ -39,6 +39,6 @@ data class Announcement(
     val safeContent: String
         get() = content.ifEmpty { message ?: "" }
 
-    val safeTimestamp: Timestamp
-        get() = timestamp ?: createdAt ?: Timestamp.now()
+    val safeTimestamp: Timestamp?
+        get() = timestamp ?: createdAt
 }

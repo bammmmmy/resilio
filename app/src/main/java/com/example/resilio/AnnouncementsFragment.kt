@@ -27,6 +27,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private var currentUserRole: UserRole? = null
+    private var announcementsAdapter: AnnouncementAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,6 +38,15 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
         
         lifecycleScope.launch {
             currentUserRole = ProfileManager.getProfile(requireContext()).first().role
+            announcementsAdapter = AnnouncementAdapter(emptyList(),
+                onItemClick = { announcement -> navigateToDetail(announcement) },
+                onEdit = { announcement -> navigateToEdit(announcement) },
+                onDelete = { announcement -> confirmDelete(announcement, false) },
+                onArchive = { announcement -> confirmArchive(announcement, false) },
+                currentUserId = auth.currentUser?.uid,
+                userRole = currentUserRole
+            )
+            binding.rvAnnouncements.adapter = announcementsAdapter
             
             if (currentUserRole == UserRole.CHAIRMAN || currentUserRole == UserRole.BDRRMO) {
                 binding.btnViewArchive.visibility = View.VISIBLE
@@ -60,23 +70,7 @@ class AnnouncementsFragment : Fragment(R.layout.fragment_announcements) {
             } else {
                 binding.tvEmptyAnnouncements.visibility = View.GONE
                 binding.rvAnnouncements.visibility = View.VISIBLE
-                binding.rvAnnouncements.adapter = AnnouncementAdapter(
-                    list,
-                    onItemClick = { announcement ->
-                        navigateToDetail(announcement)
-                    },
-                    onEdit = { announcement ->
-                        navigateToEdit(announcement)
-                    },
-                    onDelete = { announcement ->
-                        confirmDelete(announcement, false)
-                    },
-                    onArchive = { announcement ->
-                        confirmArchive(announcement, false)
-                    },
-                    currentUserId = auth.currentUser?.uid,
-                    userRole = currentUserRole
-                )
+                announcementsAdapter?.updateItems(list)
             }
         }
     }

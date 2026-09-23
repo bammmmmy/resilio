@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.resilio.util.TimeUtils
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,8 +19,23 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object DashboardUIHelper {
+
+    private fun formatRainfall24hText(rain: Double): String {
+        return String.format(Locale.US, "Rainfall: %.1f mm / 24h", rain)
+    }
+
+    private fun calculateRollingRain24h(currentTime: String?, hourlyTimes: org.json.JSONArray?, hourlyRain: org.json.JSONArray?): Double {
+        if (currentTime.isNullOrBlank() || hourlyTimes == null || hourlyRain == null || hourlyTimes.length() == 0) return 0.0
+        val currentIndex = (0 until hourlyTimes.length()).firstOrNull { hourlyTimes.getString(it) == currentTime } ?: (hourlyTimes.length() - 1).coerceAtLeast(0)
+        val start = (currentIndex - 23).coerceAtLeast(0)
+        return (start..currentIndex).sumOf { hourlyRain.optDouble(it, 0.0) }
+    }
 
     fun fetchWeather(
         context: Context,
@@ -34,12 +50,41 @@ object DashboardUIHelper {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                val shared = getSharedWeather()
+                if (shared != null) {
+                    val current = shared.getJSONObject("current")
+                    val hourly = shared.optJSONObject("hourly")
+                    val rain24h = if (hourly != null) {
+                        calculateRollingRain24h(current.optString("time"), hourly.optJSONArray("time"), hourly.optJSONArray("precipitation"))
+                    } else {
+                        shared.optDouble("rain24h", 0.0)
+                    }
+                    val snap = WeatherSnapshot(
+                        tempC = current.getDouble("temperature_2m"),
+                        humidity = current.getInt("relative_humidity_2m"),
+                        currentPrecipIntensity = current.getDouble("precipitation"),
+                        windSpeed = current.getDouble("wind_speed_10m"),
+                        windGusts = current.getDouble("wind_gusts_10m"),
+                        code = current.getInt("weather_code"),
+                        rain24h = rain24h,
+                        precipProb = shared.optInt("precipProbability", 0),
+                        apiTimeStr = current.getString("time"),
+                        fetchedAtMillis = System.currentTimeMillis(),
+                    )
+                    WeatherCache.snapshot = snap
+                    withContext(Dispatchers.Main) {
+                        DashboardNotificationHelper.notifyIfNecessary(context)
+                        onComplete()
+                    }
+                    return@launch
+                }
+
                 val client = OkHttpClient()
                 val lat = 14.5845
                 val lon = 121.1754
                 val url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                        "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m" +
-                        "&hourly=precipitation,precipitation_probability&daily=precipitation_sum&timezone=Asia%2FSingapore"
+                    "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m" +
+                    "&hourly=precipitation,precipitation_probability&daily=precipitation_sum&past_days=1&forecast_days=7&timezone=Asia%2FSingapore"
 
                 val response = client.newCall(Request.Builder().url(url).build()).execute()
                 val json = response.body?.string() ?: return@launch
@@ -48,29 +93,21 @@ object DashboardUIHelper {
                 val hourly = root.getJSONObject("hourly")
                 
                 val apiTime = current.getString("time")
-                val currentTimeStr = apiTime.substring(0, 13) + ":00"
                 val times = hourly.getJSONArray("time")
                 val probs = hourly.getJSONArray("precipitation_probability")
                 val hourlyPrecip = hourly.getJSONArray("precipitation")
-                
+
                 var currentPrecipProb = 0
                 var currentIndex = -1
                 for (i in 0 until times.length()) {
-                    if (times.getString(i).startsWith(currentTimeStr)) {
+                    if (times.getString(i) == apiTime) {
                         currentPrecipProb = probs.getInt(i)
                         currentIndex = i
                         break
                     }
                 }
 
-                // Rolling 24h total calculation
-                var rollingRain24h = 0.0
-                if (currentIndex != -1) {
-                    val start = (currentIndex - 23).coerceAtLeast(0)
-                    for (i in start..currentIndex) {
-                        rollingRain24h += hourlyPrecip.getDouble(i)
-                    }
-                }
+                val rollingRain24h = calculateRollingRain24h(apiTime, times, hourlyPrecip)
 
                 val snap = WeatherSnapshot(
                     tempC = current.getDouble("temperature_2m"),
@@ -96,6 +133,21 @@ object DashboardUIHelper {
             }
         }
     }
+
+    private suspend fun getSharedWeather(): JSONObject? = suspendCoroutine { continuation ->
+        Thread {
+            try {
+                val response = OkHttpClient().newCall(Request.Builder().url(WEATHER_ENDPOINT).build()).execute()
+                if (!response.isSuccessful) throw IllegalStateException("Shared weather request failed")
+                val payload = JSONObject(response.body?.string() ?: throw IllegalStateException("Empty shared weather response"))
+                continuation.resume(payload)
+            } catch (_: Exception) {
+                continuation.resume(null)
+            }
+        }.start()
+    }
+
+    private const val WEATHER_ENDPOINT = "https://us-central1-resilio-ab61f.cloudfunctions.net/getWeatherSnapshot"
 
     fun fetchEarthquakeData(
         context: Context,
@@ -155,7 +207,7 @@ object DashboardUIHelper {
         view.findViewById<View>(R.id.layout_weather_loading).visibility = View.GONE
         view.findViewById<View>(R.id.layout_weather_content).visibility = View.VISIBLE
 
-        val tempText = "${snap.tempC.toInt()}°C"
+        val tempText = "${snap.tempC.roundToInt()}°C"
         view.findViewById<TextView>(R.id.tv_weather_temp).text = tempText
         
         val condition = WeatherCache.getConditionName(snap.code)
@@ -185,7 +237,9 @@ object DashboardUIHelper {
         view.findViewById<TextView>(R.id.tv_weather_humidity).text = "Humidity   ${snap.humidity}%"
         view.findViewById<TextView>(R.id.tv_weather_wind).text = "Wind speed   ${String.format(Locale.US, "%.1f", snap.windSpeed)} km/h"
         view.findViewById<TextView>(R.id.tv_weather_precip).text = "Precipitation   ${String.format(Locale.US, "%.1f", snap.currentPrecipIntensity)} mm"
-        view.findViewById<TextView>(R.id.tv_rain_24h).text = String.format(Locale.US, "24h Rain: %.1f mm", snap.rain24h)
+        val rain24hText = view.findViewById<TextView>(R.id.tv_rain_24h)
+        rain24hText.visibility = View.VISIBLE
+        rain24hText.text = formatRainfall24hText(snap.rain24h)
 
         val intensityTv = view.findViewById<TextView>(R.id.tv_rain_intensity)
         if (snap.currentPrecipIntensity > 0) {
@@ -203,8 +257,8 @@ object DashboardUIHelper {
         view.findViewById<View>(R.id.layout_weather_container).setBackgroundColor(Color.parseColor("#F7FBFF"))
         headerView?.setBackgroundResource(R.drawable.bg_dashboard_header)
 
-        view.findViewById<ImageView>(R.id.iv_weather_icon).setImageResource(R.drawable.ic_weather_cloud)
-        view.findViewById<ImageView>(R.id.iv_weather_icon).clearColorFilter()
+        view.findViewById<ImageView>(R.id.iv_weather_icon).setImageResource(WeatherCache.getIcon(snap.code))
+        view.findViewById<ImageView>(R.id.iv_weather_icon).setColorFilter(Color.WHITE)
     }
 
     fun updateLandslideUI(view: View, snap: WeatherSnapshot) {
@@ -215,7 +269,7 @@ object DashboardUIHelper {
         view.findViewById<TextView>(R.id.tv_landslide_status).text = risk
         view.findViewById<TextView>(R.id.tv_landslide_desc).text = "Based on rainfall & soil condition"
         
-        view.findViewById<TextView>(R.id.tv_24h_rainfall).text = String.format(Locale.US, "Rainfall: %.1f mm / 24h", rain)
+        view.findViewById<TextView>(R.id.tv_24h_rainfall).text = formatRainfall24hText(rain)
         
         val saturation = when {
             else -> assessment.saturation

@@ -27,7 +27,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             if (result == null) return@observe
 
             result.onSuccess {
-                Toast.makeText(requireContext(), "Registration successful!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Registration successful! Please verify your email before logging in.", Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
             }.onFailure {
                 Toast.makeText(requireContext(), "Registration failed: ${it.message}", Toast.LENGTH_SHORT).show()

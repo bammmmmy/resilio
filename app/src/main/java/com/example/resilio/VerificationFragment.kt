@@ -1,6 +1,7 @@
 package com.example.resilio
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,6 +15,7 @@ import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.resilio.databinding.FragmentVerificationBinding
 import com.example.resilio.model.User
 import com.example.resilio.model.VerificationStatus
@@ -22,6 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class VerificationFragment : Fragment(R.layout.fragment_verification) {
 
@@ -45,6 +50,8 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentVerificationBinding.bind(view)
+
+        binding.etBirthday.setOnClickListener { showBirthdayPicker() }
 
         checkCurrentVerificationStatus()
 
@@ -77,15 +84,41 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
     private fun handleImageResult(uri: Uri) {
         if (isPickingFront) {
             frontUri = uri
-            binding.ivIdFront.setImageURI(uri)
             binding.ivIdFront.setPadding(0, 0, 0, 0)
             binding.ivIdFront.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            Glide.with(this).load(uri).into(binding.ivIdFront)
         } else {
             backUri = uri
-            binding.ivIdBack.setImageURI(uri)
             binding.ivIdBack.setPadding(0, 0, 0, 0)
             binding.ivIdBack.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            Glide.with(this).load(uri).into(binding.ivIdBack)
         }
+    }
+
+    private fun showBirthdayPicker() {
+        val calendar = Calendar.getInstance()
+        val existingBirthday = binding.etBirthday.text?.toString().orEmpty()
+        if (existingBirthday.isNotBlank()) {
+            runCatching {
+                SimpleDateFormat("MM/dd/yyyy", Locale.US).parse(existingBirthday)?.let {
+                    calendar.time = it
+                }
+            }
+        }
+
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, day ->
+                binding.etBirthday.setText(
+                    String.format(Locale.US, "%02d/%02d/%04d", month + 1, day, year)
+                )
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.maxDate = System.currentTimeMillis()
+        }.show()
     }
 
     private fun checkCurrentVerificationStatus() {
@@ -100,8 +133,21 @@ class VerificationFragment : Fragment(R.layout.fragment_verification) {
                 if (user.sex == "Male") binding.toggleSex.check(R.id.btnMale)
                 else if (user.sex == "Female") binding.toggleSex.check(R.id.btnFemale)
 
-                if (user.verificationStatus == VerificationStatus.PENDING ||
-                    user.verificationStatus == VerificationStatus.APPROVED
+                if (!user.idImageUrl.isNullOrBlank()) {
+                    binding.ivIdFront.setPadding(0, 0, 0, 0)
+                    binding.ivIdFront.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                    Glide.with(this).load(user.idImageUrl).into(binding.ivIdFront)
+                }
+                if (!user.idBackImageUrl.isNullOrBlank()) {
+                    binding.ivIdBack.setPadding(0, 0, 0, 0)
+                    binding.ivIdBack.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                    Glide.with(this).load(user.idBackImageUrl).into(binding.ivIdBack)
+                }
+
+                val hasSubmittedId = !user.idImageUrl.isNullOrBlank() &&
+                    !user.idBackImageUrl.isNullOrBlank()
+                if (user.verificationStatus == VerificationStatus.APPROVED ||
+                    (user.verificationStatus == VerificationStatus.PENDING && hasSubmittedId)
                 ) {
                     findNavController().navigate(R.id.action_verificationFragment_to_homeFragment)
                 }

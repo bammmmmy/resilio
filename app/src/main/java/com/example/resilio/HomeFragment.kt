@@ -49,13 +49,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var weatherView: View? = null
     private var landslideView: View? = null
     private var earthquakeView: View? = null
+    private var latestAnnouncementsAdapter: LatestAnnouncementsHomeAdapter? = null
+    private var latestAlertsAdapter: LatestAlertsHomeAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
 
         loadHeaderProfile()
-
         setupStatusPager()
         setupNavigation()
         setupCallButtons()
@@ -90,7 +91,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         .setTitle("Verification Required")
                         .setMessage(message)
                         .setPositiveButton("Verify Now") { _, _ ->
-                            findNavController().navigate(R.id.verificationFragment)
+                            if (status == VerificationStatus.PENDING) {
+                                findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+                            } else {
+                                findNavController().navigate(R.id.action_homeFragment_to_verificationFragment)
+                            }
                         }
                         .setNegativeButton("Maybe Later", null)
                         .show()
@@ -125,10 +130,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             onWeatherBind = { view -> 
                 weatherView = view
                 WeatherCache.snapshot?.let { DashboardUIHelper.updateWeatherUI(view, it, binding.layoutHeader) }
+                view.setOnClickListener {
+                    findNavController().navigate(R.id.action_homeFragment_to_weatherDetailFragment)
+                }
+                view.findViewById<View>(R.id.btn_weather_details).setOnClickListener {
+                    findNavController().navigate(R.id.action_homeFragment_to_weatherDetailFragment)
+                }
             },
             onLandslideBind = { view -> 
                 landslideView = view
                 WeatherCache.snapshot?.let { DashboardUIHelper.updateLandslideUI(view, it) }
+                view.setOnClickListener {
+                    findNavController().navigate(R.id.action_homeFragment_to_landslideRiskFragment)
+                }
             },
             onEarthquakeBind = { view ->
                 earthquakeView = view
@@ -141,6 +155,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun setupLatestAnnouncements() {
         binding.layoutLatestAnnouncements.rvLatestAnnouncements.layoutManager = LinearLayoutManager(requireContext())
+        latestAnnouncementsAdapter = LatestAnnouncementsHomeAdapter(emptyList()) { announcement ->
+            val bundle = Bundle().apply {
+                putString("id", announcement.id)
+                putString("title", announcement.title)
+                putString("content", announcement.content)
+                putString("authorUid", announcement.authorUid)
+                putString("affectedAreas", announcement.affectedAreas)
+                putString("evacuationCenter", announcement.evacuationCenter)
+                putBoolean("isAlert", false)
+                putString("status", announcement.status.name)
+            }
+            findNavController().navigate(R.id.announcementDetailFragment, bundle)
+        }
+        binding.layoutLatestAnnouncements.rvLatestAnnouncements.adapter = latestAnnouncementsAdapter
         
         announcementsListener = FirebaseFirestore.getInstance().collection("announcements")
             .addSnapshotListener { value, error ->
@@ -159,19 +187,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 } else {
                     binding.layoutLatestAnnouncements.rvLatestAnnouncements.visibility = View.VISIBLE
                     binding.layoutLatestAnnouncements.tvEmptyAnnouncements.visibility = View.GONE
-                    binding.layoutLatestAnnouncements.rvLatestAnnouncements.adapter = LatestAnnouncementsHomeAdapter(announcements) { announcement ->
-                        val bundle = Bundle().apply {
-                            putString("id", announcement.id)
-                            putString("title", announcement.title)
-                            putString("content", announcement.content)
-                            putString("authorUid", announcement.authorUid)
-                            putString("affectedAreas", announcement.affectedAreas)
-                            putString("evacuationCenter", announcement.evacuationCenter)
-                            putBoolean("isAlert", false)
-                            putString("status", announcement.status.name)
-                        }
-                        findNavController().navigate(R.id.announcementDetailFragment, bundle)
-                    }
+                    latestAnnouncementsAdapter?.updateItems(announcements)
                 }
             }
 
@@ -182,6 +198,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun setupLatestAlerts() {
         binding.layoutLatestAlerts.rvLatestAlerts.layoutManager = LinearLayoutManager(requireContext())
+        latestAlertsAdapter = LatestAlertsHomeAdapter(emptyList()) { alert ->
+            val bundle = Bundle().apply {
+                putString("id", alert.id)
+                putString("title", alert.title)
+                putString("content", alert.safeContent)
+                putString("authorUid", alert.authorUid)
+                putString("affectedAreas", alert.affectedAreas)
+                putString("evacuationCenter", alert.evacuationCenter)
+                putBoolean("isAlert", true)
+                putString("hazardType", alert.type.name)
+                putString("status", alert.status.name)
+            }
+            findNavController().navigate(R.id.announcementDetailFragment, bundle)
+        }
+        binding.layoutLatestAlerts.rvLatestAlerts.adapter = latestAlertsAdapter
         
         alertsListener = FirebaseFirestore.getInstance().collection("emergency_alerts")
             .addSnapshotListener { value, _ ->
@@ -200,20 +231,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 } else {
                     binding.layoutLatestAlerts.rvLatestAlerts.visibility = View.VISIBLE
                     binding.layoutLatestAlerts.tvEmptyAlerts.visibility = View.GONE
-                    binding.layoutLatestAlerts.rvLatestAlerts.adapter = LatestAlertsHomeAdapter(alerts) { alert ->
-                        val bundle = Bundle().apply {
-                            putString("id", alert.id)
-                            putString("title", alert.title)
-                            putString("content", alert.safeContent)
-                            putString("authorUid", alert.authorUid)
-                            putString("affectedAreas", alert.affectedAreas)
-                            putString("evacuationCenter", alert.evacuationCenter)
-                            putBoolean("isAlert", true)
-                            putString("hazardType", alert.type.name)
-                            putString("status", alert.status.name)
-                        }
-                        findNavController().navigate(R.id.announcementDetailFragment, bundle)
-                    }
+                    latestAlertsAdapter?.updateItems(alerts)
                 }
             }
 

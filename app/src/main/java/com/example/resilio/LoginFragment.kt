@@ -41,11 +41,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         viewModel.userState.observe(viewLifecycleOwner) { result ->
             if (result == null) return@observe
-            
+
             result.onSuccess { user ->
                 navigateToDashboard(user)
             }.onFailure {
-                Toast.makeText(requireContext(), "Login failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                val message = it.message ?: "Login failed"
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -61,6 +62,26 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
 
+        binding.tvResendEmail.apply {
+            visibility = View.VISIBLE
+            text = "Forgot password?"
+            setOnClickListener {
+                val email = binding.etEmail.text.toString().trim()
+                if (email.isEmpty()) {
+                    Toast.makeText(requireContext(), "Please enter your email address to reset your password.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                viewModel.resetPassword(email) { result ->
+                    val message = result.fold(
+                        onSuccess = { "Password reset link sent to $email." },
+                        onFailure = { it.message ?: "Unable to send reset link." }
+                    )
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
         // Check if user is already logged in to prevent "auto-logout" on app restart
         viewModel.checkAuthState()
     }
@@ -72,7 +93,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 // Residence User Redirect
                 if (user.uid.startsWith("mock_") || 
                     user.verificationStatus == VerificationStatus.APPROVED ||
-                    user.verificationStatus == VerificationStatus.PENDING) {
+                    (user.verificationStatus == VerificationStatus.PENDING &&
+                        !user.idImageUrl.isNullOrBlank() &&
+                        !user.idBackImageUrl.isNullOrBlank())) {
                     findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 } else {
                     findNavController().navigate(R.id.action_loginFragment_to_verificationFragment)

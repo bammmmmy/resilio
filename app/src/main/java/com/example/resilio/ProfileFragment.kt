@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -71,6 +72,29 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         binding.layoutChairmanActions.visibility = View.GONE
                         binding.layoutBdrrmoActions.visibility = View.GONE
 
+                        val hasSubmittedId = !user.idImageUrl.isNullOrBlank() &&
+                            !user.idBackImageUrl.isNullOrBlank()
+                        val statusText = when {
+                            user.verificationStatus == com.example.resilio.model.VerificationStatus.APPROVED ->
+                                "Resident verification approved."
+                            user.verificationStatus == com.example.resilio.model.VerificationStatus.PENDING && hasSubmittedId ->
+                                "Resident verification pending. An admin is reviewing your ID."
+                            user.verificationStatus == com.example.resilio.model.VerificationStatus.REJECTED ->
+                                "Resident verification rejected. Reason: ${user.rejectionReason ?: "The submitted ID could not be verified."}"
+                            else -> "Resident verification not submitted. Submit your ID to report emergencies."
+                        }
+                        binding.tvResidentVerificationStatus.text = statusText
+                        binding.tvResidentVerificationStatus.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                if (user.verificationStatus == com.example.resilio.model.VerificationStatus.REJECTED) {
+                                    R.color.emergency_red
+                                } else {
+                                    R.color.text_primary
+                                }
+                            )
+                        )
+
                         when (user.verificationStatus) {
                             com.example.resilio.model.VerificationStatus.APPROVED -> {
                                 binding.btnVerifyAccount.text = "VERIFIED ACCOUNT"
@@ -83,6 +107,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                                 binding.btnVerifyAccount.isEnabled = false
                                 binding.btnVerifyAccount.setIconResource(R.drawable.ic_nav_placeholder)
                                 binding.btnVerifyAccount.alpha = 0.6f
+                            }
+                            com.example.resilio.model.VerificationStatus.REJECTED -> {
+                                binding.btnVerifyAccount.text = "RESUBMIT VERIFICATION"
+                                binding.btnVerifyAccount.isEnabled = true
+                                binding.btnVerifyAccount.setIconResource(R.drawable.ic_done)
+                                binding.btnVerifyAccount.alpha = 1.0f
                             }
                             else -> {
                                 binding.btnVerifyAccount.text = "VERIFY ACCOUNT"

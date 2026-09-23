@@ -10,6 +10,7 @@ import com.example.resilio.model.VerificationStatus
 import com.example.resilio.model.EmergencyReport
 import com.example.resilio.model.EmergencyAlert
 import com.example.resilio.model.ReportStatus
+import com.example.resilio.model.UserRole
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -105,8 +106,21 @@ class ChairmanViewModel : ViewModel() {
     fun listenToPendingResidents() {
         db.collection("users")
             .whereEqualTo("verificationStatus", VerificationStatus.PENDING)
-            .addSnapshotListener { value, _ ->
-                value?.toObjects(User::class.java)?.let { _pendingResidents.postValue(it) }
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    android.util.Log.e("ChairmanViewModel", "Listen pending residents failed.", error)
+                    return@addSnapshotListener
+                }
+
+                val submittedResidents = value?.toObjects(User::class.java)
+                    ?.filter { user ->
+                        user.role == UserRole.RESIDENT &&
+                            !user.idImageUrl.isNullOrBlank() &&
+                            !user.idBackImageUrl.isNullOrBlank()
+                    }
+                    ?: emptyList()
+
+                _pendingResidents.postValue(submittedResidents)
             }
     }
 

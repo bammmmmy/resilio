@@ -10,9 +10,14 @@ import com.example.resilio.model.Announcement
 import com.example.resilio.util.TimeUtils
 
 class LatestAnnouncementsHomeAdapter(
-    private val announcements: List<Announcement>,
+    private var announcements: List<Announcement>,
     private val onItemClick: (Announcement) -> Unit
 ) : RecyclerView.Adapter<LatestAnnouncementsHomeAdapter.ViewHolder>() {
+
+    fun updateItems(nextAnnouncements: List<Announcement>) {
+        announcements = nextAnnouncements
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvTitle)

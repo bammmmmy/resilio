@@ -13,13 +13,6 @@
         android:padding="32dp"
         android:gravity="center_horizontal">
 
-        <ImageView
-            android:layout_width="220dp"
-            android:layout_height="140dp"
-            android:src="@drawable/resilio_app_logo"
-            android:scaleType="fitCenter"
-            android:layout_marginBottom="16dp"/>
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

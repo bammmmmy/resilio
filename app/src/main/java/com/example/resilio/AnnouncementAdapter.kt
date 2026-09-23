@@ -13,7 +13,7 @@ import com.example.resilio.model.UserRole
 import com.example.resilio.util.TimeUtils
 
 class AnnouncementAdapter(
-    private val announcements: List<Announcement>,
+    private var announcements: List<Announcement>,
     private val onItemClick: ((Announcement) -> Unit)? = null,
     private val showActions: Boolean = false,
     private val onApprove: ((String) -> Unit)? = null,
@@ -26,6 +26,11 @@ class AnnouncementAdapter(
     private val userRole: UserRole? = null,
     private val managementCanEditAll: Boolean = false
 ) : RecyclerView.Adapter<AnnouncementAdapter.ViewHolder>() {
+
+    fun updateItems(nextAnnouncements: List<Announcement>) {
+        announcements = nextAnnouncements
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvTitle)

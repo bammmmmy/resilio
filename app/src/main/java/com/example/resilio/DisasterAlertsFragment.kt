@@ -29,6 +29,7 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
     private val db = FirebaseFirestore.getInstance()
     private var alertsListener: ListenerRegistration? = null
     private var currentUserRole: UserRole? = null
+    private var alertsAdapter: AnnouncementAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,6 +44,16 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
 
         lifecycleScope.launch {
             currentUserRole = ProfileManager.getProfile(requireContext()).first().role
+            alertsAdapter = AnnouncementAdapter(emptyList(),
+                onItemClick = { announcement -> navigateToDetail(announcement) },
+                onEdit = { announcement -> navigateToEdit(announcement) },
+                onDelete = { announcement -> confirmDelete(announcement) },
+                onArchive = { announcement -> confirmArchive(announcement) },
+                currentUserId = auth.currentUser?.uid,
+                userRole = currentUserRole,
+                managementCanEditAll = true
+            )
+            rv.adapter = alertsAdapter
             
             if (currentUserRole == UserRole.CHAIRMAN || currentUserRole == UserRole.BDRRMO) {
                 adminActions.visibility = View.VISIBLE
@@ -93,24 +104,7 @@ class DisasterAlertsFragment : Fragment(R.layout.fragment_disaster_alerts) {
                             evacuationCenter = it.evacuationCenter
                         )
                     }
-                    rv.adapter = AnnouncementAdapter(
-                        mapped,
-                        onItemClick = { announcement ->
-                            navigateToDetail(announcement)
-                        },
-                        onEdit = { announcement ->
-                            navigateToEdit(announcement)
-                        },
-                        onDelete = { announcement ->
-                            confirmDelete(announcement)
-                        },
-                        onArchive = { announcement ->
-                            confirmArchive(announcement)
-                        },
-                        currentUserId = auth.currentUser?.uid,
-                        userRole = currentUserRole,
-                        managementCanEditAll = true
-                    )
+                    alertsAdapter?.updateItems(mapped)
                 }
             }
     }

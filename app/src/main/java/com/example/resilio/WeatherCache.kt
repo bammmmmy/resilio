@@ -59,25 +59,42 @@ object WeatherCache {
     fun getConditionName(code: Int): String {
         return when (code) {
             0 -> "Clear Sky"
-            1, 2, 3 -> "Mainly Clear"
+            1 -> "Mainly clear"
+            2 -> "Partly cloudy"
+            3 -> "Overcast"
             45, 48 -> "Foggy"
-            51, 53, 55 -> "Drizzle"
-            61, 63, 65 -> "Rainy"
-            71, 73, 75 -> "Snowy"
-            77 -> "Snow Grains"
-            80, 81, 82 -> "Rain Showers"
-            85, 86 -> "Snow Showers"
+            51 -> "Light drizzle"
+            53 -> "Drizzle"
+            55 -> "Heavy drizzle"
+            61 -> "Light rain"
+            63 -> "Rain"
+            65 -> "Heavy rain"
+            71 -> "Light snow"
+            73 -> "Snow"
+            75 -> "Heavy snow"
+            77 -> "Snow grains"
+            80 -> "Light showers"
+            81 -> "Showers"
+            82 -> "Heavy showers"
+            85, 86 -> "Snow showers"
             95 -> "Thunderstorm"
-            96, 99 -> "Thunderstorm with Hail"
+            96, 99 -> "Thunderstorm"
             else -> "Unknown"
         }
     }
 
     fun getIcon(code: Int): Int {
         return when (code) {
-            0, 1 -> R.drawable.ic_cloud
-            2, 3 -> R.drawable.ic_cloud
-            else -> R.drawable.ic_alerts
+            0 -> R.drawable.ic_weather_sun
+            1 -> R.drawable.ic_weather_sun
+            2 -> R.drawable.ic_weather_partly_cloudy
+            3 -> R.drawable.ic_weather_cloud
+            45, 48 -> R.drawable.ic_weather_fog
+            51, 53, 55 -> R.drawable.ic_weather_drizzle
+            61, 63, 65, 80, 81, 82 -> R.drawable.ic_weather_rain
+            71, 73, 75, 77, 85, 86 -> R.drawable.ic_weather_snow
+            95, 96, 99 -> R.drawable.ic_weather_thunderstorm
+            else -> R.drawable.ic_weather_cloud
         }
     }
 

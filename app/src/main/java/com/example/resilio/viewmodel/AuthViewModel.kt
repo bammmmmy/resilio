@@ -13,7 +13,6 @@ class AuthViewModel : ViewModel() {
     val userState: LiveData<Result<User>?> = _userState
 
     fun login(email: String, pass: String) {
-        // Pass credentials as is to repository to support mock accounts like 'user', 'userhead', etc.
         repository.login(email, pass) { result ->
             _userState.postValue(result)
         }
@@ -27,10 +26,24 @@ class AuthViewModel : ViewModel() {
 
     fun checkAuthState() {
         val uid = repository.getCurrentUserUid()
-        if (uid != null) {
-            repository.getUserData(uid) { _userState.postValue(it) }
-        } else {
+        if (uid == null) {
             _userState.postValue(null)
+            return
+        }
+
+        val currentUser = repository.getCurrentFirebaseUser()
+        repository.getUserData(uid) { result ->
+            result.onSuccess { user ->
+                val isAdmin = user.role == com.example.resilio.model.UserRole.BDRRMO || user.role == com.example.resilio.model.UserRole.CHAIRMAN
+                if (currentUser != null && !isAdmin && !currentUser.isEmailVerified) {
+                    repository.logout()
+                    _userState.postValue(Result.failure(Exception("Please verify your email before logging in.")))
+                    return@getUserData
+                }
+                _userState.postValue(Result.success(user))
+            }.onFailure {
+                _userState.postValue(result)
+            }
         }
     }
 
@@ -41,6 +54,10 @@ class AuthViewModel : ViewModel() {
 
     fun updateProfile(user: User, onResult: (Result<Unit>) -> Unit) {
         repository.updateProfile(user, onResult)
+    }
+
+    fun resetPassword(email: String, onResult: (Result<Unit>) -> Unit) {
+        repository.resetPassword(email, onResult)
     }
 
     fun uploadProfileImage(uri: android.net.Uri, onResult: (Result<String>) -> Unit) {

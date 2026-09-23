@@ -76,7 +76,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:inputType="date"/>
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -135,7 +137,6 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_camera_alt"
-                app:tint="@color/text_secondary"
                 android:padding="48dp" />
         </com.google.android.material.card.MaterialCardView>
 
@@ -164,7 +165,6 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_camera_alt"
-                app:tint="@color/text_secondary"
                 android:padding="48dp" />
         </com.google.android.material.card.MaterialCardView>
 

@@ -11,9 +11,14 @@ import com.example.resilio.util.TimeUtils
 import android.graphics.drawable.GradientDrawable
 
 class LatestAlertsHomeAdapter(
-    private val alerts: List<EmergencyAlert>,
+    private var alerts: List<EmergencyAlert>,
     private val onItemClick: (EmergencyAlert) -> Unit
 ) : RecyclerView.Adapter<LatestAlertsHomeAdapter.ViewHolder>() {
+
+    fun updateItems(nextAlerts: List<EmergencyAlert>) {
+        alerts = nextAlerts
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvTitle)
